@@ -1,0 +1,17 @@
+{
+  "name": "@ecommerce/tests",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "tsx validation.ts",
+    "validate": "tsx validation.ts"
+  },
+  "dependencies": {
+    "@ecommerce/database": "workspace:*",
+    "axios": "^1.6.8"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.2"
+  }
+}

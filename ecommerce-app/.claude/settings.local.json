@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sudo systemctl status:*)",
+      "Bash(pnpm run:*)",
+      "Bash(sudo:*)",
+      "Bash(cat:*)",
+      "Bash(export:*)",
+      "Bash(export CORS_ORIGIN=\"http://80.225.231.66:3061\")",
+      "Bash(curl:*)",
+      "Bash(timeout 10 curl -m 5 http://80.225.231.66:3061)",
+      "Bash(timeout:*)",
+      "Bash(ss:*)",
+      "Bash(chmod:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
