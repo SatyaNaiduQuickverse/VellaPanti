@@ -22,6 +22,9 @@ export const useProducts = (filters?: ProductFilters) => {
         pagination: response.data.pagination,
       };
     },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
+    refetchOnWindowFocus: false, // Don't refetch on window focus
   });
 };
 
@@ -33,5 +36,8 @@ export const useProduct = (slug: string) => {
       return handleApiResponse<Product>(response);
     },
     enabled: !!slug,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+    refetchOnWindowFocus: false,
   });
 };

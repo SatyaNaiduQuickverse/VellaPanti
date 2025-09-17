@@ -1,11 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'path';
 import { config } from '@ecommerce/config';
 import { prisma } from '@ecommerce/database';
 import { setupMiddleware } from './middleware';
 import { setupRoutes } from './routes';
 import { errorHandler } from './middleware/errorHandler';
+import { emailService } from './services/emailService';
 
 const app = express();
 
@@ -18,15 +20,21 @@ async function startServer() {
     // Security middleware
     app.use(helmet());
     app.use(cors({
-      origin: config.server.corsOrigin,
+      origin: process.env.CORS_ORIGIN || 'http://80.225.231.66:3061',
       credentials: true,
     }));
+
+    // Static file serving for uploads
+    app.use('/uploads', express.static(path.join(process.cwd(), config.upload.uploadPath)));
 
     // Setup middleware
     setupMiddleware(app);
 
     // Setup routes
     setupRoutes(app);
+
+    // Test email service connection
+    // await emailService.testConnection();
 
     // Error handling middleware (must be last)
     app.use(errorHandler);

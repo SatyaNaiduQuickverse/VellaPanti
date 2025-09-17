@@ -104,13 +104,13 @@ export default function ProductPage({ params }: ProductPageProps) {
         <div className="space-y-4">
           <div className="aspect-square relative overflow-hidden rounded-lg border">
             <Image
-              src={product.images[selectedImage] || '/placeholder.jpg'}
+              src={product.images?.[selectedImage] || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=600&q=80'}
               alt={product.name}
               fill
-              className="object-cover"
+              className="object-cover hover:scale-105 transition-transform duration-500"
             />
             {hasDiscount && (
-              <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 text-sm font-semibold rounded">
+              <div className="absolute top-4 left-4 bg-primary text-black px-3 py-2 text-sm font-bold rounded-full">
                 {discountPercentage}% OFF
               </div>
             )}
@@ -242,11 +242,11 @@ export default function ProductPage({ params }: ProductPageProps) {
               <Button
                 onClick={handleAddToCart}
                 disabled={addToCart.isPending}
-                className="w-full"
+                className="w-full bg-black hover:bg-gray-800 text-white font-bold py-4 rounded-xl transition-colors text-lg"
                 size="lg"
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
-                {addToCart.isPending ? 'Adding to Cart...' : 'Add to Cart'}
+                {addToCart.isPending ? 'ADDING TO CART...' : 'ADD TO CART'}
               </Button>
             </div>
           )}

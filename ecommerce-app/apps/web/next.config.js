@@ -7,12 +7,8 @@ const nextConfig = {
   
   // ARM64 specific optimizations
   experimental: {
-    // Use SWC for faster compilation
-    forceSwcTransforms: true,
     // Optimize server components
     serverComponentsExternalPackages: ['@prisma/client', 'bcrypt'],
-    // Use faster resolver
-    esmExternals: 'loose',
     // Enable turbopack for dev (if available)
     turbo: {
       resolveExtensions: ['.mdx', '.tsx', '.ts', '.jsx', '.js', '.mjs', '.json']
@@ -53,7 +49,6 @@ const nextConfig = {
   transpilePackages: ['@ecommerce/ui', '@ecommerce/types'],
   
   images: {
-    domains: ['images.unsplash.com', 'localhost'],
     remotePatterns: [
       {
         protocol: 'https',

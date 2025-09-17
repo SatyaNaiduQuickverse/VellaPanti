@@ -6,6 +6,8 @@ import categoryRoutes from './categoryRoutes';
 import cartRoutes from './cartRoutes';
 import orderRoutes from './orderRoutes';
 import reviewRoutes from './reviewRoutes';
+import uploadRoutes from './uploadRoutes';
+import adminRoutes from './adminRoutes';
 
 export function setupRoutes(app: Express) {
   // API routes
@@ -16,6 +18,8 @@ export function setupRoutes(app: Express) {
   app.use('/api/cart', cartRoutes);
   app.use('/api/orders', orderRoutes);
   app.use('/api/reviews', reviewRoutes);
+  app.use('/api/uploads', uploadRoutes);
+  app.use('/api/admin', adminRoutes);
 
   // 404 handler for unmatched routes
   app.use('*', (req, res) => {

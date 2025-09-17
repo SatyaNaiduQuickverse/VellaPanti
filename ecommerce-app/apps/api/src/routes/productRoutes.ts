@@ -3,6 +3,8 @@ import {
   getProducts,
   getProductBySlug,
   getProductById,
+  searchProducts,
+  getCategoriesForFilter,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -14,6 +16,8 @@ import { productQuerySchema, createProductSchema, updateProductSchema } from '..
 const router = Router();
 
 router.get('/', validateQuery(productQuerySchema), getProducts);
+router.get('/search', searchProducts);
+router.get('/categories-filter', getCategoriesForFilter);
 router.get('/slug/:slug', getProductBySlug);
 router.get('/:id', getProductById);
 

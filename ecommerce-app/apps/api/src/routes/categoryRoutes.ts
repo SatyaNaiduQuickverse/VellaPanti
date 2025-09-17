@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   getCategories,
   getCategoryBySlug,
+  getCategoryProducts,
   createCategory,
   updateCategory,
   deleteCategory,
@@ -12,6 +13,7 @@ const router = Router();
 
 router.get('/', getCategories);
 router.get('/:slug', getCategoryBySlug);
+router.get('/:slug/products', getCategoryProducts);
 
 // Admin-only routes
 router.post('/', authenticateToken, requireAdmin, createCategory);

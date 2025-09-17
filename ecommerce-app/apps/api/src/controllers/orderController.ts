@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '@ecommerce/database';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
+import { emailService } from '../services/emailService';
 import type { AuthRequest } from '../middleware/auth';
 import type { CreateOrderRequest } from '@ecommerce/types';
 
@@ -174,6 +175,37 @@ export const createOrder = asyncHandler(async (req: AuthRequest, res: Response) 
     return newOrder;
   });
 
+  // Send order confirmation email
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, name: true },
+    });
+
+    if (user) {
+      await emailService.sendOrderConfirmation(user.email, {
+        customerName: user.name,
+        orderId: order.id,
+        orderTotal: order.total,
+        orderItems: order.items.map(item => ({
+          name: item.product.name,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        shippingAddress: {
+          street: order.shippingStreet,
+          city: order.shippingCity,
+          state: order.shippingState,
+          zipCode: order.shippingZipCode,
+          country: order.shippingCountry,
+        },
+      });
+    }
+  } catch (emailError) {
+    console.error('Failed to send order confirmation email:', emailError);
+    // Don't fail the order creation if email fails
+  }
+
   res.status(201).json({
     success: true,
     data: order,
@@ -202,6 +234,12 @@ export const updateOrderStatus = asyncHandler(async (req: AuthRequest, res: Resp
     where: { id },
     data: { status },
     include: {
+      user: {
+        select: {
+          email: true,
+          name: true,
+        },
+      },
       items: {
         include: {
           product: {
@@ -216,6 +254,19 @@ export const updateOrderStatus = asyncHandler(async (req: AuthRequest, res: Resp
       },
     },
   });
+
+  // Send order status update email
+  try {
+    await emailService.sendOrderStatusUpdate(
+      order.user.email,
+      order.user.name,
+      order.id,
+      status
+    );
+  } catch (emailError) {
+    console.error('Failed to send order status update email:', emailError);
+    // Don't fail the status update if email fails
+  }
 
   res.json({
     success: true,

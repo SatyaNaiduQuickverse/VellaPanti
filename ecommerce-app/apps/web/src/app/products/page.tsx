@@ -39,7 +39,8 @@ export default function ProductsPage() {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">Products</h1>
+        <h1 className="text-4xl md:text-5xl font-black mb-4 bg-gradient-to-r from-primary to-yellow-500 bg-clip-text text-transparent">All Products</h1>
+        <p className="text-gray-600 text-lg mb-6">Discover our complete collection of trendy fashion and lifestyle products</p>
         
         {/* Search and Filter Bar */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -47,17 +48,20 @@ export default function ProductsPage() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder="Search for your style..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
             />
           </div>
-          <Button onClick={handleSearch}>Search</Button>
+          <Button onClick={handleSearch} className="bg-black hover:bg-gray-800 text-white px-6 py-3 rounded-xl font-semibold">
+            Search
+          </Button>
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
+            className="border-2 border-gray-200 hover:border-primary px-6 py-3 rounded-xl font-semibold"
           >
             <Filter className="h-4 w-4 mr-2" />
             Filters
