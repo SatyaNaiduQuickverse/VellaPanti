@@ -19,7 +19,8 @@ export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const { data: productsData, isLoading } = useProducts(filters);
-  const { data: categories } = useCategories();
+  const { data: categoriesData } = useCategories();
+  const categories = categoriesData?.data || [];
 
   const products = productsData?.data || [];
   const pagination = productsData?.pagination;
