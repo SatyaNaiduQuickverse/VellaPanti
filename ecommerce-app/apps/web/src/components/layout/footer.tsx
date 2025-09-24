@@ -31,12 +31,12 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
+                <Link href="/support" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
                   ABOUT
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
+                <Link href="/support" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
                   CONTACT
                 </Link>
               </li>
@@ -48,22 +48,22 @@ export function Footer() {
             <h4 className="font-black uppercase tracking-wider text-white">SUPPORT</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/help" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
+                <Link href="/support" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
                   HELP
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
+                <Link href="/support" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
                   SHIPPING
                 </Link>
               </li>
               <li>
-                <Link href="/returns" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
+                <Link href="/support" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
                   RETURNS
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
+                <Link href="/support" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
                   FAQ
                 </Link>
               </li>
@@ -85,7 +85,7 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/wishlist" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
+                <Link href="/profile" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
                   WISHLIST
                 </Link>
               </li>

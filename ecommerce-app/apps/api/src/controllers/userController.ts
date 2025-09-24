@@ -162,3 +162,158 @@ export const deleteAddress = asyncHandler(async (req: AuthRequest, res: Response
     message: 'Address deleted successfully',
   });
 });
+
+// Admin only - get all users
+export const getAllUsers = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (req.user!.role !== 'ADMIN') {
+    throw new AppError('Admin access required', 403);
+  }
+
+  const {
+    page = 1,
+    limit = 20,
+    search,
+    role
+  } = req.query as any;
+
+  const pageNum = parseInt(page);
+  const limitNum = parseInt(limit);
+  const skip = (pageNum - 1) * limitNum;
+
+  // Build where clause for filtering
+  const where: any = {};
+
+  if (role && role !== 'all') {
+    where.role = role.toUpperCase();
+  }
+
+  if (search) {
+    where.OR = [
+      {
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      },
+      {
+        email: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      },
+    ];
+  }
+
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      skip,
+      take: limitNum,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            orders: true,
+            addresses: true,
+            reviews: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    }),
+    prisma.user.count({ where }),
+  ]);
+
+  res.json({
+    success: true,
+    data: users,
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum),
+    },
+  });
+});
+
+// Admin only - update user role
+export const updateUserRole = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (req.user!.role !== 'ADMIN') {
+    throw new AppError('Admin access required', 403);
+  }
+
+  const { id } = req.params;
+  const { role } = req.body;
+
+  if (!['USER', 'ADMIN'].includes(role)) {
+    throw new AppError('Invalid role. Must be USER or ADMIN', 400);
+  }
+
+  // Prevent admin from demoting themselves
+  if (id === req.user!.id && role === 'USER') {
+    throw new AppError('Cannot demote yourself', 400);
+  }
+
+  const user = await prisma.user.update({
+    where: { id },
+    data: { role },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  res.json({
+    success: true,
+    data: user,
+    message: 'User role updated successfully',
+  });
+});
+
+// Get user account stats
+export const getUserStats = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const userId = req.user!.id;
+
+  try {
+    // Get total orders and total spent
+    const orderStats = await prisma.order.aggregate({
+      where: { userId },
+      _count: {
+        id: true,
+      },
+      _sum: {
+        total: true,
+      },
+    });
+
+    // Calculate loyalty points (simplified: 1 point per dollar spent)
+    const totalSpent = orderStats._sum.total || 0;
+    const loyaltyPoints = Math.floor(totalSpent);
+
+    res.json({
+      success: true,
+      data: {
+        totalOrders: orderStats._count.id || 0,
+        totalSpent: totalSpent,
+        loyaltyPoints: loyaltyPoints,
+      },
+    });
+  } catch (error) {
+    console.error('Get user stats error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch user stats',
+    });
+  }
+});

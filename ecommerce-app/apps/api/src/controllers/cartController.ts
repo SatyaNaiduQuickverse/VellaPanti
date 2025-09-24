@@ -14,10 +14,22 @@ export const getCart = asyncHandler(async (req: AuthRequest, res: Response) => {
           id: true,
           name: true,
           slug: true,
+          basePrice: true,
+          baseSalePrice: true,
+          images: true,
+        },
+      },
+      productVariant: {
+        select: {
+          id: true,
+          sku: true,
+          size: true,
+          color: true,
+          material: true,
           price: true,
           salePrice: true,
-          images: true,
           stock: true,
+          images: true,
         },
       },
     },
@@ -27,7 +39,9 @@ export const getCart = asyncHandler(async (req: AuthRequest, res: Response) => {
   });
 
   const total = cartItems.reduce((sum, item) => {
-    const price = item.product.salePrice || item.product.price;
+    const price = item.productVariant
+      ? (item.productVariant.salePrice || item.productVariant.price)
+      : (item.product.baseSalePrice || item.product.basePrice || 0);
     return sum + (price * item.quantity);
   }, 0);
 
@@ -45,61 +59,104 @@ export const getCart = asyncHandler(async (req: AuthRequest, res: Response) => {
 
 export const addToCart = asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.user!.id;
-  const { productId, quantity } = req.body;
+  const { productId, productVariantId, quantity } = req.body;
 
-  // Check if product exists and has enough stock
+  // Check if product exists
   const product = await prisma.product.findUnique({
     where: { id: productId },
+    include: {
+      variants: productVariantId ? {
+        where: { id: productVariantId },
+      } : false,
+    },
   });
 
   if (!product) {
     throw new AppError('Product not found', 404);
   }
 
-  if (product.stock < quantity) {
+  let variant = null;
+  let currentStock = 0;
+
+  if (productVariantId) {
+    variant = await prisma.productVariant.findUnique({
+      where: { id: productVariantId, productId },
+    });
+
+    if (!variant) {
+      throw new AppError('Product variant not found', 404);
+    }
+
+    currentStock = variant.stock;
+  } else {
+    // For products without variants, use total stock
+    const totalStock = await prisma.productVariant.aggregate({
+      where: { productId },
+      _sum: { stock: true },
+    });
+    currentStock = totalStock._sum.stock || 0;
+  }
+
+  if (currentStock < quantity) {
     throw new AppError('Insufficient stock', 400);
   }
 
-  // Check if item already exists in cart
+  // Check if item already exists in cart (including variant combination)
   const existingCartItem = await prisma.cartItem.findUnique({
     where: {
-      userId_productId: {
+      userId_productId_productVariantId: {
         userId,
         productId,
+        productVariantId: productVariantId || null,
       },
     },
   });
 
+  const includeClause = {
+    product: {
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        basePrice: true,
+        baseSalePrice: true,
+        images: true,
+      },
+    },
+    productVariant: productVariantId ? {
+      select: {
+        id: true,
+        sku: true,
+        size: true,
+        color: true,
+        material: true,
+        price: true,
+        salePrice: true,
+        stock: true,
+        images: true,
+      },
+    } : false,
+  };
+
   if (existingCartItem) {
     const newQuantity = existingCartItem.quantity + quantity;
-    
-    if (product.stock < newQuantity) {
+
+    if (currentStock < newQuantity) {
       throw new AppError('Insufficient stock', 400);
     }
 
     const updatedCartItem = await prisma.cartItem.update({
       where: {
-        userId_productId: {
+        userId_productId_productVariantId: {
           userId,
           productId,
+          productVariantId: productVariantId || null,
         },
       },
       data: {
         quantity: newQuantity,
       },
-      include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            price: true,
-            salePrice: true,
-            images: true,
-            stock: true,
-          },
-        },
-      },
+      include: includeClause,
     });
 
     res.json({
@@ -112,21 +169,10 @@ export const addToCart = asyncHandler(async (req: AuthRequest, res: Response) =>
       data: {
         userId,
         productId,
+        productVariantId: productVariantId || null,
         quantity,
       },
-      include: {
-        product: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-            price: true,
-            salePrice: true,
-            images: true,
-            stock: true,
-          },
-        },
-      },
+      include: includeClause,
     });
 
     res.status(201).json({
@@ -146,6 +192,7 @@ export const updateCartItem = asyncHandler(async (req: AuthRequest, res: Respons
     where: { id },
     include: {
       product: true,
+      productVariant: true,
     },
   });
 
@@ -153,7 +200,19 @@ export const updateCartItem = asyncHandler(async (req: AuthRequest, res: Respons
     throw new AppError('Cart item not found', 404);
   }
 
-  if (cartItem.product.stock < quantity) {
+  let currentStock = 0;
+  if (cartItem.productVariant) {
+    currentStock = cartItem.productVariant.stock;
+  } else {
+    // For products without variants, use total stock
+    const totalStock = await prisma.productVariant.aggregate({
+      where: { productId: cartItem.productId },
+      _sum: { stock: true },
+    });
+    currentStock = totalStock._sum.stock || 0;
+  }
+
+  if (currentStock < quantity) {
     throw new AppError('Insufficient stock', 400);
   }
 
@@ -166,10 +225,22 @@ export const updateCartItem = asyncHandler(async (req: AuthRequest, res: Respons
           id: true,
           name: true,
           slug: true,
+          basePrice: true,
+          baseSalePrice: true,
+          images: true,
+        },
+      },
+      productVariant: {
+        select: {
+          id: true,
+          sku: true,
+          size: true,
+          color: true,
+          material: true,
           price: true,
           salePrice: true,
-          images: true,
           stock: true,
+          images: true,
         },
       },
     },

@@ -6,6 +6,7 @@ import type { User } from '@ecommerce/types';
 
 export interface AuthRequest extends Request {
   user?: User;
+  userId?: string;
 }
 
 export interface JWTPayload {
@@ -52,6 +53,7 @@ export const authenticateToken = async (
     }
 
     req.user = user;
+    req.userId = user.id;
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
@@ -107,6 +109,7 @@ export const optionalAuth = async (
 
       if (user) {
         req.user = user;
+        req.userId = user.id;
       }
     }
     

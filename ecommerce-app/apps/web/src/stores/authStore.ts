@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { User, AuthResponse } from '@ecommerce/types';
 
 interface AuthState {
@@ -7,10 +7,12 @@ interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   isLoading: boolean;
+  hasHydrated: boolean;
   setAuth: (auth: AuthResponse) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
   isAuthenticated: () => boolean;
+  setHasHydrated: (hasHydrated: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -20,6 +22,7 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       isLoading: false,
+      hasHydrated: false,
       setAuth: (auth: AuthResponse) =>
         set({
           user: auth.user,
@@ -33,18 +36,23 @@ export const useAuthStore = create<AuthState>()(
           refreshToken: null,
         }),
       setLoading: (loading: boolean) => set({ isLoading: loading }),
+      setHasHydrated: (hasHydrated: boolean) => set({ hasHydrated }),
       isAuthenticated: () => {
-        const { accessToken } = get();
-        return !!accessToken;
+        const { accessToken, hasHydrated } = get();
+        return hasHydrated && !!accessToken;
       },
     }),
     {
       name: 'auth-storage',
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

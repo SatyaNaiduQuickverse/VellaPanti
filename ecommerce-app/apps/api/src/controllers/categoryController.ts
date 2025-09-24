@@ -2,15 +2,25 @@ import { Request, Response } from 'express';
 import { prisma } from '@ecommerce/database';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import type { AuthRequest } from '../middleware/auth';
+import { imageService } from '../services/uploadService';
 
 export const getCategories = asyncHandler(async (req: Request, res: Response) => {
+  const { theme } = req.query;
+
+  const where: any = {};
+  if (theme && (theme === 'BLACK' || theme === 'WHITE')) {
+    where.theme = theme;
+  }
+
   const categories = await prisma.category.findMany({
+    where,
     include: {
       parent: {
         select: {
           id: true,
           name: true,
           slug: true,
+          theme: true,
         },
       },
       children: {
@@ -18,6 +28,7 @@ export const getCategories = asyncHandler(async (req: Request, res: Response) =>
           id: true,
           name: true,
           slug: true,
+          theme: true,
         },
       },
       _count: {
@@ -75,6 +86,44 @@ export const getCategoryBySlug = asyncHandler(async (req: Request, res: Response
   });
 });
 
+export const getCategoryById = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const category = await prisma.category.findUnique({
+    where: { id },
+    include: {
+      parent: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+      children: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+      _count: {
+        select: {
+          products: true,
+        },
+      },
+    },
+  });
+
+  if (!category) {
+    throw new AppError('Category not found', 404);
+  }
+
+  res.json({
+    success: true,
+    data: category,
+  });
+});
+
 // Get products by category slug with pagination and filters
 export const getCategoryProducts = asyncHandler(async (req: Request, res: Response) => {
   const { slug } = req.params;
@@ -89,7 +138,9 @@ export const getCategoryProducts = asyncHandler(async (req: Request, res: Respon
     inStock = true,
   } = req.query as any;
 
-  const skip = (page - 1) * limit;
+  const pageNum = parseInt(page);
+  const limitNum = parseInt(limit);
+  const skip = (pageNum - 1) * limitNum;
 
   // Find category first
   const category = await prisma.category.findUnique({
@@ -114,22 +165,43 @@ export const getCategoryProducts = asyncHandler(async (req: Request, res: Respon
   }
 
   if (minPrice !== undefined || maxPrice !== undefined) {
-    where.price = {};
-    if (minPrice !== undefined) where.price.gte = parseFloat(minPrice);
-    if (maxPrice !== undefined) where.price.lte = parseFloat(maxPrice);
+    where.OR = [
+      ...(where.OR || []),
+      {
+        basePrice: {
+          ...(minPrice !== undefined && { gte: parseFloat(minPrice) }),
+          ...(maxPrice !== undefined && { lte: parseFloat(maxPrice) }),
+        },
+      },
+      {
+        variants: {
+          some: {
+            price: {
+              ...(minPrice !== undefined && { gte: parseFloat(minPrice) }),
+              ...(maxPrice !== undefined && { lte: parseFloat(maxPrice) }),
+            },
+          },
+        },
+      },
+    ];
   }
 
   if (inStock === 'true') {
-    where.stock = { gt: 0 };
+    where.OR = [
+      ...(where.OR || []),
+      {
+        variants: {
+          some: {
+            stock: { gt: 0 },
+          },
+        },
+      },
+    ];
   }
 
   // Build order by clause
   const orderBy: any = {};
-  if (sort === 'rating') {
-    orderBy.reviews = { _count: sortOrder };
-  } else {
-    orderBy[sort] = sortOrder;
-  }
+  orderBy[sort] = sortOrder;
 
   const [products, total] = await Promise.all([
     prisma.product.findMany({
@@ -140,6 +212,19 @@ export const getCategoryProducts = asyncHandler(async (req: Request, res: Respon
             id: true,
             name: true,
             slug: true,
+          },
+        },
+        variants: {
+          select: {
+            id: true,
+            sku: true,
+            size: true,
+            color: true,
+            material: true,
+            price: true,
+            salePrice: true,
+            stock: true,
+            images: true,
           },
         },
         reviews: {
@@ -155,32 +240,75 @@ export const getCategoryProducts = asyncHandler(async (req: Request, res: Respon
       },
       orderBy,
       skip,
-      take: limit,
+      take: limitNum,
     }),
     prisma.product.count({ where }),
   ]);
 
-  // Calculate average ratings
+  // Calculate average ratings and variant-based pricing
   const productsWithRatings = products.map(product => {
     const totalRating = product.reviews.reduce((sum, review) => sum + review.rating, 0);
     const averageRating = product.reviews.length > 0 ? totalRating / product.reviews.length : null;
-    
+
+    // Calculate price range and total stock from variants
+    let priceRange = null;
+    let totalStock = 0;
+    let variantOptions = {
+      colors: new Set<string>(),
+      sizes: new Set<string>(),
+      materials: new Set<string>(),
+    };
+
+    if (product.variants && product.variants.length > 0) {
+      const prices = product.variants.map(v => v.salePrice || v.price).filter(p => p > 0);
+      const originalPrices = product.variants.map(v => v.price).filter(p => p > 0);
+
+      if (prices.length > 0) {
+        const minPrice = Math.min(...prices);
+        const maxPrice = Math.max(...originalPrices);
+        const saleMinPrice = Math.min(...product.variants.map(v => v.salePrice).filter(p => p && p > 0));
+
+        priceRange = {
+          min: minPrice,
+          max: maxPrice,
+          saleMin: saleMinPrice > 0 ? saleMinPrice : null,
+          hasVariablePrice: prices.length > 1 && Math.min(...prices) !== Math.max(...prices),
+        };
+      }
+
+      totalStock = product.variants.reduce((sum, v) => sum + (v.stock || 0), 0);
+
+      // Collect variant options
+      product.variants.forEach(variant => {
+        if (variant.color) variantOptions.colors.add(variant.color);
+        if (variant.size) variantOptions.sizes.add(variant.size);
+        if (variant.material) variantOptions.materials.add(variant.material);
+      });
+    }
+
     const { reviews, ...productData } = product;
     return {
       ...productData,
       averageRating,
       reviewCount: product._count.reviews,
+      priceRange,
+      totalStock,
+      variantOptions: {
+        colors: Array.from(variantOptions.colors),
+        sizes: Array.from(variantOptions.sizes),
+        materials: Array.from(variantOptions.materials),
+      },
     };
   });
 
-  const totalPages = Math.ceil(total / limit);
+  const totalPages = Math.ceil(total / limitNum);
 
   res.json({
     success: true,
     data: productsWithRatings,
     pagination: {
-      page: parseInt(page),
-      limit: parseInt(limit),
+      page: pageNum,
+      limit: limitNum,
       total,
       totalPages,
     },
@@ -189,7 +317,15 @@ export const getCategoryProducts = asyncHandler(async (req: Request, res: Respon
 });
 
 export const createCategory = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const { name, slug, description, parentId } = req.body;
+  const { name, description, parentId, image } = req.body;
+  const file = req.file as Express.Multer.File;
+
+  // Generate slug from name
+  const slug = name.toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
 
   // Check if slug already exists
   const existingCategory = await prisma.category.findUnique({
@@ -197,7 +333,7 @@ export const createCategory = asyncHandler(async (req: AuthRequest, res: Respons
   });
 
   if (existingCategory) {
-    throw new AppError('Category with this slug already exists', 409);
+    throw new AppError('Category with this name already exists', 409);
   }
 
   // If parentId is provided, verify parent exists
@@ -211,12 +347,22 @@ export const createCategory = asyncHandler(async (req: AuthRequest, res: Respons
     }
   }
 
+  // Process image (either uploaded file or URL)
+  let imageUrl: string | null = null;
+  if (file) {
+    const processedImage = await imageService.processProductImage(file);
+    imageUrl = processedImage.url;
+  } else if (image) {
+    imageUrl = image;
+  }
+
   const category = await prisma.category.create({
     data: {
       name,
       slug,
       description,
-      parentId,
+      parentId: parentId || null,
+      image: imageUrl,
     },
     include: {
       parent: {
@@ -248,9 +394,10 @@ export const createCategory = asyncHandler(async (req: AuthRequest, res: Respons
   });
 });
 
-export const updateCategory = asyncHandler(async (req: Request, res: Response) => {
+export const updateCategory = asyncHandler(async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
-  const { name, slug, description, parentId } = req.body;
+  const { name, description, parentId, existingImage } = req.body;
+  const file = req.file as Express.Multer.File;
 
   const existingCategory = await prisma.category.findUnique({
     where: { id },
@@ -260,20 +407,92 @@ export const updateCategory = asyncHandler(async (req: Request, res: Response) =
     throw new AppError('Category not found', 404);
   }
 
+  // Generate new slug if name changed
+  let slug = existingCategory.slug;
+  if (name && name !== existingCategory.name) {
+    slug = name.toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+
+    // Check if new slug already exists
+    const slugExists = await prisma.category.findUnique({
+      where: { slug, NOT: { id } },
+    });
+
+    if (slugExists) {
+      throw new AppError('Category with this name already exists', 409);
+    }
+  }
+
+  // If parentId is provided, verify parent exists and prevent circular references
+  if (parentId) {
+    const parentCategory = await prisma.category.findUnique({
+      where: { id: parentId },
+    });
+
+    if (!parentCategory) {
+      throw new AppError('Parent category not found', 404);
+    }
+
+    // Prevent setting self as parent or creating circular references
+    if (parentId === id) {
+      throw new AppError('Category cannot be its own parent', 400);
+    }
+  }
+
+  // Handle image updates
+  let finalImageUrl = existingImage || null;
+
+  // Process new uploaded image
+  if (file) {
+    const processedImage = await imageService.processProductImage(file);
+    finalImageUrl = processedImage.url;
+
+    // Delete old image if it exists and is being replaced
+    if (existingCategory.image && existingCategory.image !== existingImage) {
+      const imagePath = existingCategory.image.split('/uploads/')[1];
+      if (imagePath) {
+        await imageService.deleteImage(imagePath);
+      }
+    }
+  } else if (!existingImage && existingCategory.image) {
+    // Image was removed
+    const imagePath = existingCategory.image.split('/uploads/')[1];
+    if (imagePath) {
+      await imageService.deleteImage(imagePath);
+    }
+  }
+
+  const updateData: any = {
+    ...(name && { name, slug }),
+    ...(description && { description }),
+    ...(parentId !== undefined && { parentId: parentId || null }),
+    image: finalImageUrl,
+  };
+
   const category = await prisma.category.update({
     where: { id },
-    data: {
-      name,
-      slug,
-      description,
-      parentId,
-    },
+    data: updateData,
     include: {
       parent: {
         select: {
           id: true,
           name: true,
           slug: true,
+        },
+      },
+      children: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+      _count: {
+        select: {
+          products: true,
         },
       },
     },
@@ -313,6 +532,14 @@ export const deleteCategory = asyncHandler(async (req: Request, res: Response) =
     throw new AppError('Cannot delete category with subcategories', 400);
   }
 
+  // Delete associated image
+  if (existingCategory.image) {
+    const imagePath = existingCategory.image.split('/uploads/')[1];
+    if (imagePath) {
+      await imageService.deleteImage(imagePath);
+    }
+  }
+
   await prisma.category.delete({
     where: { id },
   });
@@ -320,5 +547,59 @@ export const deleteCategory = asyncHandler(async (req: Request, res: Response) =
   res.json({
     success: true,
     message: 'Category deleted successfully',
+  });
+});
+
+// Get carousel images for homepage (public endpoint)
+export const getHomepageCarousel = asyncHandler(async (req: Request, res: Response) => {
+  const carouselImages = await prisma.carouselImage.findMany({
+    where: { isActive: true },
+    orderBy: { position: 'asc' },
+  });
+
+  res.json({
+    success: true,
+    data: carouselImages,
+  });
+});
+
+// Get featured collections for homepage (public endpoint)
+export const getFeaturedCategories = asyncHandler(async (req: Request, res: Response) => {
+  const { theme } = req.query;
+
+  const whereClause: any = {};
+  if (theme && (theme === 'BLACK' || theme === 'WHITE')) {
+    whereClause.theme = theme;
+  }
+
+  const featuredCollections = await prisma.featuredCollection.findMany({
+    where: whereClause,
+    include: {
+      category: {
+        select: { id: true, name: true, slug: true, image: true, theme: true },
+      },
+    },
+    orderBy: { position: 'asc' },
+  });
+
+  // Transform to return categories directly for easier frontend consumption
+  const categories = featuredCollections.map(fc => fc.category);
+
+  res.json({
+    success: true,
+    data: categories,
+  });
+});
+
+// Get homepage banners for public use
+export const getPublicHomepageBanners = asyncHandler(async (req: Request, res: Response) => {
+  const banners = await prisma.homepageBanner.findMany({
+    where: { isActive: true },
+    orderBy: { theme: 'asc' }, // BLACK first, then WHITE
+  });
+
+  res.json({
+    success: true,
+    data: banners,
   });
 });

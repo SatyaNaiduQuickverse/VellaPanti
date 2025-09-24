@@ -2,7 +2,10 @@ import axios, { type AxiosResponse } from 'axios';
 import { useAuthStore } from '@/stores/authStore';
 import toast from 'react-hot-toast';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3062';
+// Use relative URLs in the browser, absolute URLs in Node.js (SSR)
+const API_URL = typeof window !== 'undefined'
+  ? '' // Use relative URLs in browser (leverages Next.js rewrites)
+  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3062';
 
 export const api = axios.create({
   baseURL: `${API_URL}/api`,

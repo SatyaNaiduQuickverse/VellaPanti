@@ -20,7 +20,12 @@ async function startServer() {
     // Security middleware
     app.use(helmet());
     app.use(cors({
-      origin: process.env.CORS_ORIGIN || 'http://80.225.231.66:3061',
+      origin: [
+        'http://localhost:3061',
+        'http://0.0.0.0:3061',
+        'http://80.225.231.66:3061',
+        process.env.CORS_ORIGIN
+      ].filter(Boolean),
       credentials: true,
     }));
 

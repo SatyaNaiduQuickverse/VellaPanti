@@ -10,6 +10,14 @@ import {
   deleteProductAdmin,
   bulkUpdateProducts,
   bulkDeleteProducts,
+  getFeaturedProducts,
+  updateFeaturedProducts,
+  getCarouselImages,
+  updateCarouselImages,
+  getFeaturedCollections,
+  updateFeaturedCollections,
+  getHomepageBanners,
+  updateHomepageBanners,
 } from '../controllers/adminController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { validate } from '../middleware/validation';
@@ -38,5 +46,21 @@ router.delete('/products/:id', deleteProductAdmin);
 // Bulk Operations
 router.patch('/products/bulk-update', bulkUpdateProducts);
 router.delete('/products/bulk-delete', bulkDeleteProducts);
+
+// Featured Products Management
+router.get('/featured-products', getFeaturedProducts);
+router.put('/featured-products', updateFeaturedProducts);
+
+// Carousel Images Management
+router.get('/carousel-images', getCarouselImages);
+router.put('/carousel-images', updateCarouselImages);
+
+// Featured Collections Management
+router.get('/featured-collections', getFeaturedCollections);
+router.put('/featured-collections', updateFeaturedCollections);
+
+// Homepage Banners Management
+router.get('/homepage-banners', getHomepageBanners);
+router.put('/homepage-banners', updateHomepageBanners);
 
 export default router;

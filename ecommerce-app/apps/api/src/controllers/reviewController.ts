@@ -85,8 +85,22 @@ export const getReviewById = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const createReview = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
-  const { productId, rating, comment } = req.body;
+  console.log('Create review request:', {
+    body: req.body,
+    userId: req.userId,
+    headers: req.headers.authorization
+  });
+
+  const userId = req.userId!;
+  const { productId, rating, title, comment, images = [] } = req.body;
+
+  if (!productId || !rating) {
+    throw new AppError('Product ID and rating are required', 400);
+  }
+
+  if (rating < 1 || rating > 5) {
+    throw new AppError('Rating must be between 1 and 5', 400);
+  }
 
   // Check if product exists
   const product = await prisma.product.findUnique({
@@ -111,7 +125,7 @@ export const createReview = asyncHandler(async (req: AuthRequest, res: Response)
     throw new AppError('You have already reviewed this product', 409);
   }
 
-  // Check if user has purchased this product
+  // Check if user has purchased this product (optional - allow reviews from all users)
   const hasOrdered = await prisma.orderItem.findFirst({
     where: {
       productId,
@@ -122,16 +136,15 @@ export const createReview = asyncHandler(async (req: AuthRequest, res: Response)
     },
   });
 
-  if (!hasOrdered) {
-    throw new AppError('You can only review products you have purchased and received', 400);
-  }
-
   const review = await prisma.review.create({
     data: {
       userId,
       productId,
       rating,
+      title,
       comment,
+      images,
+      isVerified: !!hasOrdered, // Mark as verified if they purchased
     },
     include: {
       user: {
@@ -158,9 +171,9 @@ export const createReview = asyncHandler(async (req: AuthRequest, res: Response)
 });
 
 export const updateReview = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
+  const userId = req.userId!;
   const { id } = req.params;
-  const { rating, comment } = req.body;
+  const { rating, title, comment, images } = req.body;
 
   const existingReview = await prisma.review.findUnique({
     where: { id },
@@ -177,8 +190,10 @@ export const updateReview = asyncHandler(async (req: AuthRequest, res: Response)
   const review = await prisma.review.update({
     where: { id },
     data: {
-      rating,
-      comment,
+      ...(rating && { rating }),
+      ...(title !== undefined && { title }),
+      ...(comment !== undefined && { comment }),
+      ...(images !== undefined && { images }),
     },
     include: {
       user: {
@@ -205,7 +220,7 @@ export const updateReview = asyncHandler(async (req: AuthRequest, res: Response)
 });
 
 export const deleteReview = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.id;
+  const userId = req.userId!;
   const { id } = req.params;
 
   const existingReview = await prisma.review.findUnique({
@@ -216,8 +231,8 @@ export const deleteReview = asyncHandler(async (req: AuthRequest, res: Response)
     throw new AppError('Review not found', 404);
   }
 
-  // Allow user to delete their own review or admin to delete any review
-  if (existingReview.userId !== userId && req.user!.role !== 'ADMIN') {
+  // Allow user to delete their own review
+  if (existingReview.userId !== userId) {
     throw new AppError('You can only delete your own reviews', 403);
   }
 
@@ -228,5 +243,113 @@ export const deleteReview = asyncHandler(async (req: AuthRequest, res: Response)
   res.json({
     success: true,
     message: 'Review deleted successfully',
+  });
+});
+
+// Get product reviews with stats
+export const getProductReviews = asyncHandler(async (req: Request, res: Response) => {
+  const { productId } = req.params;
+  const { page = 1, limit = 10, sort = 'newest' } = req.query;
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  let orderBy: any = { createdAt: 'desc' };
+
+  switch (sort) {
+    case 'oldest':
+      orderBy = { createdAt: 'asc' };
+      break;
+    case 'highest':
+      orderBy = { rating: 'desc' };
+      break;
+    case 'lowest':
+      orderBy = { rating: 'asc' };
+      break;
+    case 'helpful':
+      orderBy = { isHelpful: 'desc' };
+      break;
+    default:
+      orderBy = { createdAt: 'desc' };
+  }
+
+  const [reviews, totalCount, averageRating] = await Promise.all([
+    prisma.review.findMany({
+      where: { productId },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy,
+      skip,
+      take: Number(limit),
+    }),
+    prisma.review.count({
+      where: { productId },
+    }),
+    prisma.review.aggregate({
+      where: { productId },
+      _avg: { rating: true },
+      _count: { rating: true },
+    }),
+  ]);
+
+  // Get rating distribution
+  const ratingDistribution = await prisma.review.groupBy({
+    by: ['rating'],
+    where: { productId },
+    _count: { rating: true },
+  });
+
+  const distribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  ratingDistribution.forEach(item => {
+    distribution[item.rating as keyof typeof distribution] = item._count.rating;
+  });
+
+  res.json({
+    success: true,
+    data: {
+      reviews,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total: totalCount,
+        pages: Math.ceil(totalCount / Number(limit)),
+      },
+      summary: {
+        averageRating: averageRating._avg.rating || 0,
+        totalReviews: averageRating._count.rating,
+        distribution,
+      },
+    },
+  });
+});
+
+// Mark review as helpful
+export const markReviewHelpful = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { reviewId } = req.params;
+
+  const review = await prisma.review.findUnique({
+    where: { id: reviewId },
+  });
+
+  if (!review) {
+    throw new AppError('Review not found', 404);
+  }
+
+  const updatedReview = await prisma.review.update({
+    where: { id: reviewId },
+    data: {
+      isHelpful: review.isHelpful + 1,
+    },
+  });
+
+  res.json({
+    success: true,
+    message: 'Review marked as helpful',
+    data: { helpfulCount: updatedReview.isHelpful },
   });
 });

@@ -19,16 +19,23 @@ interface CategoryProductsResponse extends PaginatedResponse<Product> {
 function useCategoryProducts(slug: string, filters: any = {}) {
   return useQuery({
     queryKey: ['category-products', slug, filters],
-    queryFn: async (): Promise<CategoryProductsResponse> => {
+    queryFn: async () => {
       const params = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
           params.append(key, String(value));
         }
       });
-      
+
       const response = await api.get(`/categories/${slug}/products?${params.toString()}`);
-      return response.data;
+      if (response.data.success) {
+        return {
+          data: response.data.data,
+          pagination: response.data.pagination,
+          category: response.data.category,
+        };
+      }
+      throw new Error(response.data.error || 'Failed to fetch category products');
     },
     enabled: !!slug,
     staleTime: 2 * 60 * 1000, // 2 minutes
@@ -40,7 +47,7 @@ function useCategoryProducts(slug: string, filters: any = {}) {
 export default function CategoryPage() {
   const params = useParams();
   const slug = params.slug as string;
-  
+
   const [filters, setFilters] = useState({
     page: 1,
     limit: 12,
@@ -59,6 +66,38 @@ export default function CategoryPage() {
   const products = data?.data || [];
   const category = data?.category;
   const pagination = data?.pagination;
+
+  // Get theme-based styles
+  const getThemeStyles = () => {
+    if (category?.theme === 'BLACK') {
+      return {
+        bg: 'bg-black',
+        text: 'text-white',
+        accent: 'text-white',
+        border: 'border-white',
+        button: 'bg-white text-black hover:bg-gray-200'
+      };
+    } else if (category?.theme === 'WHITE') {
+      return {
+        bg: 'bg-white',
+        text: 'text-black',
+        accent: 'text-black',
+        border: 'border-black',
+        button: 'bg-black text-white hover:bg-gray-800'
+      };
+    } else {
+      return {
+        bg: 'bg-black',
+        text: 'text-white',
+        accent: 'text-white',
+        border: 'border-white',
+        button: 'bg-white text-black hover:bg-gray-200'
+      };
+    }
+  };
+
+  const styles = getThemeStyles();
+
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters(prev => ({
@@ -87,24 +126,25 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen ${styles.bg}`}>
       {/* Category Header */}
-      <section className="bg-black text-white py-16">
+      <section className={`${styles.bg} ${styles.text} py-16`}>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             {isLoading ? (
               <div className="animate-pulse">
-                <div className="h-12 bg-gray-700 rounded w-64 mx-auto mb-4"></div>
-                <div className="h-6 bg-gray-700 rounded w-96 mx-auto"></div>
+                <div className={`h-12 ${category?.theme === 'WHITE' ? 'bg-gray-300' : 'bg-gray-700'} rounded w-64 mx-auto mb-4`}></div>
               </div>
             ) : (
               <>
                 <h1 className="text-4xl md:text-6xl font-black mb-4 uppercase tracking-tight">
                   {category?.name}
                 </h1>
-                <p className="text-lg md:text-xl text-gray-300 font-bold uppercase tracking-wide">
-                  {category?.description}
-                </p>
+                <div className={`inline-block border-b-4 ${styles.border} pb-2`}>
+                  <span className="text-lg font-bold uppercase tracking-wide">
+                    {category?.theme === 'BLACK' ? 'STREET • CULTURE • UNDERGROUND' : 'CLEAN • MINIMAL • PREMIUM'}
+                  </span>
+                </div>
               </>
             )}
           </div>

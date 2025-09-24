@@ -3,114 +3,181 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCategories } from '@/hooks/useCategories';
+import { useFeaturedCollections } from '@/hooks/useFeaturedCollections';
 import { useState, useEffect } from 'react';
 
 interface CategoryGridProps {
   limit?: number;
+  theme?: 'BLACK' | 'WHITE' | null;
+  featured?: boolean; // Use featured collections instead of all categories
 }
 
-export function CategoryGrid({ limit }: CategoryGridProps) {
-  const { data: categoriesData, isLoading } = useCategories();
+export function CategoryGrid({ limit, theme, featured = false }: CategoryGridProps) {
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories(featured ? null : theme);
+  const { data: featuredData, isLoading: featuredLoading } = useFeaturedCollections(featured ? { theme: theme || undefined } : {});
   const [mounted, setMounted] = useState(false);
-  
+
+  const isLoading = featured ? featuredLoading : categoriesLoading;
+
   useEffect(() => {
     setMounted(true);
   }, []);
-  
-  const categories = limit 
-    ? (categoriesData?.data || []).slice(0, limit) 
-    : categoriesData?.data || [];
+
+  // Get the appropriate data source
+  const sourceData = featured ? featuredData?.data : categoriesData?.data;
+  const categories = limit
+    ? (sourceData || []).slice(0, limit)
+    : sourceData || [];
 
   const mockCategories = [
+    // Black Theme Categories
     {
       id: '1',
-      name: 'T-Shirts',
-      slug: 't-shirts',
+      name: 'STREET WEAR',
+      slug: 'street-wear',
       image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&q=80&fit=crop&auto=format',
-      description: 'Comfortable cotton t-shirts'
+      theme: 'BLACK'
     },
     {
-      id: '2', 
-      name: 'Hoodies',
-      slug: 'hoodies',
+      id: '2',
+      name: 'HOODIES & SWEATS',
+      slug: 'hoodies-sweats',
       image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&h=400&q=80&fit=crop&auto=format',
-      description: 'Cozy hoodies for all seasons'
+      theme: 'BLACK'
     },
     {
       id: '3',
-      name: 'Jeans',
-      slug: 'jeans', 
+      name: 'RAP CULTURE',
+      slug: 'rap-culture',
       image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&q=80&fit=crop&auto=format',
-      description: 'Premium denim collection'
+      theme: 'BLACK'
     },
     {
       id: '4',
-      name: 'Sneakers',
-      slug: 'sneakers',
-      image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&q=80&fit=crop&auto=format', 
-      description: 'Trendy sneakers and footwear'
+      name: 'URBAN FOOTWEAR',
+      slug: 'urban-footwear',
+      image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&q=80&fit=crop&auto=format',
+      theme: 'BLACK'
     },
     {
       id: '5',
-      name: 'Accessories',
-      slug: 'accessories',
+      name: 'ACCESSORIES',
+      slug: 'black-accessories',
       image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&q=80&fit=crop&auto=format',
-      description: 'Bags, watches, and more'
+      theme: 'BLACK'
     },
     {
       id: '6',
-      name: 'Winter Wear',
-      slug: 'winter-wear',
+      name: 'DENIM & JEANS',
+      slug: 'denim-jeans',
+      image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&q=80&fit=crop&auto=format',
+      theme: 'BLACK'
+    },
+    // White Theme Categories
+    {
+      id: '7',
+      name: 'PREMIUM BASICS',
+      slug: 'premium-basics',
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&q=80&fit=crop&auto=format',
+      theme: 'WHITE'
+    },
+    {
+      id: '8',
+      name: 'MINIMAL LUXURY',
+      slug: 'minimal-luxury',
       image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&h=400&q=80&fit=crop&auto=format',
-      description: 'Jackets, coats, and winter essentials'
+      theme: 'WHITE'
+    },
+    {
+      id: '9',
+      name: 'CLEAN CUTS',
+      slug: 'clean-cuts',
+      image: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=400&q=80&fit=crop&auto=format',
+      theme: 'WHITE'
+    },
+    {
+      id: '10',
+      name: 'ESSENTIALS',
+      slug: 'essentials',
+      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&q=80&fit=crop&auto=format',
+      theme: 'WHITE'
+    },
+    {
+      id: '11',
+      name: 'PREMIUM FOOTWEAR',
+      slug: 'premium-footwear',
+      image: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&q=80&fit=crop&auto=format',
+      theme: 'WHITE'
+    },
+    {
+      id: '12',
+      name: 'REFINED ACCESSORIES',
+      slug: 'refined-accessories',
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&q=80&fit=crop&auto=format',
+      theme: 'WHITE'
     }
   ];
 
-  const displayCategories = mounted && categories.length > 0 ? categories : mockCategories;
+  const filterCategoriesByTheme = (categoriesList: any[]) => {
+    if (!theme) return categoriesList;
+    return categoriesList.filter(category => category.theme === theme);
+  };
+
+  // For featured mode, show empty state if no categories, otherwise use fallback
+  const displayCategories = featured
+    ? (mounted && categories.length > 0 ? categories : [])
+    : (mounted && categories.length > 0 ? categories : filterCategoriesByTheme(mockCategories));
 
   if (!mounted || isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {[...Array(limit || 5)].map((_, index) => (
+      <div className="grid grid-cols-2 gap-0">
+        {[...Array(Math.min(limit || 6, 6))].map((_, index) => (
           <div key={index} className="animate-pulse">
-            <div className="bg-gray-200 aspect-square rounded-lg mb-3"></div>
-            <div className="h-4 bg-gray-200 rounded mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+            <div className="bg-gray-700 aspect-[4/3] border border-black"></div>
           </div>
         ))}
       </div>
     );
   }
 
+  // Show empty state for featured mode when no collections are configured
+  if (featured && displayCategories.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <p className={`text-lg font-bold ${theme === 'BLACK' ? 'text-white' : 'text-black'}`}>
+          No featured collections selected
+        </p>
+        <p className={`text-sm ${theme === 'BLACK' ? 'text-gray-300' : 'text-gray-600'}`}>
+          Configure featured collections in admin panel
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 gap-0">
       {displayCategories.map((category) => (
-        <Link 
-          key={category.id} 
-          href={`/categories/${category.slug}`}
+        <Link
+          key={category.id}
+          href={`/categories/${category.slug}?theme=${category.theme || ''}`}
           className="group cursor-pointer"
         >
-          <div className="relative overflow-hidden bg-black aspect-square mb-3 group-hover:bg-white group-hover:shadow-2xl transition-all duration-300 border-2 border-black">
+          <div className="relative overflow-hidden bg-black aspect-[4/3] group-hover:bg-white group-hover:shadow-2xl transition-all duration-300 border border-black">
             <Image
               src={category.image || '/placeholder-category.svg'}
               alt={category.name}
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-500 grayscale group-hover:grayscale-0 filter contrast-125"
               loading="lazy"
-              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 20vw"
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 33vw"
             />
             <div className="absolute inset-0 bg-black/60 group-hover:bg-white/90 transition-all duration-300" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <h3 className="text-white group-hover:text-black font-black text-sm md:text-base text-center px-2 uppercase tracking-wider transition-colors">
+              <h3 className="text-white group-hover:text-black font-black text-lg md:text-xl text-center px-4 uppercase tracking-wider transition-colors leading-tight">
                 {category.name}
               </h3>
             </div>
           </div>
-          {category.description && (
-            <p className="text-xs text-gray-800 text-center group-hover:text-black transition-colors font-bold uppercase tracking-wide">
-              {category.description}
-            </p>
-          )}
         </Link>
       ))}
     </div>

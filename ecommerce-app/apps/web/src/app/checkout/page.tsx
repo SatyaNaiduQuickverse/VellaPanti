@@ -48,9 +48,9 @@ export default function CheckoutPage() {
 
       const orderData = {
         shippingAddress,
-        paymentMethod: 'CASH_ON_DELIVERY',
         items: items.map(item => ({
           productId: item.productId,
+          productVariantId: item.productVariantId,
           quantity: item.quantity,
         })),
       };
@@ -265,9 +265,23 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex-1">
                       <h4 className="font-bold text-sm">{item.product?.name}</h4>
+                      {/* Variant Information */}
+                      {item.productVariant && (
+                        <div className="text-xs text-gray-400 mb-1">
+                          {item.productVariant.size && <span>Size: {item.productVariant.size} • </span>}
+                          {item.productVariant.color && <span>Color: {item.productVariant.color} • </span>}
+                          {item.productVariant.material && <span>Material: {item.productVariant.material} • </span>}
+                          {item.productVariant.sku && <span>SKU: {item.productVariant.sku}</span>}
+                        </div>
+                      )}
                       <p className="text-sm text-gray-300">Qty: {item.quantity}</p>
                       <p className="font-bold">
-                        ${((item.product?.salePrice || item.product?.price || 0) * item.quantity).toFixed(2)}
+                        ${(() => {
+                          const price = item.productVariant
+                            ? (item.productVariant.salePrice || item.productVariant.price || 0)
+                            : (item.product?.baseSalePrice || item.product?.basePrice || 0);
+                          return (price * item.quantity).toFixed(2);
+                        })()}
                       </p>
                     </div>
                   </div>

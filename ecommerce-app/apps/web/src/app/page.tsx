@@ -118,12 +118,31 @@ export default function HomePage() {
         {/* Hero Content Overlay */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center text-white px-4">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 tracking-wider">
-              VELLA PANTI
-            </h1>
-            <p className="text-lg md:text-xl mb-8 font-bold tracking-wider">
-              STREET CULTURE • PREMIUM FASHION • AUTHENTIC STYLE
-            </p>
+            {/* Use carousel data if available, otherwise fallback to default */}
+            {carouselImages.length > 0 && carouselImages[0].title !== undefined ? (
+              carouselImages[0].title !== '' && (
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 tracking-wider">
+                  {carouselImages[0].title}
+                </h1>
+              )
+            ) : (
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 tracking-wider">
+                VELLA PANTI
+              </h1>
+            )}
+
+            {carouselImages.length > 0 && carouselImages[0].description !== undefined ? (
+              carouselImages[0].description !== '' && (
+                <p className="text-lg md:text-xl mb-8 font-bold tracking-wider">
+                  {carouselImages[0].description}
+                </p>
+              )
+            ) : (
+              <p className="text-lg md:text-xl mb-8 font-bold tracking-wider">
+                STREET CULTURE • PREMIUM FASHION • AUTHENTIC STYLE
+              </p>
+            )}
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/categories">
                 <Button size="lg" className="bg-white text-black hover:bg-gray-100 px-8 py-3 text-sm font-black uppercase tracking-wider">
@@ -314,7 +333,7 @@ export default function HomePage() {
             {/* View All Street Products Button */}
             <div className="text-center mb-12">
               <Link href="/products?theme=BLACK&limit=30">
-                <Button variant="outline" className="border-2 border-gray-600 text-white hover:bg-white hover:text-black font-black py-3 px-8 text-sm uppercase tracking-wider transition-all duration-300">
+                <Button className="bg-white text-black font-black py-3 px-8 text-sm uppercase tracking-wider">
                   View All Street Products
                 </Button>
               </Link>

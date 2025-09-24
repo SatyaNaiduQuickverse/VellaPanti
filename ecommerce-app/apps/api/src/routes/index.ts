@@ -8,6 +8,9 @@ import orderRoutes from './orderRoutes';
 import reviewRoutes from './reviewRoutes';
 import uploadRoutes from './uploadRoutes';
 import adminRoutes from './adminRoutes';
+import supportRoutes from './supportRoutes';
+import wishlistRoutes from './wishlistRoutes';
+import bulkUploadRoutes from './bulkUploadRoutes';
 
 export function setupRoutes(app: Express) {
   // API routes
@@ -20,6 +23,9 @@ export function setupRoutes(app: Express) {
   app.use('/api/reviews', reviewRoutes);
   app.use('/api/uploads', uploadRoutes);
   app.use('/api/admin', adminRoutes);
+  app.use('/api/support', supportRoutes);
+  app.use('/api/wishlist', wishlistRoutes);
+  app.use('/api/bulk-upload', bulkUploadRoutes);
 
   // 404 handler for unmatched routes
   app.use('*', (req, res) => {

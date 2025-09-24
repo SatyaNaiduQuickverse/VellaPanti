@@ -53,14 +53,16 @@ function OrderSuccessContent() {
     }
   }, [isAuthenticated, router]);
 
-  const { data: orderData, isLoading } = useQuery({
-    queryKey: ['order', orderId],
+  const { data: orderData, isLoading, error } = useQuery({
+    queryKey: ['order-success', orderId],
     queryFn: async () => {
       if (!orderId) throw new Error('Order ID is required');
-      const response = await api.get(`/orders/${orderId}`);
-      return handleApiResponse<{ data: Order }>(response);
+      const response = await api.get(`/orders/${orderId}/success`);
+      return handleApiResponse<Order>(response);
     },
     enabled: !!orderId && isAuthenticated(),
+    retry: 1,
+    retryDelay: 1000,
   });
 
   if (!isAuthenticated()) {
@@ -93,7 +95,35 @@ function OrderSuccessContent() {
     );
   }
 
-  const order = orderData?.data;
+  const order = orderData;
+
+  if (error) {
+    console.error('Order fetch error:', error);
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 text-lg font-bold">Error loading order details</p>
+          <p className="text-gray-600 mt-2">
+            {error instanceof Error ? error.message : 'Unable to load order information'}
+          </p>
+          <div className="mt-4 space-x-4">
+            <Button
+              onClick={() => window.location.reload()}
+              variant="outline"
+              className="border-2 border-black font-black uppercase tracking-wider"
+            >
+              Try Again
+            </Button>
+            <Link href="/">
+              <Button className="bg-black text-white hover:bg-gray-800 font-black uppercase tracking-wider">
+                Go Home
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!order) {
     return (
@@ -272,7 +302,7 @@ function OrderSuccessContent() {
                     variant="outline"
                     className="w-full border-2 border-black font-black uppercase tracking-wider mb-3"
                   >
-                    View All Orders
+                    Track This Order
                   </Button>
                 </Link>
                 <Link href="/">

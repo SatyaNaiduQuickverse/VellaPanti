@@ -48,14 +48,21 @@ export const getDashboardStats = asyncHandler(async (req: AuthRequest, res: Resp
         },
       },
     }),
-    prisma.product.findMany({
+    prisma.productVariant.findMany({
       where: {
         stock: { lte: 10 },
       },
       take: 10,
       include: {
-        category: {
-          select: { name: true, slug: true },
+        product: {
+          select: {
+            id: true,
+            name: true,
+            basePrice: true,
+            category: {
+              select: { name: true, slug: true },
+            },
+          },
         },
       },
       orderBy: { stock: 'asc' },
@@ -545,5 +552,318 @@ export const bulkDeleteProducts = asyncHandler(async (req: AuthRequest, res: Res
     success: true,
     data: { deletedCount: result.count },
     message: `${result.count} products deleted successfully`,
+  });
+});
+
+// Featured Products Management
+export const getFeaturedProducts = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { theme } = req.query as { theme?: 'BLACK' | 'WHITE' };
+
+  const where: any = {};
+  if (theme) {
+    where.theme = theme;
+  }
+
+  const featuredProducts = await prisma.featuredProduct.findMany({
+    where,
+    include: {
+      product: {
+        include: {
+          category: {
+            select: { id: true, name: true, slug: true },
+          },
+        },
+      },
+    },
+    orderBy: { position: 'asc' },
+  });
+
+  res.json({
+    success: true,
+    data: featuredProducts,
+  });
+});
+
+export const updateFeaturedProducts = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { blackFeaturedIds, whiteFeaturedIds } = req.body;
+
+  if (!Array.isArray(blackFeaturedIds) || !Array.isArray(whiteFeaturedIds)) {
+    throw new AppError('Invalid featured products data', 400);
+  }
+
+  // Validate that all products exist and have correct themes
+  const blackProducts = await prisma.product.findMany({
+    where: {
+      id: { in: blackFeaturedIds },
+      theme: 'BLACK',
+    },
+  });
+
+  const whiteProducts = await prisma.product.findMany({
+    where: {
+      id: { in: whiteFeaturedIds },
+      theme: 'WHITE',
+    },
+  });
+
+  if (blackProducts.length !== blackFeaturedIds.length) {
+    throw new AppError('Some BLACK theme products not found', 400);
+  }
+
+  if (whiteProducts.length !== whiteFeaturedIds.length) {
+    throw new AppError('Some WHITE theme products not found', 400);
+  }
+
+  // Remove existing featured products
+  await prisma.featuredProduct.deleteMany({});
+
+  // Add new featured products
+  const featuredProductsData = [
+    ...blackFeaturedIds.map((productId: string, index: number) => ({
+      productId,
+      theme: 'BLACK' as const,
+      position: index,
+    })),
+    ...whiteFeaturedIds.map((productId: string, index: number) => ({
+      productId,
+      theme: 'WHITE' as const,
+      position: index,
+    })),
+  ];
+
+  await prisma.featuredProduct.createMany({
+    data: featuredProductsData,
+  });
+
+  res.json({
+    success: true,
+    message: 'Featured products updated successfully',
+  });
+});
+
+// Carousel Images Management
+export const getCarouselImages = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const carouselImages = await prisma.carouselImage.findMany({
+    where: { isActive: true },
+    orderBy: { position: 'asc' },
+  });
+
+  res.json({
+    success: true,
+    data: carouselImages,
+  });
+});
+
+export const updateCarouselImages = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { images } = req.body;
+
+  if (!Array.isArray(images)) {
+    throw new AppError('Invalid carousel images data', 400);
+  }
+
+  // Validate required fields
+  for (const image of images) {
+    if (!image.src || !image.alt) {
+      throw new AppError('Image src and alt are required', 400);
+    }
+  }
+
+  // Remove existing carousel images
+  await prisma.carouselImage.deleteMany({});
+
+  // Add new carousel images
+  const carouselImagesData = images.map((image: any, index: number) => ({
+    src: image.src,
+    alt: image.alt,
+    title: image.title || null,
+    description: image.description || null,
+    position: index,
+    isActive: true,
+  }));
+
+  await prisma.carouselImage.createMany({
+    data: carouselImagesData,
+  });
+
+  res.json({
+    success: true,
+    message: 'Carousel images updated successfully',
+  });
+});
+
+// Featured Collections Management
+export const getFeaturedCollections = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const featuredCollections = await prisma.featuredCollection.findMany({
+    include: {
+      category: {
+        select: { id: true, name: true, slug: true, image: true, theme: true },
+      },
+    },
+    orderBy: { position: 'asc' },
+  });
+
+  res.json({
+    success: true,
+    data: featuredCollections,
+  });
+});
+
+export const updateFeaturedCollections = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { blackFeaturedIds, whiteFeaturedIds } = req.body;
+
+  if (!Array.isArray(blackFeaturedIds) || !Array.isArray(whiteFeaturedIds)) {
+    throw new AppError('Invalid featured collections data', 400);
+  }
+
+  // Validate that categories exist
+  const allCategoryIds = [...blackFeaturedIds, ...whiteFeaturedIds];
+  if (allCategoryIds.length > 0) {
+    const categories = await prisma.category.findMany({
+      where: { id: { in: allCategoryIds } },
+      select: { id: true, theme: true },
+    });
+
+    const foundIds = categories.map(cat => cat.id);
+    const missingIds = allCategoryIds.filter(id => !foundIds.includes(id));
+
+    if (missingIds.length > 0) {
+      throw new AppError(`Categories not found: ${missingIds.join(', ')}`, 404);
+    }
+
+    // Check theme matching
+    const blackCategories = categories.filter(cat => blackFeaturedIds.includes(cat.id));
+    const whiteCategories = categories.filter(cat => whiteFeaturedIds.includes(cat.id));
+
+    const wrongBlackTheme = blackCategories.filter(cat => cat.theme !== 'BLACK');
+    const wrongWhiteTheme = whiteCategories.filter(cat => cat.theme !== 'WHITE');
+
+    if (wrongBlackTheme.length > 0) {
+      throw new AppError(`Some BLACK theme categories not found: ${wrongBlackTheme.map(cat => cat.id).join(', ')}`, 400);
+    }
+
+    if (wrongWhiteTheme.length > 0) {
+      throw new AppError(`Some WHITE theme categories not found: ${wrongWhiteTheme.map(cat => cat.id).join(', ')}`, 400);
+    }
+  }
+
+  // Remove existing featured collections
+  await prisma.featuredCollection.deleteMany({});
+
+  // Create new featured collections
+  const featuredCollectionsData = [
+    ...blackFeaturedIds.map((categoryId: string, index: number) => ({
+      categoryId,
+      theme: 'BLACK' as const,
+      position: index,
+    })),
+    ...whiteFeaturedIds.map((categoryId: string, index: number) => ({
+      categoryId,
+      theme: 'WHITE' as const,
+      position: index,
+    })),
+  ];
+
+  if (featuredCollectionsData.length > 0) {
+    await prisma.featuredCollection.createMany({
+      data: featuredCollectionsData,
+    });
+  }
+
+  res.json({
+    success: true,
+    message: 'Featured collections updated successfully',
+    data: { blackCount: blackFeaturedIds.length, whiteCount: whiteFeaturedIds.length },
+  });
+});
+
+// Get homepage banners
+export const getHomepageBanners = asyncHandler(async (req: Request, res: Response) => {
+  const banners = await prisma.homepageBanner.findMany({
+    orderBy: { theme: 'asc' }, // BLACK first, then WHITE
+  });
+
+  res.json({
+    success: true,
+    data: banners,
+  });
+});
+
+// Update homepage banners
+export const updateHomepageBanners = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { blackBanner, whiteBanner } = req.body;
+
+  console.log('Updating homepage banners:', { blackBanner, whiteBanner });
+
+  // Validate required fields (only src and alt are required, everything else is optional)
+  const validateBanner = (banner: any, theme: string) => {
+    if (!banner) return;
+    if (!banner.src) {
+      throw new AppError(`${theme} banner must have src field`, 400);
+    }
+    // Alt can be empty string, but should exist for accessibility
+    if (banner.alt === undefined) {
+      banner.alt = '';
+    }
+  };
+
+  validateBanner(blackBanner, 'BLACK');
+  validateBanner(whiteBanner, 'WHITE');
+
+  const updates = [];
+
+  // Update BLACK banner
+  if (blackBanner) {
+    const updateData = {
+      theme: 'BLACK' as const,
+      src: blackBanner.src,
+      alt: blackBanner.alt,
+      title: blackBanner.title || null,
+      description: blackBanner.description || null,
+      buttonText: blackBanner.buttonText || null,
+      buttonLink: blackBanner.buttonLink || null,
+      isActive: blackBanner.isActive !== undefined ? blackBanner.isActive : true,
+    };
+
+    const blackUpdate = prisma.homepageBanner.upsert({
+      where: { theme: 'BLACK' },
+      create: updateData,
+      update: updateData,
+    });
+    updates.push(blackUpdate);
+  }
+
+  // Update WHITE banner
+  if (whiteBanner) {
+    const updateData = {
+      theme: 'WHITE' as const,
+      src: whiteBanner.src,
+      alt: whiteBanner.alt,
+      title: whiteBanner.title || null,
+      description: whiteBanner.description || null,
+      buttonText: whiteBanner.buttonText || null,
+      buttonLink: whiteBanner.buttonLink || null,
+      isActive: whiteBanner.isActive !== undefined ? whiteBanner.isActive : true,
+    };
+
+    const whiteUpdate = prisma.homepageBanner.upsert({
+      where: { theme: 'WHITE' },
+      create: updateData,
+      update: updateData,
+    });
+    updates.push(whiteUpdate);
+  }
+
+  if (updates.length === 0) {
+    throw new AppError('No banner data provided', 400);
+  }
+
+  const results = await Promise.all(updates);
+
+  console.log('Homepage banners updated successfully:', results);
+
+  res.json({
+    success: true,
+    message: 'Homepage banners updated successfully',
+    data: results,
   });
 });

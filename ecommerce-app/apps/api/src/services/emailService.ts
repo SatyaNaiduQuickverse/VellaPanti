@@ -36,8 +36,8 @@ class EmailService {
   private transporter: nodemailer.Transporter;
 
   constructor() {
-    // In development without email config, use a dummy transporter
-    if (config.isDevelopment && !config.email.user) {
+    // In development, always use a dummy transporter to avoid SMTP connection issues
+    if (config.isDevelopment) {
       this.transporter = nodemailer.createTransport({
         streamTransport: true,
         newline: 'unix',
@@ -66,8 +66,8 @@ class EmailService {
         html: options.html,
       };
 
-      if (config.isDevelopment && !config.email.user) {
-        // In development without email config, log to console
+      if (config.isDevelopment) {
+        // In development, just log to console instead of sending real emails
         console.log('📧 Email would be sent:');
         console.log('To:', options.to);
         console.log('Subject:', options.subject);
@@ -307,13 +307,88 @@ VellaPanti Team
     await this.sendEmail({ to: email, subject, text, html });
   }
 
+  async sendSupportTicket(ticketData: {
+    subject: string;
+    category: string;
+    priority: string;
+    message: string;
+    customerName?: string;
+    customerEmail?: string;
+  }): Promise<void> {
+    const subject = `New Support Ticket: ${ticketData.subject}`;
+
+    const text = `
+New Support Ticket Received
+
+Category: ${ticketData.category}
+Priority: ${ticketData.priority}
+Subject: ${ticketData.subject}
+
+From: ${ticketData.customerName || 'Guest'} ${ticketData.customerEmail ? `(${ticketData.customerEmail})` : ''}
+
+Message:
+${ticketData.message}
+
+---
+This ticket was submitted via the VellaPanti website contact form.
+    `;
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>New Support Ticket</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #f8f9fa; padding: 20px; text-align: center; border-bottom: 2px solid #000; }
+        .ticket-info { background-color: #fff; border: 2px solid #000; padding: 20px; margin: 20px 0; }
+        .priority-high { border-left: 4px solid #dc3545; }
+        .priority-critical { border-left: 4px solid #dc3545; background-color: #fff5f5; }
+        .priority-medium { border-left: 4px solid #ffc107; }
+        .priority-low { border-left: 4px solid #28a745; }
+        .message-content { background-color: #f8f9fa; padding: 15px; margin: 15px 0; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>NEW SUPPORT TICKET</h1>
+            <p><strong>${ticketData.subject}</strong></p>
+        </div>
+
+        <div class="ticket-info priority-${ticketData.priority.toLowerCase()}">
+            <h3>Ticket Details:</h3>
+            <p><strong>Category:</strong> ${ticketData.category}</p>
+            <p><strong>Priority:</strong> ${ticketData.priority.toUpperCase()}</p>
+            <p><strong>From:</strong> ${ticketData.customerName || 'Guest'} ${ticketData.customerEmail ? `(${ticketData.customerEmail})` : ''}</p>
+        </div>
+
+        <div class="message-content">
+            <h3>Message:</h3>
+            <p>${ticketData.message.replace(/\n/g, '<br>')}</p>
+        </div>
+
+        <hr>
+        <p><em>This ticket was submitted via the VellaPanti website contact form.</em></p>
+    </div>
+</body>
+</html>
+    `;
+
+    // Send to support team email (in production this would be configured)
+    const supportEmail = config.email.supportEmail || 'support@vellapanti.com';
+    await this.sendEmail({ to: supportEmail, subject, text, html });
+  }
+
   async testConnection(): Promise<boolean> {
     try {
       if (config.isDevelopment && !config.email.user) {
         console.log('📧 Email service in development mode (console logging)');
         return true;
       }
-      
+
       await this.transporter.verify();
       console.log('✅ Email service connection verified');
       return true;
