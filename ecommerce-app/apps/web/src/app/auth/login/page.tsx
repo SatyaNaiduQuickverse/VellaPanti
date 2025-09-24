@@ -47,101 +47,118 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="max-w-md mx-auto">
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome Back</CardTitle>
-            <p className="text-gray-600 mt-2">Sign in to your account</p>
-          </CardHeader>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
+        <div className="text-center">
+          <h2 className="text-3xl font-semibold text-gray-900 tracking-tight mb-2">VellaPanti</h2>
+          <p className="text-sm text-gray-600 font-normal">Sign in to your account or create a new one</p>
+        </div>
 
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">
-                  Email Address
-                </label>
+        {/* Form */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200/50 p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-2 tracking-tight">
+                Email address
+              </label>
+              <Input
+                id="email"
+                type="email"
+                {...register('email')}
+                placeholder="name@company.com"
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                } focus:ring-2 focus:ring-black focus:border-black transition-all text-sm font-normal`}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-2 font-normal">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-900 mb-2 tracking-tight">
+                Password
+              </label>
+              <div className="relative">
                 <Input
-                  id="email"
-                  type="email"
-                  {...register('email')}
-                  placeholder="Enter your email"
-                  className={errors.email ? 'border-red-500' : ''}
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  {...register('password')}
+                  placeholder="••••••••"
+                  className={`w-full px-4 py-3 pr-12 rounded-lg border ${
+                    errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  } focus:ring-2 focus:ring-black focus:border-black transition-all text-sm font-normal`}
                 />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    {...register('password')}
-                    placeholder="Enter your password"
-                    className={errors.password ? 'border-red-500 pr-10' : 'pr-10'}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="rounded border-gray-300 text-primary focus:ring-primary"
-                  />
-                  <span className="ml-2 text-sm text-gray-600">Remember me</span>
-                </label>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-sm text-primary hover:underline"
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  Forgot password?
-                </Link>
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-2 font-normal">{errors.password.message}</p>
+              )}
+            </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isSubmitting || login.isPending}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black focus:ring-2"
+                />
+                <span className="ml-2 text-sm text-gray-600 font-normal">Remember me</span>
+              </label>
+              <Link
+                href="/auth/forgot-password"
+                className="text-sm text-black hover:text-gray-700 font-medium tracking-tight transition-colors"
               >
-                {isSubmitting || login.isPending ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
-                <Link href="/auth/register" className="text-primary hover:underline font-medium">
-                  Sign up
-                </Link>
-              </p>
+                Forgot password?
+              </Link>
             </div>
 
-            {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm font-medium text-blue-800 mb-2">Demo Credentials:</p>
-              <div className="text-sm text-blue-700 space-y-1">
-                <div><strong>User:</strong> user@ecommerce.com / password123</div>
-                <div><strong>Admin:</strong> admin@ecommerce.com / password123</div>
-              </div>
+            <Button
+              type="submit"
+              className="w-full bg-black text-white hover:bg-gray-900 focus:ring-2 focus:ring-black focus:ring-offset-2 py-3 rounded-lg font-medium text-sm tracking-tight transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled={isSubmitting || login.isPending}
+            >
+              {isSubmitting || login.isPending ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                  Signing in...
+                </div>
+              ) : (
+                'Sign in'
+              )}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600 font-normal">
+              Don't have an account?{' '}
+              <Link href="/auth/register" className="text-black hover:text-gray-700 font-medium tracking-tight transition-colors">
+                Sign up
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Demo Credentials */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <p className="text-sm font-medium text-gray-900 mb-3 tracking-tight">Demo Credentials:</p>
+          <div className="space-y-2 text-sm font-normal">
+            <div className="bg-gray-50 rounded-lg p-3">
+              <div className="text-gray-700"><span className="font-medium">User:</span> user@example.com</div>
+              <div className="text-gray-600 text-xs mt-1">Password: user123</div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="bg-gray-50 rounded-lg p-3">
+              <div className="text-gray-700"><span className="font-medium">Admin:</span> admin@vellapanti.com</div>
+              <div className="text-gray-600 text-xs mt-1">Password: admin123</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

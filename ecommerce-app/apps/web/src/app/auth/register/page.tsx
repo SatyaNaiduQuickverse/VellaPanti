@@ -62,135 +62,150 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="max-w-md mx-auto">
-        <Card>
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Create Account</CardTitle>
-            <p className="text-gray-600 mt-2">Join us today</p>
-          </CardHeader>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
+        <div className="text-center">
+          <h2 className="text-3xl font-semibold text-gray-900 tracking-tight mb-2">Join VellaPanti</h2>
+          <p className="text-sm text-gray-600 font-normal">Create your account to get started</p>
+        </div>
 
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-1">
-                  Full Name
-                </label>
-                <Input
-                  id="name"
-                  type="text"
-                  {...registerField('name')}
-                  placeholder="Enter your full name"
-                  className={errors.name ? 'border-red-500' : ''}
-                />
-                {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-1">
-                  Email Address
-                </label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...registerField('email')}
-                  placeholder="Enter your email"
-                  className={errors.email ? 'border-red-500' : ''}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    {...registerField('password')}
-                    placeholder="Create a password"
-                    className={errors.password ? 'border-red-500 pr-10' : 'pr-10'}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    {...registerField('confirmPassword')}
-                    placeholder="Confirm your password"
-                    className={errors.confirmPassword ? 'border-red-500 pr-10' : 'pr-10'}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {errors.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
-                )}
-              </div>
-
-              <div className="flex items-start">
-                <input
-                  type="checkbox"
-                  required
-                  className="mt-1 rounded border-gray-300 text-primary focus:ring-primary"
-                />
-                <span className="ml-2 text-sm text-gray-600">
-                  I agree to the{' '}
-                  <Link href="/terms" className="text-primary hover:underline">
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link href="/privacy" className="text-primary hover:underline">
-                    Privacy Policy
-                  </Link>
-                </span>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={isSubmitting || register.isPending}
-              >
-                {isSubmitting || register.isPending ? 'Creating Account...' : 'Create Account'}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Already have an account?{' '}
-                <Link href="/auth/login" className="text-primary hover:underline font-medium">
-                  Sign in
-                </Link>
-              </p>
+        {/* Form */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200/50 p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-2 tracking-tight">
+                Full name
+              </label>
+              <Input
+                id="name"
+                type="text"
+                {...registerField('name')}
+                placeholder="John Doe"
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  errors.name ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                } focus:ring-2 focus:ring-black focus:border-black transition-all text-sm font-normal`}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-xs mt-2 font-normal">{errors.name.message}</p>
+              )}
             </div>
-          </CardContent>
-        </Card>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-2 tracking-tight">
+                Email address
+              </label>
+              <Input
+                id="email"
+                type="email"
+                {...registerField('email')}
+                placeholder="name@company.com"
+                className={`w-full px-4 py-3 rounded-lg border ${
+                  errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                } focus:ring-2 focus:ring-black focus:border-black transition-all text-sm font-normal`}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-2 font-normal">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-900 mb-2 tracking-tight">
+                Password
+              </label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  {...registerField('password')}
+                  placeholder="••••••••"
+                  className={`w-full px-4 py-3 pr-12 rounded-lg border ${
+                    errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  } focus:ring-2 focus:ring-black focus:border-black transition-all text-sm font-normal`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-2 font-normal">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-900 mb-2 tracking-tight">
+                Confirm password
+              </label>
+              <div className="relative">
+                <Input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  {...registerField('confirmPassword')}
+                  placeholder="••••••••"
+                  className={`w-full px-4 py-3 pr-12 rounded-lg border ${
+                    errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                  } focus:ring-2 focus:ring-black focus:border-black transition-all text-sm font-normal`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs mt-2 font-normal">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
+            <div className="flex items-start">
+              <input
+                type="checkbox"
+                required
+                className="h-4 w-4 mt-1 rounded border-gray-300 text-black focus:ring-black focus:ring-2"
+              />
+              <span className="ml-2 text-sm text-gray-600 font-normal">
+                I agree to the{' '}
+                <Link href="/terms" className="text-black hover:text-gray-700 font-medium tracking-tight transition-colors">
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link href="/privacy" className="text-black hover:text-gray-700 font-medium tracking-tight transition-colors">
+                  Privacy Policy
+                </Link>
+              </span>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-black text-white hover:bg-gray-900 focus:ring-2 focus:ring-black focus:ring-offset-2 py-3 rounded-lg font-medium text-sm tracking-tight transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
+              disabled={isSubmitting || register.isPending}
+            >
+              {isSubmitting || register.isPending ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                  Creating account...
+                </div>
+              ) : (
+                'Create account'
+              )}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600 font-normal">
+              Already have an account?{' '}
+              <Link href="/auth/login" className="text-black hover:text-gray-700 font-medium tracking-tight transition-colors">
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
