@@ -26,7 +26,18 @@ export default function ProductPage({ params }: ProductPageProps) {
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<string>('');
 
-  const { data: product, isLoading, error } = useProduct(params.slug);
+  const { data: product, isLoading, error, isError } = useProduct(params.slug);
+
+  // Debug logging
+  if (typeof window !== 'undefined') {
+    console.log('Product page state:', {
+      slug: params.slug,
+      isLoading,
+      isError,
+      hasProduct: !!product,
+      error: error?.message
+    });
+  }
   const { data: recommendedData } = useProducts({ limit: 4, sort: 'createdAt', sortOrder: 'desc' });
   const { isAuthenticated } = useAuthStore();
   const addToCart = useAddToCart();
@@ -72,7 +83,12 @@ export default function ProductPage({ params }: ProductPageProps) {
     );
   }
 
-  if (error || !product) {
+  if (error) {
+    console.error('Product page error:', error);
+    notFound();
+  }
+
+  if (!product) {
     notFound();
   }
 
@@ -90,22 +106,22 @@ export default function ProductPage({ params }: ProductPageProps) {
   // Get the current price and stock from variant or product base
   const getCurrentPrice = () => {
     if (currentVariant) {
-      return currentVariant.salePrice || currentVariant.price;
+      return currentVariant.salePrice || currentVariant.price || 0;
     }
     if (product.priceRange) {
-      return product.priceRange.saleMin || product.priceRange.min;
+      return product.priceRange.saleMin || product.priceRange.min || 0;
     }
-    return product.baseSalePrice || product.basePrice;
+    return product.baseSalePrice || product.basePrice || 0;
   };
 
   const getOriginalPrice = () => {
     if (currentVariant) {
-      return currentVariant.price;
+      return currentVariant.price || 0;
     }
     if (product.priceRange) {
-      return product.priceRange.max;
+      return product.priceRange.max || 0;
     }
-    return product.basePrice;
+    return product.basePrice || 0;
   };
 
   const getCurrentStock = () => {
@@ -196,12 +212,50 @@ export default function ProductPage({ params }: ProductPageProps) {
           {/* Product Images */}
           <div className="space-y-4">
             <div className="aspect-square relative overflow-hidden rounded-lg shadow-lg bg-white border">
-              <Image
-                src={displayImages?.[selectedImage] || product.images?.[selectedImage] || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&h=600&q=80'}
-                alt={`${product.name}${currentVariant ? ` - ${currentVariant.color} ${currentVariant.size}` : ''}`}
-                fill
-                className="object-cover hover:scale-110 transition-all duration-700 ease-out"
-              />
+              {(() => {
+                const imageUrl = displayImages?.[selectedImage] || product.images?.[selectedImage];
+
+                // Convert ibb.co sharing URLs to direct image URLs
+                const getDirectImageUrl = (url: string) => {
+                  if (!url) return 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&h=1200&q=95&fit=crop&auto=format';
+
+                  // If it's already a direct ibb.co URL, use it
+                  if (url.includes('i.ibb.co/')) {
+                    return url;
+                  }
+
+                  // Convert ibb.co sharing URL to direct URL
+                  if (url.includes('ibb.co/') && !url.includes('i.ibb.co/')) {
+                    // Extract the image ID from URL like https://ibb.co/abcd123
+                    const match = url.match(/ibb\.co\/([a-zA-Z0-9]+)/);
+                    if (match && match[1]) {
+                      // Convert to direct URL format: https://i.ibb.co/imageId/filename.jpg
+                      // We'll use a generic filename since we don't have the original
+                      return `https://i.ibb.co/${match[1]}/image.jpg`;
+                    }
+                  }
+
+                  return url;
+                };
+
+                const finalUrl = getDirectImageUrl(imageUrl);
+
+                return (
+                  <img
+                    src={finalUrl}
+                    alt={`${product.name}${currentVariant ? ` - ${currentVariant.color} ${currentVariant.size}` : ''}`}
+                    className="w-full h-full object-cover hover:scale-110 transition-all duration-700 ease-out"
+                    style={{
+                      imageRendering: 'auto',
+                      filter: 'contrast(1.1) saturate(1.1) brightness(1.02)'
+                    }}
+                    onError={(e) => {
+                      // Fallback to high-quality placeholder
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&h=1200&q=95&fit=crop&auto=format';
+                    }}
+                  />
+                );
+              })()}
 
               {/* Floating Elements */}
               {hasDiscount && (
@@ -236,16 +290,71 @@ export default function ProductPage({ params }: ProductPageProps) {
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
-                    <Image
-                      src={image}
-                      alt={`${product.name} ${index + 1}${currentVariant ? ` - ${currentVariant.color}` : ''}`}
-                      fill
-                      className="object-cover"
-                    />
+                    {(() => {
+                      // Convert ibb.co sharing URLs to direct image URLs
+                      const getDirectImageUrl = (url: string) => {
+                        if (!url) return 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&q=95&fit=crop&auto=format';
+
+                        // If it's already a direct ibb.co URL, use it
+                        if (url.includes('i.ibb.co/')) {
+                          return url;
+                        }
+
+                        // Convert ibb.co sharing URL to direct URL
+                        if (url.includes('ibb.co/') && !url.includes('i.ibb.co/')) {
+                          // Extract the image ID from URL like https://ibb.co/abcd123
+                          const match = url.match(/ibb\.co\/([a-zA-Z0-9]+)/);
+                          if (match && match[1]) {
+                            // Convert to direct URL format: https://i.ibb.co/imageId/filename.jpg
+                            // We'll use a generic filename since we don't have the original
+                            return `https://i.ibb.co/${match[1]}/image.jpg`;
+                          }
+                        }
+
+                        return url;
+                      };
+
+                      const thumbUrl = getDirectImageUrl(image);
+
+                      return (
+                        <img
+                          src={thumbUrl}
+                          alt={`${product.name} ${index + 1}${currentVariant ? ` - ${currentVariant.color}` : ''}`}
+                          className="w-full h-full object-cover"
+                          style={{
+                            imageRendering: 'auto',
+                            filter: 'contrast(1.1) saturate(1.1) brightness(1.02)'
+                          }}
+                          onError={(e) => {
+                            // Fallback to high-quality placeholder
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&q=95&fit=crop&auto=format';
+                          }}
+                        />
+                      );
+                    })()}
                   </button>
                 ))}
               </div>
             )}
+
+            {/* Size Chart - Moved to left column */}
+            <div className="bg-white rounded-lg p-4 shadow-sm border">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900 tracking-tight">Size Chart</h3>
+              <div className="relative overflow-hidden rounded-lg">
+                <Image
+                  src="/size-chart.png"
+                  alt="VellaPanti Size Chart - Measurements for T-shirts, Hoodies, Jeans and Shoes"
+                  width={600}
+                  height={400}
+                  className="w-full h-auto max-w-full object-contain"
+                  priority={false}
+                />
+              </div>
+              <p className="text-xs text-gray-600 mt-2 leading-relaxed">
+                All measurements are in inches. For the best fit, please measure yourself and compare with our size chart.
+                If you&apos;re between sizes, we recommend sizing up for a comfortable fit.
+              </p>
+            </div>
           </div>
 
           {/* Product Info */}
@@ -269,7 +378,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                     ))}
                   </div>
                   <div className="text-sm">
-                    <span className="font-semibold text-gray-900">{product.averageRating.toFixed(1)}</span>
+                    <span className="font-semibold text-gray-900">{(product.averageRating || 0).toFixed(1)}</span>
                     <span className="text-gray-600 ml-1">({product.reviewCount || 0} reviews)</span>
                   </div>
                 </div>
@@ -281,9 +390,9 @@ export default function ProductPage({ params }: ProductPageProps) {
                   {product.priceRange?.hasVariablePrice ? (
                     <div>
                       <span className="text-2xl font-bold text-black">
-                        ₹{displayPrice.toFixed(2)}
+                        ₹{(displayPrice || 0).toFixed(2)}
                       </span>
-                      {!currentVariant && (
+                      {!currentVariant && product.priceRange?.max && (
                         <span className="text-lg text-gray-600 ml-2">
                           - ₹{product.priceRange.max.toFixed(2)}
                         </span>
@@ -291,13 +400,13 @@ export default function ProductPage({ params }: ProductPageProps) {
                     </div>
                   ) : (
                     <span className="text-2xl font-bold text-black">
-                      ₹{displayPrice.toFixed(2)}
+                      ₹{(displayPrice || 0).toFixed(2)}
                     </span>
                   )}
                   {hasDiscount && currentVariant && (
                     <div className="flex flex-col items-start">
                       <span className="text-lg text-gray-500 line-through">
-                        ₹{currentVariant.price.toFixed(2)}
+                        ₹{(currentVariant.price || 0).toFixed(2)}
                       </span>
                       <div className="bg-red-500 text-white px-2 py-1 text-xs font-semibold rounded-md">
                         SAVE {discountPercentage}%
@@ -401,18 +510,87 @@ export default function ProductPage({ params }: ProductPageProps) {
                 <div className="flex items-center gap-2 bg-blue-50 p-3 rounded-lg border border-blue-200">
                   <Truck className="h-4 w-4 text-blue-600" />
                   <div>
-                    <span className="text-blue-700 font-semibold block text-xs">Free Delivery</span>
-                    <span className="text-blue-600 text-xs">2-3 days</span>
+                    <span className="text-blue-700 font-semibold block text-xs">Delivery</span>
+                    <span className="text-blue-600 text-xs">By Oct 2</span>
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* Quantity and Add to Cart - Moved above description */}
+            {currentStock > 0 && (
+              <div className="bg-white rounded-lg p-3 shadow-sm border space-y-3">
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-900 tracking-tight">Quantity</label>
+                  <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg w-fit">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      disabled={quantity <= 1}
+                      className="h-10 w-10 rounded-lg border-2 border-gray-300 hover:border-black hover:bg-black hover:text-white transition-all bg-white"
+                    >
+                      <Minus className="h-4 w-4 text-black hover:text-white" />
+                    </Button>
+                    <input
+                      type="number"
+                      min="1"
+                      max={currentStock}
+                      value={quantity}
+                      onChange={(e) => setQuantity(Math.min(currentStock, Math.max(1, parseInt(e.target.value) || 1)))}
+                      className="w-16 text-center border-2 border-gray-300 rounded-lg py-2 text-sm font-semibold focus:border-black focus:outline-none transition-colors bg-white"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
+                      disabled={quantity >= currentStock}
+                      className="h-10 w-10 rounded-lg border-2 border-gray-300 hover:border-black hover:bg-black hover:text-white transition-all bg-white"
+                    >
+                      <Plus className="h-4 w-4 text-black hover:text-white" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Premium Features */}
+                <div className="grid grid-cols-3 gap-2 py-2">
+                  <div className="flex flex-col items-center gap-1 p-2 bg-blue-50 rounded-lg">
+                    <Shield className="h-4 w-4 text-blue-600" />
+                    <span className="text-xs font-medium text-blue-700 tracking-tight">Secure</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 p-2 bg-green-50 rounded-lg">
+                    <RefreshCw className="h-4 w-4 text-green-600" />
+                    <span className="text-xs font-medium text-green-700 tracking-tight">Exchange</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1 p-2 bg-purple-50 rounded-lg">
+                    <Star className="h-4 w-4 text-purple-600" />
+                    <span className="text-xs font-medium text-purple-700 tracking-tight">Quality</span>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleAddToCart}
+                  disabled={addToCart.isPending || (product.variants?.length > 1 && !currentVariant)}
+                  className="w-full bg-black hover:bg-gray-900 disabled:bg-gray-400 text-white font-medium py-3 rounded-md transition-all text-sm"
+                  size="lg"
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  {addToCart.isPending
+                    ? 'Adding...'
+                    : (product.variants?.length > 1 && !currentVariant)
+                    ? 'Select options first'
+                    : `Add to Cart • ₹${((displayPrice || 0) * quantity).toFixed(2)}`
+                  }
+                </Button>
+              </div>
+            )}
+
             {/* Description */}
-            <div className="bg-white rounded-lg p-3 shadow-sm border">
-              <h3 className="text-sm font-medium mb-2 text-gray-900 tracking-tight">Description</h3>
-              <p className="text-gray-700 leading-relaxed text-xs font-normal">{product.description}</p>
+            <div className="bg-white rounded-lg p-4 shadow-sm border">
+              <h3 className="text-lg font-semibold mb-3 text-gray-900 tracking-tight">Description</h3>
+              <p className="text-gray-700 leading-relaxed text-base font-normal">{product.description}</p>
             </div>
+
 
             {/* Product Details */}
             {(product.aboutItems || product.materialComposition || product.manufacturer) && (
@@ -526,80 +704,16 @@ export default function ProductPage({ params }: ProductPageProps) {
               </div>
             )}
 
-            {/* Quantity and Add to Cart */}
-            {currentStock > 0 && (
-              <div className="bg-white rounded-lg p-3 shadow-sm border space-y-3">
-                <div>
-                  <label className="block text-xs font-medium mb-1 text-gray-900 tracking-tight">Quantity</label>
-                  <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-md w-fit">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      disabled={quantity <= 1}
-                      className="h-6 w-6 rounded border border-gray-300 hover:border-black hover:bg-black hover:text-white transition-all"
-                    >
-                      <Minus className="h-3 w-3" />
-                    </Button>
-                    <input
-                      type="number"
-                      min="1"
-                      max={currentStock}
-                      value={quantity}
-                      onChange={(e) => setQuantity(Math.min(currentStock, Math.max(1, parseInt(e.target.value) || 1)))}
-                      className="w-12 text-center border border-gray-300 rounded py-1 text-xs font-medium focus:border-black focus:outline-none transition-colors"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
-                      disabled={quantity >= currentStock}
-                      className="h-6 w-6 rounded border border-gray-300 hover:border-black hover:bg-black hover:text-white transition-all"
-                    >
-                      <Plus className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Premium Features */}
-                <div className="grid grid-cols-3 gap-2 py-2">
-                  <div className="flex flex-col items-center gap-1 p-2 bg-blue-50 rounded-lg">
-                    <Shield className="h-4 w-4 text-blue-600" />
-                    <span className="text-xs font-medium text-blue-700 tracking-tight">Secure</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 p-2 bg-green-50 rounded-lg">
-                    <RefreshCw className="h-4 w-4 text-green-600" />
-                    <span className="text-xs font-medium text-green-700 tracking-tight">Returns</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 p-2 bg-purple-50 rounded-lg">
-                    <Star className="h-4 w-4 text-purple-600" />
-                    <span className="text-xs font-medium text-purple-700 tracking-tight">Quality</span>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleAddToCart}
-                  disabled={addToCart.isPending || (product.variants?.length > 1 && !currentVariant)}
-                  className="w-full bg-black hover:bg-gray-900 disabled:bg-gray-400 text-white font-medium py-2 rounded-md transition-all text-xs"
-                  size="sm"
-                >
-                  <ShoppingCart className="h-3 w-3 mr-1" />
-                  {addToCart.isPending
-                    ? 'Adding...'
-                    : (product.variants?.length > 1 && !currentVariant)
-                    ? 'Select options first'
-                    : `Add to Cart • ₹${(displayPrice * quantity).toFixed(2)}`
-                  }
-                </Button>
-              </div>
-            )}
           </div>
         </div>
 
-        {/* Reviews Section */}
+        {/* Reviews Section - Compact */}
         <div className="mt-6">
-          <div className="bg-white rounded-lg p-3 shadow-sm border">
-            <ReviewsList productId={product.id} />
+          <div className="bg-white rounded-lg p-4 shadow-sm border">
+            <h2 className="text-lg font-semibold mb-3 text-gray-900">Customer Reviews</h2>
+            <div className="max-h-80 overflow-hidden">
+              <ReviewsList productId={product.id} />
+            </div>
           </div>
         </div>
 

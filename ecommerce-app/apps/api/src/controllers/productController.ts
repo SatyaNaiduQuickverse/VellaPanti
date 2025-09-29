@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '@ecommerce/database';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
-import type { ProductFilters, PaginatedResponse, Product } from '@ecommerce/types';
+import type { PaginatedResponse, Product } from '@ecommerce/types';
 import { imageService } from '../services/uploadService';
 import type { AuthRequest } from '../middleware/auth';
 
@@ -392,7 +392,56 @@ export const getProductById = asyncHandler(async (req: Request, res: Response) =
 });
 
 export const createProduct = asyncHandler(async (req: AuthRequest, res: Response) => {
-  const { name, description, price, salePrice, stock, categoryId } = req.body;
+  // Debug logging for product creation
+  console.log('🔍 Regular Product Creation Debug:');
+  console.log('📝 Full Request Body:', JSON.stringify(req.body, null, 2));
+  console.log('📁 Files:', req.files ? req.files.length : 0);
+  console.log('🏷️ Content Type:', req.headers['content-type']);
+  console.log('🔑 All Body Keys:', Object.keys(req.body));
+  console.log('🔑 All Body Values:', Object.values(req.body));
+
+  const { name, description, price, salePrice, stock, categoryId, basePrice, baseSalePrice, images } = req.body;
+
+  // Handle both field naming conventions (price/salePrice vs basePrice/baseSalePrice)
+  const priceValue = price || basePrice;
+  const salePriceValue = salePrice || baseSalePrice;
+
+  console.log('🔍 Field mapping check:');
+  console.log('   price:', price);
+  console.log('   basePrice:', basePrice);
+  console.log('   salePrice:', salePrice);
+  console.log('   baseSalePrice:', baseSalePrice);
+  console.log('   Final priceValue:', priceValue);
+  console.log('   Final salePriceValue:', salePriceValue);
+
+  // CRITICAL: Add validation to prevent incomplete products
+  if (!name || !name.trim()) {
+    throw new AppError('Product name is required', 400);
+  }
+
+  if (!description || !description.trim()) {
+    throw new AppError('Product description is required', 400);
+  }
+
+  console.log('🔍 Price validation - raw value:', priceValue, 'type:', typeof priceValue);
+
+  if (!priceValue || priceValue === '' || priceValue === 'undefined' || priceValue === 'null') {
+    throw new AppError('Product price is required', 400);
+  }
+
+  const parsedPrice = parseFloat(String(priceValue).trim());
+  console.log('🔍 Parsed price:', parsedPrice, 'isNaN:', isNaN(parsedPrice));
+
+  if (isNaN(parsedPrice) || parsedPrice <= 0) {
+    throw new AppError(`Invalid price value: "${priceValue}". Please enter a valid positive number.`, 400);
+  }
+
+  if (!categoryId) {
+    throw new AppError('Category ID is required', 400);
+  }
+
+  console.log('✅ Validation passed for product:', name, 'price:', parsedPrice);
+
   const files = req.files as Express.Multer.File[];
 
   // Generate slug from name
@@ -411,11 +460,24 @@ export const createProduct = asyncHandler(async (req: AuthRequest, res: Response
     throw new AppError('Product with this name already exists', 409);
   }
 
-  // Process uploaded images
+  // Process uploaded images and direct image URLs
   let imageUrls: string[] = [];
   if (files && files.length > 0) {
+    // Handle file uploads
     const processedImages = await imageService.processProductImages(files);
     imageUrls = processedImages.map(img => img.url);
+  } else if (images && Array.isArray(images) && images.length > 0) {
+    // Handle direct image URLs from JSON request
+    imageUrls = images.filter(url => url && typeof url === 'string' && url.trim().length > 0);
+    console.log('🖼️ Using direct image URLs:', imageUrls);
+  }
+
+  // Use the already validated price
+  const finalPrice = parsedPrice;
+  const finalSalePrice = salePriceValue ? parseFloat(String(salePriceValue).trim()) : null;
+
+  if (finalSalePrice !== null && (isNaN(finalSalePrice) || finalSalePrice <= 0)) {
+    throw new AppError('Sale price must be a valid positive number', 400);
   }
 
   // Create product data
@@ -423,9 +485,8 @@ export const createProduct = asyncHandler(async (req: AuthRequest, res: Response
     name,
     slug,
     description,
-    price: parseFloat(price),
-    salePrice: salePrice ? parseFloat(salePrice) : null,
-    stock: parseInt(stock),
+    basePrice: finalPrice,
+    baseSalePrice: finalSalePrice,
     categoryId,
     images: imageUrls,
   };
@@ -513,15 +574,14 @@ export const updateProduct = asyncHandler(async (req: AuthRequest, res: Response
   const updateData: any = {
     ...(name && { name, slug }),
     ...(description && { description }),
-    ...(price && { price: parseFloat(price) }),
-    ...(stock !== undefined && { stock: parseInt(stock) }),
+    ...(price && { basePrice: parseFloat(price) }),
     ...(categoryId && { categoryId }),
     images: finalImageUrls,
   };
 
   // Handle salePrice separately to allow null values
   if (salePrice !== undefined) {
-    updateData.salePrice = salePrice ? parseFloat(salePrice) : null;
+    updateData.baseSalePrice = salePrice ? parseFloat(salePrice) : null;
   }
 
   const product = await prisma.product.update({
@@ -697,8 +757,8 @@ export const searchProducts = asyncHandler(async (req: Request, res: Response) =
             { description: { contains: q, mode: 'insensitive' } },
           ],
         } : {},
-        _min: { price: true },
-        _max: { price: true },
+        _min: { basePrice: true },
+        _max: { basePrice: true },
       }),
     ]),
   ]);
@@ -751,8 +811,8 @@ export const searchProducts = asyncHandler(async (req: Request, res: Response) =
     facets: {
       categories: processedCategoryFacets,
       priceRange: {
-        min: priceRange._min.price || 0,
-        max: priceRange._max.price || 0,
+        min: priceRange._min.basePrice || 0,
+        max: priceRange._max.basePrice || 0,
       },
     },
     filters: {
@@ -856,7 +916,7 @@ export const checkVariantAvailability = asyncHandler(async (req: Request, res: R
 });
 
 // Get all categories for filter dropdown
-export const getCategoriesForFilter = asyncHandler(async (req: Request, res: Response) => {
+export const getCategoriesForFilter = asyncHandler(async (_req: Request, res: Response) => {
   const categories = await prisma.category.findMany({
     select: {
       id: true,

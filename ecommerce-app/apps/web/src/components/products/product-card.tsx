@@ -70,20 +70,20 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
   // Get price from variants or base price
   const getDisplayPrice = () => {
     if (product.priceRange) {
-      return product.priceRange.saleMin || product.priceRange.min;
+      return product.priceRange.saleMin || product.priceRange.min || 0;
     }
     if (product.variants?.[0]) {
-      return product.variants[0].salePrice || product.variants[0].price;
+      return product.variants[0].salePrice || product.variants[0].price || 0;
     }
     return product.baseSalePrice || product.basePrice || 0;
   };
 
   const getOriginalPrice = () => {
     if (product.priceRange) {
-      return product.priceRange.max;
+      return product.priceRange.max || 0;
     }
     if (product.variants?.[0]) {
-      return product.variants[0].price;
+      return product.variants[0].price || 0;
     }
     return product.basePrice || 0;
   };
@@ -165,81 +165,124 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
   const config = themeConfig[theme];
 
   return (
-    <div className={`group ${config.cardBg} overflow-hidden transition-all duration-500 ${config.shadow} hover:-translate-y-1`}>
+    <div className={`group ${config.cardBg} overflow-hidden transition-all duration-500 ${config.shadow} hover:-translate-y-1 flex flex-col h-full`}>
       <Link href={`/products/${product.slug}`} className="block">
         <div className="aspect-square relative overflow-hidden bg-black">
-          <Image
-            src={product.images?.[0] || 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&q=80&fit=crop&auto=format'}
-            alt={product.name}
-            fill
-            className="object-cover group-hover:scale-110 transition-transform duration-700 filter grayscale group-hover:grayscale-0"
-            loading="lazy"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
+          {(() => {
+            const imageUrl = product.images?.[0];
+
+            // Convert ibb.co sharing URLs to direct image URLs
+            const getDirectImageUrl = (url: string) => {
+              if (!url) return 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&h=1200&q=95&fit=crop&auto=format';
+
+              // If it's already a direct ibb.co URL, use it
+              if (url.includes('i.ibb.co/')) {
+                return url;
+              }
+
+              // Convert ibb.co sharing URL to direct URL
+              if (url.includes('ibb.co/') && !url.includes('i.ibb.co/')) {
+                // Extract the image ID from URL like https://ibb.co/abcd123
+                const match = url.match(/ibb\.co\/([a-zA-Z0-9]+)/);
+                if (match && match[1]) {
+                  // Convert to direct URL format: https://i.ibb.co/imageId/filename.jpg
+                  // We'll use a generic filename since we don't have the original
+                  return `https://i.ibb.co/${match[1]}/image.jpg`;
+                }
+              }
+
+              return url;
+            };
+
+            const finalImageUrl = getDirectImageUrl(imageUrl);
+
+            return (
+              <img
+                src={finalImageUrl}
+                alt={product.name}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                style={{
+                  imageRendering: 'auto',
+                  filter: 'contrast(1.1) saturate(1.1) brightness(1.02)'
+                }}
+                loading="lazy"
+                onError={(e) => {
+                  // Fallback to high-quality placeholder
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&h=1200&q=95&fit=crop&auto=format';
+                }}
+              />
+            );
+          })()}
           {hasDiscount && (
-            <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 text-xs font-black uppercase tracking-wider">
+            <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 text-xs font-semibold uppercase tracking-wide">
               {discountPercentage}% OFF
             </div>
           )}
 
           {currentStock === 0 && (
             <div className="absolute inset-0 bg-black/80 flex items-center justify-center">
-              <span className="text-white font-black bg-red-600 px-6 py-2 text-sm uppercase tracking-wider">SOLD OUT</span>
+              <span className="text-white font-semibold bg-red-600 px-6 py-2 text-sm uppercase tracking-wide">SOLD OUT</span>
             </div>
           )}
 
           {/* Hover overlay */}
           <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
             <div className="text-white text-center">
-              <p className="font-black text-sm uppercase tracking-wider mb-2">QUICK VIEW</p>
+              <p className="font-semibold text-sm uppercase tracking-wide mb-2">QUICK VIEW</p>
               <div className="w-8 h-0.5 bg-white mx-auto"></div>
             </div>
           </div>
         </div>
       </Link>
 
-      <div className={`p-6 space-y-4 ${config.cardBg}`}>
+      <div className={`p-2 sm:p-3 lg:p-4 space-y-1 sm:space-y-2 lg:space-y-3 ${config.cardBg} flex flex-col flex-1`}>
         <Link href={`/products/${product.slug}`}>
-          <h3 className={`font-black ${config.textPrimary} line-clamp-1 group-hover:opacity-75 transition-colors uppercase tracking-wider text-sm`}>
+          <h3 className={`font-semibold ${config.textPrimary} line-clamp-1 group-hover:opacity-75 transition-colors uppercase tracking-wide text-xs sm:text-sm lg:text-sm leading-tight`}>
             {product.name}
           </h3>
         </Link>
 
-        {/* Rating */}
-        {product.averageRating && (
-          <div className="flex items-center gap-2">
-            <div className="flex items-center">
-              {[...Array(5)].map((_, index) => (
-                <Star
-                  key={index}
-                  className={`h-3 w-3 ${
-                    index < Math.floor(product.averageRating!)
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
-            <span className={`text-xs ${config.textSecondary} font-bold`}>
-              ({product.reviewCount || 0})
+        {/* Rating - Fixed height to prevent asymmetry */}
+        <div className="h-5 flex items-center gap-2">
+          {product.averageRating ? (
+            <>
+              <div className="flex items-center">
+                {[...Array(5)].map((_, index) => (
+                  <Star
+                    key={index}
+                    className={`h-3 w-3 ${
+                      index < Math.floor(product.averageRating!)
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'text-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
+              <span className={`text-xs ${config.textSecondary} font-bold`}>
+                ({product.reviewCount || 0})
+              </span>
+            </>
+          ) : (
+            <span className={`text-xs ${config.textSecondary} font-bold opacity-60`}>
+              No reviews yet
             </span>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Price */}
         <div className="flex items-center gap-2 flex-wrap">
           {hasVariablePrice ? (
-            <span className={`text-xl font-black ${config.textPrimary} tracking-wider`}>
-              ₹{displayPrice.toFixed(2)} - ₹{originalPrice.toFixed(2)}
+            <span className={`text-xl font-semibold ${config.textPrimary} tracking-wide`}>
+              ₹{(displayPrice || 0).toFixed(2)} - ₹{(originalPrice || 0).toFixed(2)}
             </span>
           ) : (
             <>
-              <span className={`text-xl font-black ${config.textPrimary} tracking-wider`}>
-                ₹{displayPrice.toFixed(2)}
+              <span className={`text-sm sm:text-base lg:text-lg font-semibold ${config.textPrimary} tracking-wide`}>
+                ₹{(displayPrice || 0).toFixed(2)}
               </span>
               {hasDiscount && (
                 <span className={`text-sm ${config.textTertiary} line-through font-bold`}>
-                  ₹{originalPrice.toFixed(2)}
+                  ₹{(originalPrice || 0).toFixed(2)}
                 </span>
               )}
             </>
@@ -247,8 +290,8 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
         </div>
 
         {/* Delivery Info */}
-        <div className="px-3 py-2 mb-3">
-          <p className={`text-xs font-semibold text-center uppercase tracking-wider ${config.textSecondary}`}>
+        <div className="hidden sm:block px-3 py-2">
+          <p className={`text-xs font-semibold text-center uppercase tracking-wide ${config.textSecondary}`}>
             Delivery by {(() => {
               const deliveryDate = new Date();
               deliveryDate.setDate(deliveryDate.getDate() + 5);
@@ -261,23 +304,37 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
           </p>
         </div>
 
+        {/* Spacer to push buttons to bottom */}
+        <div className="flex-1"></div>
+
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 mt-auto">
           {/* Add to Cart Button */}
           <Button
             onClick={handleAddToCart}
             disabled={!mounted || currentStock === 0 || addToCart.isPending}
-            className={`flex-1 ${config.button.primary} font-black py-3 transition-all duration-300 uppercase tracking-wider text-xs hover:shadow-lg`}
+            className={`flex-1 ${config.button.primary} font-semibold py-1.5 sm:py-2 lg:py-2.5 transition-all duration-300 uppercase tracking-wide text-xs hover:shadow-lg`}
             size="sm"
           >
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            {!mounted
-              ? 'LOADING...'
-              : currentStock === 0
-              ? 'SOLD OUT'
-              : addToCart.isPending
-              ? 'ADDING...'
-              : 'ADD TO CART'}
+            <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="sm:hidden">
+              {!mounted
+                ? 'LOADING'
+                : currentStock === 0
+                ? 'SOLD OUT'
+                : addToCart.isPending
+                ? 'ADDING'
+                : 'ADD'}
+            </span>
+            <span className="hidden sm:inline">
+              {!mounted
+                ? 'LOADING...'
+                : currentStock === 0
+                ? 'SOLD OUT'
+                : addToCart.isPending
+                ? 'ADDING...'
+                : 'ADD TO CART'}
+            </span>
           </Button>
 
           {/* Wishlist Heart Button */}
@@ -287,14 +344,14 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
               disabled={toggleWishlist.isPending}
               variant="outline"
               size="sm"
-              className={`p-3 transition-all duration-200 hover:scale-110 ${
+              className={`p-1.5 sm:p-2 lg:p-2.5 transition-all duration-200 hover:scale-110 ${
                 isInWishlist
                   ? config.button.wishlist.active
                   : config.button.wishlist.default
               }`}
             >
               <Heart
-                className={`h-4 w-4 ${isInWishlist ? 'fill-current' : ''}`}
+                className={`h-3 w-3 sm:h-4 sm:w-4 ${isInWishlist ? 'fill-current' : ''}`}
               />
             </Button>
           )}
