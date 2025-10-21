@@ -7,6 +7,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import { api } from '@/lib/api';
 
 interface CarouselImage {
   id: string;
@@ -45,27 +46,15 @@ export default function HomepageManagement() {
       setLoading(true);
       try {
         // Load carousel images
-        const carouselResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/carousel-images`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-
-        if (carouselResponse.ok) {
-          const carouselData = await carouselResponse.json();
-          setCarouselImages(carouselData.data || []);
+        const carouselResponse = await api.get("/admin/carousel-images");
+        if (carouselResponse.data.success) {
+          setCarouselImages(carouselResponse.data.data || []);
         }
 
         // Load homepage banners
-        const bannersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/homepage-banners`, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-
-        if (bannersResponse.ok) {
-          const bannersData = await bannersResponse.json();
-          setHomepageBanners(bannersData.data || []);
+        const bannersResponse = await api.get("/admin/homepage-banners");
+        if (bannersResponse.data.success) {
+          setHomepageBanners(bannersResponse.data.data || []);
         }
       } catch (error) {
         console.error('Failed to load homepage data:', error);
@@ -172,41 +161,25 @@ export default function HomepageManagement() {
     setSaving(true);
     try {
       // Save carousel images
-      const carouselResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/carousel-images`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          images: carouselImages.filter(img => img.src && img.alt),
-        }),
+      const carouselResponse = await api.put("/admin/carousel-images", {
+        images: carouselImages.filter(img => img.src && img.alt),
       });
 
-      if (!carouselResponse.ok) {
-        const errorData = await carouselResponse.json();
-        throw new Error(errorData.error || 'Failed to update carousel');
+      if (!carouselResponse.data.success) {
+        throw new Error(carouselResponse.data.error || 'Failed to update carousel');
       }
 
       // Save homepage banners
       const blackBanner = homepageBanners.find(b => b.theme === 'BLACK');
       const whiteBanner = homepageBanners.find(b => b.theme === 'WHITE');
 
-      const bannersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/homepage-banners`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          blackBanner: blackBanner && blackBanner.src ? blackBanner : null,
-          whiteBanner: whiteBanner && whiteBanner.src ? whiteBanner : null,
-        }),
+      const bannersResponse = await api.put("/admin/homepage-banners", {
+        blackBanner: blackBanner && blackBanner.src ? blackBanner : null,
+        whiteBanner: whiteBanner && whiteBanner.src ? whiteBanner : null,
       });
 
-      if (!bannersResponse.ok) {
-        const errorData = await bannersResponse.json();
-        throw new Error(errorData.error || 'Failed to update homepage banners');
+      if (!bannersResponse.data.success) {
+        throw new Error(bannersResponse.data.error || 'Failed to update homepage banners');
       }
 
       toast.success('Homepage updated successfully!');

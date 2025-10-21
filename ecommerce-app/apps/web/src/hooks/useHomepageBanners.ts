@@ -1,8 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
+
 export function useHomepageBanners() {
-  return useQuery({
+  return useQuery<ApiResponse<any>>({
     queryKey: ['homepageBanners'],
     queryFn: async () => {
       console.log('Fetching homepage banners');
@@ -11,6 +16,6 @@ export function useHomepageBanners() {
       return response.data;
     },
     staleTime: 0,
-    cacheTime: 1000,
+    gcTime: 1000,
   });
 }

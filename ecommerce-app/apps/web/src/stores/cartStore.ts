@@ -44,7 +44,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     // Recalculate totals
     const newItems = get().items;
     const newTotal = newItems.reduce((sum, i) => {
-      const price = i.product?.salePrice || i.product?.price || 0;
+      const price = (i.product as any)?.salePrice || (i.product as any)?.basePrice || (i.product as any)?.price || 0;
       return sum + (price * i.quantity);
     }, 0);
     const newItemCount = newItems.reduce((sum, i) => sum + i.quantity, 0);
@@ -67,7 +67,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     // Recalculate totals
     const newItems = get().items;
     const newTotal = newItems.reduce((sum, i) => {
-      const price = i.product?.salePrice || i.product?.price || 0;
+      const price = (i.product as any)?.salePrice || (i.product as any)?.basePrice || (i.product as any)?.price || 0;
       return sum + (price * i.quantity);
     }, 0);
     const newItemCount = newItems.reduce((sum, i) => sum + i.quantity, 0);
@@ -78,7 +78,7 @@ export const useCartStore = create<CartState>((set, get) => ({
     const { items } = get();
     const newItems = items.filter((i) => i.id !== itemId);
     const newTotal = newItems.reduce((sum, i) => {
-      const price = i.product?.salePrice || i.product?.price || 0;
+      const price = (i.product as any)?.salePrice || (i.product as any)?.basePrice || (i.product as any)?.price || 0;
       return sum + (price * i.quantity);
     }, 0);
     const newItemCount = newItems.reduce((sum, i) => sum + i.quantity, 0);

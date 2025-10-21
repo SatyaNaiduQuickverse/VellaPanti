@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api, handleApiResponse } from '@/lib/api';
 import type { Category } from '@ecommerce/types';
 
-const mockCategories: Category[] = [
+const mockCategories: any[] = [
   // Black Theme Categories
   {
     id: '1',

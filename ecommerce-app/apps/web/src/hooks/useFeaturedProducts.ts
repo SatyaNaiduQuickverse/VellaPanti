@@ -5,8 +5,13 @@ interface FeaturedProductsParams {
   theme?: 'BLACK' | 'WHITE';
 }
 
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
+
 export function useFeaturedProducts(params: FeaturedProductsParams = {}) {
-  return useQuery({
+  return useQuery<ApiResponse<any>>({
     queryKey: ['featuredProducts', params],
     queryFn: async () => {
       const searchParams = new URLSearchParams();
@@ -24,6 +29,6 @@ export function useFeaturedProducts(params: FeaturedProductsParams = {}) {
       return response.data;
     },
     staleTime: 0, // Always refetch from server
-    cacheTime: 1000, // Keep in cache for 1 second only
+    gcTime: 1000, // Keep in cache for 1 second only
   });
 }

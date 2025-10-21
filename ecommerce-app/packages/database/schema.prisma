@@ -235,15 +235,17 @@ model FeaturedProduct {
 }
 
 model CarouselImage {
-  id          String   @id @default(cuid())
-  src         String
-  alt         String
-  title       String?
-  description String?
-  position    Int      @default(0) // For ordering
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  src                   String
+  alt                   String
+  position              Int      @default(0) // For ordering
+  isActive              Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  bottomLeftDescription String?
+  bottomLeftTitle       String?
+  centerDescription     String?
+  centerTitle           String?
 
   @@map("carousel_images")
 }

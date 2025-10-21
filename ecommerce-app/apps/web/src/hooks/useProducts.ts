@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api, handleApiResponse } from '@/lib/api';
 import type { Product, ProductFilters, PaginatedResponse } from '@ecommerce/types';
 
-const mockProducts: Product[] = [
+const mockProducts: any[] = [
   // BLACK THEME PRODUCTS - Category 1: STREET WEAR
   {
     id: '1',

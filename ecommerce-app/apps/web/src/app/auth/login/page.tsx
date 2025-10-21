@@ -65,11 +65,13 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
+                autoComplete="email"
                 {...register('email')}
                 placeholder="name@company.com"
                 className={`w-full px-4 py-3 rounded-lg border ${
                   errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300'
                 } focus:ring-2 focus:ring-black focus:border-black transition-all text-sm font-normal`}
+                suppressHydrationWarning
               />
               {errors.email && (
                 <p className="text-red-500 text-xs mt-2 font-normal">{errors.email.message}</p>
@@ -84,11 +86,13 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
                   {...register('password')}
                   placeholder="••••••••"
                   className={`w-full px-4 py-3 pr-12 rounded-lg border ${
                     errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300'
                   } focus:ring-2 focus:ring-black focus:border-black transition-all text-sm font-normal`}
+                  suppressHydrationWarning
                 />
                 <button
                   type="button"

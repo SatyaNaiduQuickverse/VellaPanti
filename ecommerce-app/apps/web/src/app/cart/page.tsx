@@ -175,17 +175,17 @@ export default function CartPage() {
                                   let originalPrice = 0;
 
                                   if (item.productVariant) {
-                                    hasDiscount = item.productVariant.salePrice && item.productVariant.salePrice < item.productVariant.price;
+                                    hasDiscount = !!(item.productVariant.salePrice && item.productVariant.salePrice < item.productVariant.price);
                                     originalPrice = item.productVariant.price || 0;
                                   } else if (item.product) {
-                                    hasDiscount = item.product.baseSalePrice && item.product.baseSalePrice < (item.product.basePrice || 0);
+                                    hasDiscount = !!(item.product.baseSalePrice && item.product.baseSalePrice < (item.product.basePrice || 0));
                                     originalPrice = item.product.basePrice || 0;
                                   }
 
                                   if (hasDiscount && originalPrice > 0) {
                                     return (
                                       <span className="text-lg text-gray-500 line-through">
-                                        ${originalPrice.toFixed(2)}
+                                        ₹{originalPrice.toFixed(2)}
                                       </span>
                                     );
                                   }
@@ -247,7 +247,7 @@ export default function CartPage() {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
                     <span className="font-bold">Subtotal ({itemCount} items):</span>
-                    <span className="font-black">${total.toFixed(2)}</span>
+                    <span className="font-black">₹{total.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-bold">Shipping:</span>
@@ -260,7 +260,7 @@ export default function CartPage() {
                   <div className="border-t border-white/20 pt-4">
                     <div className="flex justify-between text-xl">
                       <span className="font-black">Total:</span>
-                      <span className="font-black">${total.toFixed(2)}</span>
+                      <span className="font-black">₹{total.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>

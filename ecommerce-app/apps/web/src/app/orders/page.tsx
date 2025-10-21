@@ -213,7 +213,7 @@ export default function OrdersPage() {
         status: 'DELIVERED',
         message: 'Package has been delivered successfully',
         timestamp: new Date(orderDate.getTime() + 72 * 60 * 60 * 1000).toISOString(),
-        location: `${order.shippingCity}, ${order.shippingState}`,
+        location: `₹{order.shippingCity}, ${order.shippingState}`,
       });
     }
 
@@ -300,7 +300,7 @@ export default function OrdersPage() {
                           </span>
                           <span className="flex items-center gap-1">
                             <CreditCard className="h-4 w-4" />
-                            ${order.total.toFixed(2)}
+                            ₹{order.total.toFixed(2)}
                           </span>
                         </div>
                       </div>
@@ -365,7 +365,7 @@ export default function OrdersPage() {
                           <div className="flex-1 min-w-0">
                             <h5 className="font-bold text-sm truncate">{item.product.name}</h5>
                             <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
-                            <p className="text-sm font-bold">${item.price.toFixed(2)} each</p>
+                            <p className="text-sm font-bold">₹{item.price.toFixed(2)} each</p>
                             {(item.variantSize || item.variantColor || item.variantMaterial) && (
                               <div className="text-xs text-gray-500 mt-1">
                                 {[item.variantSize, item.variantColor, item.variantMaterial].filter(Boolean).join(' • ')}
@@ -403,7 +403,7 @@ export default function OrdersPage() {
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-bold">Order Total:</span>
-                                <span className="font-black text-lg">${order.total.toFixed(2)}</span>
+                                <span className="font-black text-lg">₹{order.total.toFixed(2)}</span>
                               </div>
                               <div className="flex justify-between">
                                 <span className="font-bold">Status:</span>
@@ -512,10 +512,10 @@ export default function OrdersPage() {
                                         <span className="font-bold">Quantity:</span> {item.quantity}
                                       </div>
                                       <div>
-                                        <span className="font-bold">Unit Price:</span> ${item.price.toFixed(2)}
+                                        <span className="font-bold">Unit Price:</span> ₹{item.price.toFixed(2)}
                                       </div>
                                       <div>
-                                        <span className="font-bold">Total:</span> ${(item.price * item.quantity).toFixed(2)}
+                                        <span className="font-bold">Total:</span> ₹{(item.price * item.quantity).toFixed(2)}
                                       </div>
                                       {item.productVariant?.sku && (
                                         <div>

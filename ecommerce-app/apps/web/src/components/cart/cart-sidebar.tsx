@@ -150,17 +150,17 @@ export function CartSidebar() {
                           let originalPrice = 0;
 
                           if (item.productVariant) {
-                            hasDiscount = item.productVariant.salePrice && item.productVariant.salePrice < item.productVariant.price;
+                            hasDiscount = !!(item.productVariant.salePrice && item.productVariant.salePrice < item.productVariant.price);
                             originalPrice = item.productVariant.price || 0;
                           } else if (item.product) {
-                            hasDiscount = item.product.baseSalePrice && item.product.baseSalePrice < (item.product.basePrice || 0);
+                            hasDiscount = !!(item.product.baseSalePrice && item.product.baseSalePrice < (item.product.basePrice || 0));
                             originalPrice = item.product.basePrice || 0;
                           }
 
                           if (hasDiscount && originalPrice > 0) {
                             return (
                               <span className="text-sm text-gray-500 line-through">
-                                ${originalPrice.toFixed(2)}
+                                ₹{originalPrice.toFixed(2)}
                               </span>
                             );
                           }
@@ -237,7 +237,7 @@ export function CartSidebar() {
             <div className="mb-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="font-bold uppercase tracking-wide">Subtotal:</span>
-                <span className="text-2xl font-black">${total.toFixed(2)}</span>
+                <span className="text-2xl font-black">₹{total.toFixed(2)}</span>
               </div>
               <p className="text-sm text-gray-600">Shipping and taxes calculated at checkout</p>
             </div>

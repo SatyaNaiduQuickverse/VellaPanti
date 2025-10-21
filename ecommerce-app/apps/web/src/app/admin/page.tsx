@@ -213,7 +213,7 @@ function DashboardContent({ dashboardData, user, error }: {
               <TrendingUp className="h-8 w-8 text-black" />
               <div className="ml-4">
                 <p className="text-sm font-bold uppercase tracking-wide text-gray-600">Revenue</p>
-                <p className="text-2xl font-black text-black">${(stats?.monthlyRevenue || 0).toFixed(2)}</p>
+                <p className="text-2xl font-black text-black">₹{(stats?.monthlyRevenue || 0).toFixed(2)}</p>
               </div>
             </div>
           </div>
@@ -281,7 +281,7 @@ function DashboardContent({ dashboardData, user, error }: {
                         <p className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-black text-lg">${order.total.toFixed(2)}</p>
+                        <p className="font-black text-lg">₹{order.total.toFixed(2)}</p>
                         <span className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded ${
                           order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
                           order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
@@ -322,7 +322,7 @@ function DashboardContent({ dashboardData, user, error }: {
                         <p className="text-sm font-bold text-red-600">Only {variant.stock} left</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-black text-lg">${(variant.salePrice || variant.price || 0).toFixed(2)}</p>
+                        <p className="font-black text-lg">₹{(variant.salePrice || variant.price || 0).toFixed(2)}</p>
                         <Link href={`/admin/products/${variant.product?.id || ''}`}>
                           <Button size="sm" className="bg-red-600 text-white hover:bg-red-700 font-bold uppercase">
                             Restock
@@ -358,7 +358,7 @@ function DashboardContent({ dashboardData, user, error }: {
                     )}
                   </div>
                   <p className="font-bold text-sm mb-1">{product.name || 'Unknown Product'}</p>
-                  <p className="text-sm text-gray-600">${(product.basePrice || product.price || 0).toFixed(2)}</p>
+                  <p className="text-sm text-gray-600">₹{(product.price || 0).toFixed(2)}</p>
                   <p className="text-xs font-bold text-green-600">{product._count?.orderItems || 0} sold</p>
                 </div>
               ))

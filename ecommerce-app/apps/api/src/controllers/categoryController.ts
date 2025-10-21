@@ -557,9 +557,16 @@ export const getHomepageCarousel = asyncHandler(async (req: Request, res: Respon
     orderBy: { position: 'asc' },
   });
 
+  // Map database fields to frontend expected format for backward compatibility
+  const mappedImages = carouselImages.map(img => ({
+    ...img,
+    title: img.centerTitle || img.bottomLeftTitle || '',
+    description: img.centerDescription || img.bottomLeftDescription || '',
+  }));
+
   res.json({
     success: true,
-    data: carouselImages,
+    data: mappedImages,
   });
 });
 

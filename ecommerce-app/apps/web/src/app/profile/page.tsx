@@ -213,7 +213,7 @@ export default function ProfilePage() {
                 <div className="flex justify-between items-center">
                   <span className="font-bold">Total Spent:</span>
                   <span className="text-2xl font-black">
-                    {loading ? '...' : `$${accountStats.totalSpent.toFixed(2)}`}
+                    {loading ? '...' : `$₹{accountStats.totalSpent.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">

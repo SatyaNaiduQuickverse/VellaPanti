@@ -29,7 +29,7 @@ export interface BadgeProps
 
 function Badge({ className, variant, ...props }: BadgeProps) {
   return (
-    <div className={`${badgeVariants({ variant })} ${className || ""}`} {...props} />
+    <div className={`₹{badgeVariants({ variant })} ${className || ""}`} {...props} />
   )
 }
 

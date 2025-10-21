@@ -648,9 +648,16 @@ export const getCarouselImages = asyncHandler(async (req: AuthRequest, res: Resp
     orderBy: { position: 'asc' },
   });
 
+  // Map database fields to frontend expected format for backward compatibility
+  const mappedImages = carouselImages.map(img => ({
+    ...img,
+    title: img.centerTitle || img.bottomLeftTitle || '',
+    description: img.centerDescription || img.bottomLeftDescription || '',
+  }));
+
   res.json({
     success: true,
-    data: carouselImages,
+    data: mappedImages,
   });
 });
 
@@ -671,12 +678,14 @@ export const updateCarouselImages = asyncHandler(async (req: AuthRequest, res: R
   // Remove existing carousel images
   await prisma.carouselImage.deleteMany({});
 
-  // Add new carousel images
+  // Add new carousel images - map old title/description to new schema fields
   const carouselImagesData = images.map((image: any, index: number) => ({
     src: image.src,
     alt: image.alt,
-    title: image.title || null,
-    description: image.description || null,
+    bottomLeftTitle: image.title || '',
+    bottomLeftDescription: image.description || '',
+    centerTitle: image.title || '',
+    centerDescription: image.description || '',
     position: index,
     isActive: true,
   }));

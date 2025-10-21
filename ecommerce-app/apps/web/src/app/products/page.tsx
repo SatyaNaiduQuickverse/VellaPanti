@@ -179,7 +179,7 @@ export default function ProductsPage() {
               <div>
                 <label className="block text-sm font-medium mb-2">Sort By</label>
                 <select
-                  value={`${filters.sort}-${filters.sortOrder}`}
+                  value={`₹{filters.sort}-${filters.sortOrder}`}
                   onChange={(e) => {
                     const [sort, sortOrder] = e.target.value.split('-');
                     handleFilterChange({ sort: sort as any, sortOrder: sortOrder as any });

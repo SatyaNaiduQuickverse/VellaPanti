@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Trash2, Edit, Plus, Folder, Package } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import { useAuthStore } from '@/stores/authStore';
+import Link from 'next/link';
 
 interface Category {
   id: string;
@@ -308,13 +309,15 @@ export default function AdminCategories() {
 
                   {/* Action Buttons */}
                   <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="border-2 border-gray-400 text-gray-700 hover:bg-gray-50 font-bold"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    <Link href={`/admin/categories/${category.id}/edit`}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-2 border-gray-400 text-gray-700 hover:bg-gray-50 font-bold"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    </Link>
                     <Button
                       variant="outline"
                       size="sm"

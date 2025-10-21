@@ -24,7 +24,7 @@ export function CategoryGrid({ limit, theme, featured = false }: CategoryGridPro
   }, []);
 
   // Get the appropriate data source
-  const sourceData = featured ? featuredData?.data : categoriesData?.data;
+  const sourceData = featured ? (featuredData as any)?.data : (categoriesData as any)?.data;
   const categories = limit
     ? (sourceData || []).slice(0, limit)
     : sourceData || [];
@@ -156,7 +156,7 @@ export function CategoryGrid({ limit, theme, featured = false }: CategoryGridPro
 
   return (
     <div className="grid grid-cols-2 gap-0">
-      {displayCategories.map((category) => (
+      {displayCategories.map((category: any) => (
         <Link
           key={category.id}
           href={`/categories/${category.slug}?theme=${category.theme || ''}`}

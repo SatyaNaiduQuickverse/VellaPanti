@@ -39,7 +39,7 @@ function AllProductsGrid({ theme, limit = 12 }: { theme?: 'BLACK' | 'WHITE', lim
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      {products.slice(0, limit).map((product) => (
+      {products.slice(0, limit).map((product: any) => (
         <ProductCard key={product.id} product={product} theme="light" />
       ))}
     </div>
@@ -68,11 +68,11 @@ export default function HomePage() {
   // Get homepage banners
   const { data: homepageBannersData, isLoading: homepageBannersLoading } = useHomepageBanners();
 
-  const featuredProducts = productsData?.data || [];
-  const blackFeaturedProducts = blackFeaturedData?.data || [];
-  const whiteFeaturedProducts = whiteFeaturedData?.data || [];
-  const carouselImages = carouselData?.data || [];
-  const homepageBanners = homepageBannersData?.data || [];
+  const featuredProducts = (productsData as any)?.data || [];
+  const blackFeaturedProducts = (blackFeaturedData as any)?.data || [];
+  const whiteFeaturedProducts = (whiteFeaturedData as any)?.data || [];
+  const carouselImages = (carouselData as any)?.data || [];
+  const homepageBanners = (homepageBannersData as any)?.data || [];
 
   // Use carousel images from admin or fallback to default
   const heroCarouselImages = carouselImages.length > 0 ? carouselImages : [
@@ -111,7 +111,7 @@ export default function HomePage() {
             images={heroCarouselImages}
             theme="black"
             className="h-full"
-            showOverlay={heroCarouselImages.some(img => img.title || img.description)}
+            showOverlay={heroCarouselImages.some((img: any) => img.title || img.description)}
           />
         )}
 
@@ -170,7 +170,7 @@ export default function HomePage() {
             {/* Black Side Banner */}
             <div className="w-1/2 relative overflow-hidden">
               {(() => {
-                const blackBanner = homepageBanners.find(b => b.theme === 'BLACK');
+                const blackBanner = homepageBanners.find((b: any) => b.theme === 'BLACK');
                 if (blackBanner?.src) {
                   return (
                     <div className="relative h-full">
@@ -183,7 +183,7 @@ export default function HomePage() {
                           target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=400&q=80&fit=crop&auto=format';
                         }}
                       />
-                      <div className="absolute inset-0 bg-black/70" />
+                      <div className="absolute inset-0 bg-black/30" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-8">
                         {blackBanner.title && (
                           <h3 className="text-2xl md:text-4xl font-black mb-4 text-center tracking-wider uppercase">
@@ -221,7 +221,7 @@ export default function HomePage() {
             {/* White Side Banner */}
             <div className="w-1/2 relative overflow-hidden border-l border-gray-300">
               {(() => {
-                const whiteBanner = homepageBanners.find(b => b.theme === 'WHITE');
+                const whiteBanner = homepageBanners.find((b: any) => b.theme === 'WHITE');
                 if (whiteBanner?.src) {
                   return (
                     <div className="relative h-full">
@@ -234,7 +234,7 @@ export default function HomePage() {
                           target.src = 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800&h=400&q=80&fit=crop&auto=format';
                         }}
                       />
-                      <div className="absolute inset-0 bg-white/70" />
+                      <div className="absolute inset-0 bg-white/30" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-black p-8">
                         {whiteBanner.title && (
                           <h3 className="text-2xl md:text-4xl font-black mb-4 text-center tracking-wider uppercase">
@@ -317,7 +317,7 @@ export default function HomePage() {
                 </div>
               ) : blackFeaturedProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {blackFeaturedProducts.slice(0, 8).map((product) => (
+                  {blackFeaturedProducts.slice(0, 8).map((product: any) => (
                     <ProductCard key={product.id} product={product} theme="dark" />
                   ))}
                 </div>
@@ -414,7 +414,7 @@ export default function HomePage() {
                 </div>
               ) : whiteFeaturedProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  {whiteFeaturedProducts.slice(0, 8).map((product) => (
+                  {whiteFeaturedProducts.slice(0, 8).map((product: any) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>

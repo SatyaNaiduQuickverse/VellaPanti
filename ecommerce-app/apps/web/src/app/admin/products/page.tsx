@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Trash2, Edit, Plus, Package, DollarSign, Archive, AlertTriangle, Eye, Palette, Shirt } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import { useAuthStore } from '@/stores/authStore';
+import Link from 'next/link';
 
 interface ProductVariant {
   id: string;
@@ -763,7 +764,7 @@ export default function AdminProducts() {
                                 {variant.images && variant.images.length > 0 ? (
                                   <img
                                     src={variant.images[0]}
-                                    alt={`${variant.sku}`}
+                                    alt={`₹{variant.sku}`}
                                     className="w-full h-full object-cover"
                                   />
                                 ) : (
@@ -914,14 +915,15 @@ export default function AdminProducts() {
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditingProduct(product)}
-                        className="border-2 border-gray-400 text-gray-700 hover:bg-gray-50 font-bold"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
+                      <Link href={`/admin/products/${product.id}/edit`}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-2 border-gray-400 text-gray-700 hover:bg-gray-50 font-bold"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Link>
                       <Button
                         variant="outline"
                         size="sm"

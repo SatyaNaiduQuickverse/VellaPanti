@@ -276,7 +276,7 @@ export default function CheckoutPage() {
                       )}
                       <p className="text-sm text-gray-300">Qty: {item.quantity}</p>
                       <p className="font-bold">
-                        ${(() => {
+                        ₹{(() => {
                           const price = item.productVariant
                             ? (item.productVariant.salePrice || item.productVariant.price || 0)
                             : (item.product?.baseSalePrice || item.product?.basePrice || 0);
@@ -292,22 +292,22 @@ export default function CheckoutPage() {
               <div className="space-y-3 mb-6 pt-6 border-t border-white/20">
                 <div className="flex justify-between">
                   <span className="font-bold">Subtotal ({itemCount} items):</span>
-                  <span className="font-black">${total.toFixed(2)}</span>
+                  <span className="font-black">₹{total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="font-bold">Shipping:</span>
                   <span className="font-black text-green-400">
-                    {shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? 'FREE' : `₹${shipping.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="font-bold">Tax:</span>
-                  <span className="font-black">${tax.toFixed(2)}</span>
+                  <span className="font-black">₹{tax.toFixed(2)}</span>
                 </div>
                 <div className="border-t border-white/20 pt-3">
                   <div className="flex justify-between text-xl">
                     <span className="font-black">Total:</span>
-                    <span className="font-black">${finalTotal.toFixed(2)}</span>
+                    <span className="font-black">₹{finalTotal.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -319,7 +319,7 @@ export default function CheckoutPage() {
                 disabled={isProcessing}
                 className="w-full bg-white text-black hover:bg-gray-200 py-4 text-lg font-black uppercase tracking-wider disabled:opacity-50"
               >
-                {isProcessing ? 'Processing...' : `Complete Order - $${finalTotal.toFixed(2)}`}
+                {isProcessing ? 'Processing...' : `Complete Order - ₹${finalTotal.toFixed(2)}`}
               </Button>
 
               <p className="text-sm text-gray-300 mt-4 text-center">

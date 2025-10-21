@@ -168,7 +168,7 @@ export default function CategoryPage() {
             <div className="flex items-center gap-4">
               {/* Sort dropdown */}
               <select
-                value={`${filters.sort}-${filters.sortOrder}`}
+                value={`₹{filters.sort}-${filters.sortOrder}`}
                 onChange={(e) => handleSortChange(e.target.value)}
                 className="border-2 border-black px-4 py-2 font-bold uppercase tracking-wide text-sm bg-white focus:outline-none"
               >
@@ -301,7 +301,7 @@ export default function CategoryPage() {
               ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
               : 'grid-cols-1'
           }`}>
-            {products.map((product) => (
+            {products.map((product: Product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

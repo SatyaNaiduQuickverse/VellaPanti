@@ -99,9 +99,9 @@ export default function ProductPage({ params }: ProductPageProps) {
   );
 
   // Get images to display (variant images if available, otherwise product images)
-  const displayImages = currentVariant?.images?.length > 0
-    ? currentVariant.images
-    : product.images;
+  const displayImages = ((currentVariant?.images?.length ?? 0) > 0
+    ? currentVariant?.images
+    : product.images) || [];
 
   // Get the current price and stock from variant or product base
   const getCurrentPrice = () => {
@@ -171,7 +171,7 @@ export default function ProductPage({ params }: ProductPageProps) {
     }
 
     // Check if variant selection is required but not made
-    if (product.variants?.length > 1 && !currentVariant) {
+    if ((product.variants?.length ?? 0) > 1 && !currentVariant) {
       toast.error('Please select all product options');
       return;
     }
@@ -268,7 +268,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                 <Heart className="h-5 w-5 text-gray-700 hover:text-red-500 transition-colors" />
               </div>
 
-              {product.stock === 0 && (
+              {(currentVariant?.stock ?? product.totalStock ?? 0) === 0 && (
                 <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center rounded-3xl">
                   <div className="text-center">
                     <span className="text-white text-2xl font-bold block">Out of Stock</span>
@@ -570,16 +570,16 @@ export default function ProductPage({ params }: ProductPageProps) {
 
                 <Button
                   onClick={handleAddToCart}
-                  disabled={addToCart.isPending || (product.variants?.length > 1 && !currentVariant)}
+                  disabled={addToCart.isPending || ((product.variants?.length ?? 0) > 1 && !currentVariant)}
                   className="w-full bg-black hover:bg-gray-900 disabled:bg-gray-400 text-white font-medium py-3 rounded-md transition-all text-sm"
                   size="lg"
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   {addToCart.isPending
                     ? 'Adding...'
-                    : (product.variants?.length > 1 && !currentVariant)
+                    : ((product.variants?.length ?? 0) > 1 && !currentVariant)
                     ? 'Select options first'
-                    : `Add to Cart • ₹${((displayPrice || 0) * quantity).toFixed(2)}`
+                    : `Add to Cart • ₹₹{((displayPrice || 0) * quantity).toFixed(2)}`
                   }
                 </Button>
               </div>

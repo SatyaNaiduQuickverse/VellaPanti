@@ -24,6 +24,6 @@ export function useFeaturedCollections(params: FeaturedCollectionsParams = {}) {
       return response.data;
     },
     staleTime: 0, // Always refetch from server
-    cacheTime: 1000, // Keep in cache for 1 second only
+    gcTime: 1000, // Keep in cache for 1 second only
   });
 }

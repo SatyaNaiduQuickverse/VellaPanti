@@ -276,7 +276,7 @@ export default function AdminOrders() {
                   <div className="flex items-center space-x-4">
                     {/* Order Total */}
                     <div className="text-center bg-gray-50 px-4 py-2 border-2 border-gray-300">
-                      <div className="text-2xl font-black text-black">${order.total.toFixed(2)}</div>
+                      <div className="text-2xl font-black text-black">₹{order.total.toFixed(2)}</div>
                       <div className="text-xs font-bold uppercase tracking-wide text-gray-600">Total</div>
                     </div>
 
@@ -326,7 +326,7 @@ export default function AdminOrders() {
                       {order.items.slice(0, 3).map((item, index) => (
                         <div key={index} className="flex justify-between text-sm bg-gray-50 p-2 border border-gray-200">
                           <span className="font-bold">{item.product?.name || 'Product'}</span>
-                          <span className="text-gray-600">×{item.quantity} @ ${item.price.toFixed(2)}</span>
+                          <span className="text-gray-600">×{item.quantity} @ ₹{item.price.toFixed(2)}</span>
                         </div>
                       ))}
                       {order.items.length > 3 && (
@@ -438,11 +438,11 @@ export default function AdminOrders() {
                                     Quantity: {item.quantity}
                                   </div>
                                   <div className="text-lg font-bold text-green-600">
-                                    ${item.price.toFixed(2)} each
+                                    ₹{item.price.toFixed(2)} each
                                   </div>
                                 </div>
                                 <div className="text-right text-xl font-black text-black">
-                                  Total: ${(item.price * item.quantity).toFixed(2)}
+                                  Total: ₹{(item.price * item.quantity).toFixed(2)}
                                 </div>
                               </div>
                             </div>
@@ -465,7 +465,7 @@ export default function AdminOrders() {
           </div>
           <div className="bg-white border-2 border-black p-6">
             <div className="text-3xl font-black text-black">
-              ${orders.reduce((sum, order) => sum + order.total, 0).toFixed(2)}
+              ₹{orders.reduce((sum, order) => sum + order.total, 0).toFixed(2)}
             </div>
             <div className="text-gray-600 font-bold uppercase tracking-wide text-sm">Total Revenue</div>
           </div>

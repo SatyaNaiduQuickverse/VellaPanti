@@ -193,10 +193,10 @@ function OrderSuccessContent() {
                     <div className="flex-1">
                       <h3 className="font-bold">{item.product.name}</h3>
                       <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
-                      <p className="font-bold">${item.price.toFixed(2)} each</p>
+                      <p className="font-bold">₹{item.price.toFixed(2)} each</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-bold">₹{(item.price * item.quantity).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}
@@ -205,7 +205,7 @@ function OrderSuccessContent() {
               <div className="border-t-2 border-black mt-6 pt-4">
                 <div className="flex justify-between text-xl">
                   <span className="font-black">Total:</span>
-                  <span className="font-black">${order.total.toFixed(2)}</span>
+                  <span className="font-black">₹{order.total.toFixed(2)}</span>
                 </div>
                 <p className="text-sm text-gray-600 mt-2">
                   Payment Method: Cash on Delivery (COD)

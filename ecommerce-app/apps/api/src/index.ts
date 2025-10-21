@@ -17,6 +17,9 @@ async function startServer() {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
+    // Trust proxy for rate limiting behind nginx
+    app.set('trust proxy', true);
+
     // Security middleware
     app.use(helmet());
     app.use(cors({
