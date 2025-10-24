@@ -277,21 +277,21 @@ export default function HomePage() {
         {/* Black Side */}
         <div className="w-full lg:w-1/2 bg-black text-white relative">
           <div className="p-4 sm:p-6 md:p-8 lg:p-16 min-h-screen flex flex-col">
-            <div className="mb-8 sm:mb-10 lg:mb-12">
+            <div className="mb-8 sm:mb-10 lg:mb-12 text-center">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider">
                 STREET
               </h2>
               <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-300">
-                CULTURE • AUTHENTIC • UNDERGROUND
+                CULTURE · AUTHENTIC · UNDERGROUND
               </p>
             </div>
 
-            {/* Categories Grid */}
+            {/* Collections Grid */}
             <div className="mb-8 sm:mb-10 lg:mb-12">
-              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center sm:text-left">COLLECTIONS</h3>
+              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center">COLLECTIONS</h3>
               <Suspense fallback={
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  {[...Array(6)].map((_, index) => (
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                  {[...Array(3)].map((_, index) => (
                     <div key={index} className="animate-pulse">
                       <div className="bg-gray-700 aspect-square rounded mb-2 sm:mb-3"></div>
                       <div className="h-3 bg-gray-700 rounded"></div>
@@ -299,13 +299,13 @@ export default function HomePage() {
                   ))}
                 </div>
               }>
-                <CategoryGrid limit={6} theme="BLACK" featured={true} />
+                <CategoryGrid limit={3} theme="BLACK" featured={true} />
               </Suspense>
             </div>
 
             {/* Featured Street Products */}
             <div className="mb-6 sm:mb-8">
-              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center sm:text-left">FEATURED STREET</h3>
+              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center">FEATURED STREET</h3>
               {blackFeaturedLoading ? (
                 <div className="grid grid-cols-2 gap-4 sm:gap-6">
                   {[...Array(8)].map((_, index) => (
@@ -327,6 +327,18 @@ export default function HomePage() {
                   <p className="text-xs sm:text-sm">Configure featured products in admin panel</p>
                 </div>
               )}
+            </div>
+
+            {/* Black Tees Section */}
+            <div className="mb-8 sm:mb-10 lg:mb-12">
+              <div className="text-center py-6 sm:py-8 border-t border-b border-gray-700">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2 sm:mb-3 tracking-wider">
+                  DEEPEST BLACK TEES
+                </h3>
+                <p className="text-sm sm:text-base md:text-lg font-bold tracking-wide text-gray-300">
+                  Classic, Strong, Understated Power
+                </p>
+              </div>
             </div>
 
 
@@ -374,21 +386,21 @@ export default function HomePage() {
         {/* White Side */}
         <div className="w-full lg:w-1/2 bg-white text-black border-t lg:border-t-0 lg:border-l border-gray-200">
           <div className="p-4 sm:p-6 md:p-8 lg:p-16 min-h-screen flex flex-col">
-            <div className="mb-8 sm:mb-10 lg:mb-12">
+            <div className="mb-8 sm:mb-10 lg:mb-12 text-center">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider">
                 PREMIUM
               </h2>
               <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-600">
-                CLEAN • MINIMAL • REFINED
+                CLEAN · MINIMAL · REFINED
               </p>
             </div>
 
-            {/* Categories Grid */}
+            {/* Collections Grid */}
             <div className="mb-8 sm:mb-10 lg:mb-12">
-              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider">COLLECTIONS</h3>
+              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center">COLLECTIONS</h3>
               <Suspense fallback={
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  {[...Array(6)].map((_, index) => (
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                  {[...Array(3)].map((_, index) => (
                     <div key={index} className="animate-pulse">
                       <div className="bg-gray-200 aspect-square rounded mb-2 sm:mb-3"></div>
                       <div className="h-3 bg-gray-200 rounded"></div>
@@ -396,13 +408,13 @@ export default function HomePage() {
                   ))}
                 </div>
               }>
-                <CategoryGrid limit={6} theme="WHITE" featured={true} />
+                <CategoryGrid limit={3} theme="WHITE" featured={true} />
               </Suspense>
             </div>
 
             {/* Featured Premium Products */}
             <div className="mb-6 sm:mb-8">
-              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center sm:text-left">FEATURED PREMIUM</h3>
+              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center">FEATURED PREMIUM</h3>
               {whiteFeaturedLoading ? (
                 <div className="grid grid-cols-2 gap-4 sm:gap-6">
                   {[...Array(8)].map((_, index) => (
@@ -424,6 +436,18 @@ export default function HomePage() {
                   <p className="text-xs sm:text-sm">Configure featured products in admin panel</p>
                 </div>
               )}
+            </div>
+
+            {/* White Tees Section */}
+            <div className="mb-8 sm:mb-10 lg:mb-12">
+              <div className="text-center py-6 sm:py-8 border-t border-b border-gray-300">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2 sm:mb-3 tracking-wider">
+                  PUREST WHITE TEES
+                </h3>
+                <p className="text-sm sm:text-base md:text-lg font-bold tracking-wide text-gray-600">
+                  Clean, Bright, Effortless Style
+                </p>
+              </div>
             </div>
 
 

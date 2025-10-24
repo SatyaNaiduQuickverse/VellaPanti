@@ -130,7 +130,7 @@ export function CategoryGrid({ limit, theme, featured = false }: CategoryGridPro
 
   if (!mounted || isLoading) {
     return (
-      <div className="grid grid-cols-2 gap-0">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-0">
         {[...Array(Math.min(limit || 6, 6))].map((_, index) => (
           <div key={index} className="animate-pulse">
             <div className="bg-gray-700 aspect-[4/3] border border-black"></div>
@@ -155,7 +155,7 @@ export function CategoryGrid({ limit, theme, featured = false }: CategoryGridPro
   }
 
   return (
-    <div className="grid grid-cols-2 gap-0">
+    <div className="grid grid-cols-2 lg:grid-cols-3 gap-0">
       {displayCategories.map((category: any) => (
         <Link
           key={category.id}
@@ -173,7 +173,7 @@ export function CategoryGrid({ limit, theme, featured = false }: CategoryGridPro
             />
             <div className="absolute inset-0 bg-black/60 group-hover:bg-white/90 transition-all duration-300" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <h3 className="text-white group-hover:text-black font-black text-lg md:text-xl text-center px-4 uppercase tracking-wider transition-colors leading-tight">
+              <h3 className="text-white group-hover:text-black font-black text-sm sm:text-base md:text-lg lg:text-xl text-center px-3 sm:px-4 uppercase tracking-wider transition-colors leading-tight">
                 {category.name}
               </h3>
             </div>
