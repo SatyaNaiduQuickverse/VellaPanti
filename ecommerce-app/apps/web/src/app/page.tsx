@@ -25,7 +25,7 @@ function AllProductsGrid({ theme, limit = 12 }: { theme?: 'BLACK' | 'WHITE', lim
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {[...Array(limit)].map((_, index) => (
           <div key={index} className="animate-pulse">
             <div className={`${theme === 'BLACK' ? 'bg-gray-700' : 'bg-gray-200'} aspect-square rounded mb-3`}></div>
@@ -38,7 +38,7 @@ function AllProductsGrid({ theme, limit = 12 }: { theme?: 'BLACK' | 'WHITE', lim
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
       {products.slice(0, limit).map((product: any) => (
         <ProductCard key={product.id} product={product} theme="light" />
       ))}
@@ -101,10 +101,10 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Single Hero Carousel */}
-      <section className="h-96 md:h-[500px] lg:h-[600px] relative overflow-hidden">
+      <section className="h-[400px] sm:h-[500px] md:h-[550px] lg:h-[600px] relative overflow-hidden">
         {carouselLoading ? (
           <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
+            <div className="animate-spin rounded-full h-20 w-20 sm:h-32 sm:w-32 border-b-2 border-white"></div>
           </div>
         ) : (
           <ImageCarousel
@@ -117,40 +117,40 @@ export default function HomePage() {
 
         {/* Hero Content Overlay */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white px-4">
+          <div className="text-center text-white px-4 sm:px-6">
             {/* Use carousel data if available, otherwise fallback to default */}
             {carouselImages.length > 0 && carouselImages[0].title !== undefined ? (
               carouselImages[0].title !== '' && (
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 tracking-wider">
+                <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 sm:mb-6 tracking-wider">
                   {carouselImages[0].title}
                 </h1>
               )
             ) : (
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 tracking-wider">
+              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 sm:mb-6 tracking-wider">
                 VELLA PANTI
               </h1>
             )}
 
             {carouselImages.length > 0 && carouselImages[0].description !== undefined ? (
               carouselImages[0].description !== '' && (
-                <p className="text-lg md:text-xl mb-8 font-bold tracking-wider">
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-8 font-bold tracking-wider">
                   {carouselImages[0].description}
                 </p>
               )
             ) : (
-              <p className="text-lg md:text-xl mb-8 font-bold tracking-wider">
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-8 font-bold tracking-wider">
                 STREET CULTURE • PREMIUM FASHION • AUTHENTIC STYLE
               </p>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
               <Link href="/categories">
-                <Button size="lg" className="bg-white text-black hover:bg-gray-100 px-8 py-3 text-sm font-black uppercase tracking-wider">
+                <Button size="lg" className="bg-white text-black hover:bg-gray-100 px-6 py-2 sm:px-8 sm:py-3 text-xs sm:text-sm font-black uppercase tracking-wider w-full sm:w-auto">
                   EXPLORE COLLECTIONS
                 </Button>
               </Link>
               <Link href="/products">
-                <Button size="lg" className="bg-white text-black border-2 border-white hover:bg-gray-100 hover:text-black px-8 py-3 text-sm font-black uppercase tracking-wider">
+                <Button size="lg" className="bg-white text-black border-2 border-white hover:bg-gray-100 hover:text-black px-6 py-2 sm:px-8 sm:py-3 text-xs sm:text-sm font-black uppercase tracking-wider w-full sm:w-auto">
                   SHOP NOW
                 </Button>
               </Link>
@@ -160,15 +160,15 @@ export default function HomePage() {
       </section>
 
       {/* Homepage Banner Images */}
-      <section className="flex h-96 relative overflow-hidden">
+      <section className="flex flex-col lg:flex-row h-auto lg:h-96 relative overflow-hidden">
         {homepageBannersLoading ? (
-          <div className="w-full h-full bg-gray-500 flex items-center justify-center">
+          <div className="w-full h-96 lg:h-full bg-gray-500 flex items-center justify-center">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
           </div>
         ) : (
           <>
             {/* Black Side Banner */}
-            <div className="w-1/2 relative overflow-hidden">
+            <div className="w-full lg:w-1/2 h-80 lg:h-auto relative overflow-hidden">
               {(() => {
                 const blackBanner = homepageBanners.find((b: any) => b.theme === 'BLACK');
                 if (blackBanner?.src) {
@@ -184,20 +184,20 @@ export default function HomePage() {
                         }}
                       />
                       <div className="absolute inset-0 bg-black/30" />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-8">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-4 sm:p-6 lg:p-8">
                         {blackBanner.title && (
-                          <h3 className="text-2xl md:text-4xl font-black mb-4 text-center tracking-wider uppercase">
+                          <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black mb-3 sm:mb-4 text-center tracking-wider uppercase">
                             {blackBanner.title}
                           </h3>
                         )}
                         {blackBanner.description && (
-                          <p className="text-lg md:text-xl font-bold mb-6 text-center tracking-wide">
+                          <p className="text-base sm:text-lg md:text-xl font-bold mb-4 sm:mb-6 text-center tracking-wide">
                             {blackBanner.description}
                           </p>
                         )}
                         {blackBanner.buttonText && blackBanner.buttonLink && (
                           <Link href={blackBanner.buttonLink}>
-                            <Button className="bg-white text-black hover:bg-gray-100 font-black py-3 px-8 text-sm uppercase tracking-wider">
+                            <Button className="bg-white text-black hover:bg-gray-100 font-black py-2 px-6 sm:py-3 sm:px-8 text-xs sm:text-sm uppercase tracking-wider">
                               {blackBanner.buttonText}
                             </Button>
                           </Link>
@@ -219,7 +219,7 @@ export default function HomePage() {
             </div>
 
             {/* White Side Banner */}
-            <div className="w-1/2 relative overflow-hidden border-l border-gray-300">
+            <div className="w-full lg:w-1/2 h-80 lg:h-auto relative overflow-hidden border-t lg:border-t-0 lg:border-l border-gray-300">
               {(() => {
                 const whiteBanner = homepageBanners.find((b: any) => b.theme === 'WHITE');
                 if (whiteBanner?.src) {
@@ -235,20 +235,20 @@ export default function HomePage() {
                         }}
                       />
                       <div className="absolute inset-0 bg-white/30" />
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-black p-8">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-black p-4 sm:p-6 lg:p-8">
                         {whiteBanner.title && (
-                          <h3 className="text-2xl md:text-4xl font-black mb-4 text-center tracking-wider uppercase">
+                          <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black mb-3 sm:mb-4 text-center tracking-wider uppercase">
                             {whiteBanner.title}
                           </h3>
                         )}
                         {whiteBanner.description && (
-                          <p className="text-lg md:text-xl font-bold mb-6 text-center tracking-wide">
+                          <p className="text-base sm:text-lg md:text-xl font-bold mb-4 sm:mb-6 text-center tracking-wide">
                             {whiteBanner.description}
                           </p>
                         )}
                         {whiteBanner.buttonText && whiteBanner.buttonLink && (
                           <Link href={whiteBanner.buttonLink}>
-                            <Button className="bg-black text-white hover:bg-gray-800 font-black py-3 px-8 text-sm uppercase tracking-wider">
+                            <Button className="bg-black text-white hover:bg-gray-800 font-black py-2 px-6 sm:py-3 sm:px-8 text-xs sm:text-sm uppercase tracking-wider">
                               {whiteBanner.buttonText}
                             </Button>
                           </Link>
@@ -273,27 +273,27 @@ export default function HomePage() {
       </section>
 
       {/* Split Screen Section - Extended to full page */}
-      <section className="flex relative z-10">
+      <section className="flex flex-col lg:flex-row relative z-10">
         {/* Black Side */}
-        <div className="w-1/2 bg-black text-white relative">
-          <div className="p-8 lg:p-16 min-h-screen flex flex-col">
-            <div className="mb-12">
-              <h2 className="text-4xl md:text-6xl font-black mb-4 tracking-wider">
+        <div className="w-full lg:w-1/2 bg-black text-white relative">
+          <div className="p-4 sm:p-6 md:p-8 lg:p-16 min-h-screen flex flex-col">
+            <div className="mb-8 sm:mb-10 lg:mb-12">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider">
                 STREET
               </h2>
-              <p className="text-xl font-bold tracking-wider text-gray-300">
+              <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-300">
                 CULTURE • AUTHENTIC • UNDERGROUND
               </p>
             </div>
 
             {/* Categories Grid */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-black mb-6 tracking-wider">COLLECTIONS</h3>
+            <div className="mb-8 sm:mb-10 lg:mb-12">
+              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center sm:text-left">COLLECTIONS</h3>
               <Suspense fallback={
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   {[...Array(6)].map((_, index) => (
                     <div key={index} className="animate-pulse">
-                      <div className="bg-gray-700 aspect-square rounded mb-3"></div>
+                      <div className="bg-gray-700 aspect-square rounded mb-2 sm:mb-3"></div>
                       <div className="h-3 bg-gray-700 rounded"></div>
                     </div>
                   ))}
@@ -304,50 +304,50 @@ export default function HomePage() {
             </div>
 
             {/* Featured Street Products */}
-            <div className="mb-8">
-              <h3 className="text-2xl font-black mb-6 tracking-wider">FEATURED STREET</h3>
+            <div className="mb-6 sm:mb-8">
+              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center sm:text-left">FEATURED STREET</h3>
               {blackFeaturedLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4 sm:gap-6">
                   {[...Array(8)].map((_, index) => (
                     <div key={index} className="animate-pulse">
-                      <div className="bg-gray-700 aspect-square rounded mb-3"></div>
+                      <div className="bg-gray-700 aspect-square rounded mb-2 sm:mb-3"></div>
                       <div className="h-3 bg-gray-700 rounded"></div>
                     </div>
                   ))}
                 </div>
               ) : blackFeaturedProducts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4 sm:gap-6">
                   {blackFeaturedProducts.slice(0, 8).map((product: any) => (
                     <ProductCard key={product.id} product={product} theme="dark" />
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-300">
-                  <p className="text-lg font-bold">No featured street products selected</p>
-                  <p className="text-sm">Configure featured products in admin panel</p>
+                <div className="text-center py-6 sm:py-8 text-gray-300">
+                  <p className="text-base sm:text-lg font-bold">No featured street products selected</p>
+                  <p className="text-xs sm:text-sm">Configure featured products in admin panel</p>
                 </div>
               )}
             </div>
 
 
             {/* View All Street Products Button */}
-            <div className="text-center mb-12">
+            <div className="text-center mb-8 sm:mb-10 lg:mb-12">
               <Link href="/products?theme=BLACK&limit=30">
-                <Button className="bg-white text-black font-black py-3 px-8 text-sm uppercase tracking-wider">
+                <Button className="bg-white text-black font-black py-2 px-6 sm:py-3 sm:px-8 text-xs sm:text-sm uppercase tracking-wider">
                   View All Street Products
                 </Button>
               </Link>
             </div>
 
-            <div className="mt-auto">
-              <div className="border-t border-gray-700 pt-8 mb-8">
-                <h4 className="text-lg font-black mb-6 text-center tracking-wider text-gray-300">
+            <div className="mt-auto pt-6 sm:pt-8">
+              <div className="border-t border-gray-700 pt-6 sm:pt-8 mb-6 sm:mb-8">
+                <h4 className="text-base sm:text-lg font-black mb-4 sm:mb-6 text-center tracking-wider text-gray-300">
                   DISCOVER STREET CULTURE
                 </h4>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <Link href="/categories?theme=BLACK" className="group block">
-                  <Button className="w-full bg-white text-black hover:bg-gray-900 hover:text-white font-black py-4 px-6 text-base uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border-2 border-white hover:border-gray-900">
+                  <Button className="w-full bg-white text-black hover:bg-gray-900 hover:text-white font-black py-3 px-4 sm:py-4 sm:px-6 text-sm sm:text-base uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border-2 border-white hover:border-gray-900">
                     <span className="flex items-center justify-center">
                       EXPLORE STREET
                       <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
@@ -357,7 +357,7 @@ export default function HomePage() {
                   </Button>
                 </Link>
                 <Link href="/products?theme=BLACK" className="group block">
-                  <Button variant="outline" className="w-full border-2 border-white text-white hover:bg-white hover:text-black font-black py-4 px-6 text-base uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 bg-transparent backdrop-blur-sm">
+                  <Button variant="outline" className="w-full border-2 border-white text-white hover:bg-white hover:text-black font-black py-3 px-4 sm:py-4 sm:px-6 text-sm sm:text-base uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 bg-transparent backdrop-blur-sm">
                     <span className="flex items-center justify-center">
                       SHOP COLLECTION
                       <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
@@ -372,25 +372,25 @@ export default function HomePage() {
         </div>
 
         {/* White Side */}
-        <div className="w-1/2 bg-white text-black">
-          <div className="p-8 lg:p-16 min-h-screen flex flex-col">
-            <div className="mb-12">
-              <h2 className="text-4xl md:text-6xl font-black mb-4 tracking-wider">
+        <div className="w-full lg:w-1/2 bg-white text-black border-t lg:border-t-0 lg:border-l border-gray-200">
+          <div className="p-4 sm:p-6 md:p-8 lg:p-16 min-h-screen flex flex-col">
+            <div className="mb-8 sm:mb-10 lg:mb-12">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider">
                 PREMIUM
               </h2>
-              <p className="text-xl font-bold tracking-wider text-gray-600">
+              <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-600">
                 CLEAN • MINIMAL • REFINED
               </p>
             </div>
 
             {/* Categories Grid */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-black mb-6 tracking-wider">COLLECTIONS</h3>
+            <div className="mb-8 sm:mb-10 lg:mb-12">
+              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider">COLLECTIONS</h3>
               <Suspense fallback={
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
                   {[...Array(6)].map((_, index) => (
                     <div key={index} className="animate-pulse">
-                      <div className="bg-gray-200 aspect-square rounded mb-3"></div>
+                      <div className="bg-gray-200 aspect-square rounded mb-2 sm:mb-3"></div>
                       <div className="h-3 bg-gray-200 rounded"></div>
                     </div>
                   ))}
@@ -401,50 +401,50 @@ export default function HomePage() {
             </div>
 
             {/* Featured Premium Products */}
-            <div className="mb-8">
-              <h3 className="text-2xl font-black mb-6 tracking-wider">FEATURED PREMIUM</h3>
+            <div className="mb-6 sm:mb-8">
+              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center sm:text-left">FEATURED PREMIUM</h3>
               {whiteFeaturedLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4 sm:gap-6">
                   {[...Array(8)].map((_, index) => (
                     <div key={index} className="animate-pulse">
-                      <div className="bg-gray-200 aspect-square rounded mb-3"></div>
+                      <div className="bg-gray-200 aspect-square rounded mb-2 sm:mb-3"></div>
                       <div className="h-3 bg-gray-200 rounded"></div>
                     </div>
                   ))}
                 </div>
               ) : whiteFeaturedProducts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4 sm:gap-6">
                   {whiteFeaturedProducts.slice(0, 8).map((product: any) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  <p className="text-lg font-bold">No featured premium products selected</p>
-                  <p className="text-sm">Configure featured products in admin panel</p>
+                <div className="text-center py-6 sm:py-8 text-gray-500">
+                  <p className="text-base sm:text-lg font-bold">No featured premium products selected</p>
+                  <p className="text-xs sm:text-sm">Configure featured products in admin panel</p>
                 </div>
               )}
             </div>
 
 
             {/* View All Premium Products Button */}
-            <div className="text-center mb-12">
+            <div className="text-center mb-8 sm:mb-10 lg:mb-12">
               <Link href="/products?theme=WHITE&limit=30">
-                <Button variant="outline" className="border-2 border-gray-400 text-black hover:bg-black hover:text-white font-black py-3 px-8 text-sm uppercase tracking-wider transition-all duration-300">
+                <Button variant="outline" className="border-2 border-gray-400 text-black hover:bg-black hover:text-white font-black py-2 px-6 sm:py-3 sm:px-8 text-xs sm:text-sm uppercase tracking-wider transition-all duration-300">
                   View All Premium Products
                 </Button>
               </Link>
             </div>
 
-            <div className="mt-auto">
-              <div className="border-t border-gray-300 pt-8 mb-8">
-                <h4 className="text-lg font-black mb-6 text-center tracking-wider text-gray-600">
+            <div className="mt-auto pt-6 sm:pt-8">
+              <div className="border-t border-gray-300 pt-6 sm:pt-8 mb-6 sm:mb-8">
+                <h4 className="text-base sm:text-lg font-black mb-4 sm:mb-6 text-center tracking-wider text-gray-600">
                   PREMIUM EXPERIENCE
                 </h4>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <Link href="/categories?theme=WHITE" className="group block">
-                  <Button className="w-full bg-black text-white hover:bg-white hover:text-black font-black py-4 px-6 text-base uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border-2 border-black hover:border-gray-300">
+                  <Button className="w-full bg-black text-white hover:bg-white hover:text-black font-black py-3 px-4 sm:py-4 sm:px-6 text-sm sm:text-base uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border-2 border-black hover:border-gray-300">
                     <span className="flex items-center justify-center">
                       EXPLORE PREMIUM
                       <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
@@ -454,7 +454,7 @@ export default function HomePage() {
                   </Button>
                 </Link>
                 <Link href="/products?theme=WHITE" className="group block">
-                  <Button variant="outline" className="w-full border-2 border-black text-black hover:bg-black hover:text-white font-black py-4 px-6 text-base uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 bg-transparent backdrop-blur-sm">
+                  <Button variant="outline" className="w-full border-2 border-black text-black hover:bg-black hover:text-white font-black py-3 px-4 sm:py-4 sm:px-6 text-sm sm:text-base uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 bg-transparent backdrop-blur-sm">
                     <span className="flex items-center justify-center">
                       SHOP COLLECTION
                       <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">

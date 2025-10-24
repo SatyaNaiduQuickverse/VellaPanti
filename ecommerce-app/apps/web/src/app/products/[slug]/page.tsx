@@ -208,9 +208,9 @@ export default function ProductPage({ params }: ProductPageProps) {
           <span className="text-black font-semibold">{product.name}</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
           {/* Product Images */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             <div className="aspect-square relative overflow-hidden rounded-lg shadow-lg bg-white border">
               {(() => {
                 const imageUrl = displayImages?.[selectedImage] || product.images?.[selectedImage];
@@ -259,32 +259,32 @@ export default function ProductPage({ params }: ProductPageProps) {
 
               {/* Floating Elements */}
               {hasDiscount && (
-                <div className="absolute top-6 left-6 bg-gradient-to-r from-red-500 to-pink-500 text-white px-4 py-2 text-sm font-bold rounded-full shadow-lg animate-pulse">
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 md:top-6 md:left-6 bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-full shadow-lg animate-pulse">
                   {discountPercentage}% OFF
                 </div>
               )}
 
-              <div className="absolute top-6 right-6 bg-white/80 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-colors cursor-pointer">
-                <Heart className="h-5 w-5 text-gray-700 hover:text-red-500 transition-colors" />
+              <div className="absolute top-3 right-3 sm:top-4 sm:right-4 md:top-6 md:right-6 bg-white/80 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg hover:bg-white transition-colors cursor-pointer">
+                <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700 hover:text-red-500 transition-colors" />
               </div>
 
               {(currentVariant?.stock ?? product.totalStock ?? 0) === 0 && (
                 <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center rounded-3xl">
-                  <div className="text-center">
-                    <span className="text-white text-2xl font-bold block">Out of Stock</span>
-                    <span className="text-white/80 text-sm">Notify me when available</span>
+                  <div className="text-center px-4">
+                    <span className="text-white text-lg sm:text-xl md:text-2xl font-bold block">Out of Stock</span>
+                    <span className="text-white/80 text-xs sm:text-sm">Notify me when available</span>
                   </div>
                 </div>
               )}
             </div>
 
             {displayImages.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto pb-2">
+              <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2">
                 {displayImages.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-16 h-16 relative rounded-md overflow-hidden border-2 transition-all ${
+                    className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 relative rounded-md overflow-hidden border-2 transition-all ${
                       selectedImage === index
                         ? 'border-black shadow-md'
                         : 'border-gray-200 hover:border-gray-300'
@@ -579,7 +579,7 @@ export default function ProductPage({ params }: ProductPageProps) {
                     ? 'Adding...'
                     : ((product.variants?.length ?? 0) > 1 && !currentVariant)
                     ? 'Select options first'
-                    : `Add to Cart • ₹₹{((displayPrice || 0) * quantity).toFixed(2)}`
+                    : `Add to Cart • ₹${((displayPrice || 0) * quantity).toFixed(2)}`
                   }
                 </Button>
               </div>
@@ -724,7 +724,7 @@ export default function ProductPage({ params }: ProductPageProps) {
               <h2 className="text-xl font-semibold text-gray-900 mb-2">You Might Also Like</h2>
               <p className="text-sm text-gray-600">Discover more from our collection</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {recommendedProducts.map((product) => (
                 <div key={product.id} className="transform hover:scale-105 transition-all duration-300">
                   <ProductCard product={product} theme="light" />

@@ -98,7 +98,7 @@ export default function ProductsPage() {
   return (
     <div className={`min-h-screen ${styles.bg} ${styles.text}`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="mb-12">
+        <div className="mb-12 text-center sm:text-left">
           <h1 className="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tight">
             <span className={`border-b-4 ${styles.border} pb-2`}>{getTitle()}</span>
           </h1>
@@ -200,7 +200,7 @@ export default function ProductsPage() {
         )}
 
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {[...Array(12)].map((_, index) => (
               <div key={index} className="animate-pulse">
                 <div className="bg-gray-200 aspect-square rounded-lg mb-4"></div>
@@ -213,7 +213,7 @@ export default function ProductsPage() {
           </div>
         ) : products.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {products.map((product) => (
                 <ProductCard
                   key={product.id}
