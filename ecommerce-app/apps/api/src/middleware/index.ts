@@ -17,6 +17,7 @@ export function setupMiddleware(app: Express) {
     },
     standardHeaders: true,
     legacyHeaders: false,
+    validate: { trustProxy: false }, // Disable validation since we're behind nginx proxy
   });
 
   app.use('/api', limiter);

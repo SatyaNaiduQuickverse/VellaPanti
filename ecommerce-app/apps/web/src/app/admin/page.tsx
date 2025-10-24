@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { useQuery } from '@tanstack/react-query';
 import { api, handleApiResponse } from '@/lib/api';
-import { Package, Users, ShoppingCart, TrendingUp, AlertTriangle, Eye, Image, Star } from 'lucide-react';
+import { Package, Users, ShoppingCart, TrendingUp, AlertTriangle, Eye, Image, Star, Tag } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import Link from 'next/link';
 
@@ -232,7 +232,7 @@ function DashboardContent({ dashboardData, user, error }: {
         {/* Quick Actions */}
         <div className="bg-white border-2 border-black p-6 mb-8">
           <h2 className="text-2xl font-black text-black uppercase tracking-tight mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link href="/admin/products/new">
               <Button className="w-full bg-black text-white hover:bg-gray-800 font-black uppercase tracking-wider">
                 <Package className="h-4 w-4 mr-2" />
@@ -261,6 +261,12 @@ function DashboardContent({ dashboardData, user, error }: {
               <Button variant="outline" className="w-full border-2 border-black text-black hover:bg-black hover:text-white font-black uppercase tracking-wider">
                 <Star className="h-4 w-4 mr-2" />
                 Featured Products
+              </Button>
+            </Link>
+            <Link href="/admin/offer-popup">
+              <Button variant="outline" className="w-full border-2 border-black text-black hover:bg-black hover:text-white font-black uppercase tracking-wider">
+                <Tag className="h-4 w-4 mr-2" />
+                Offer Popup
               </Button>
             </Link>
           </div>

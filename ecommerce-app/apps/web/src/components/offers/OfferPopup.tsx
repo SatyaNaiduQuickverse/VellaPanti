@@ -4,30 +4,106 @@ import { useEffect, useState } from 'react';
 import { X, Tag, Gift, Sparkles, ShoppingBag } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import Link from 'next/link';
+import { api } from '@/lib/api';
+
+interface OfferPopupData {
+  id: string;
+  isActive: boolean;
+  imageUrl?: string;
+  title: string;
+  subtitle: string;
+  offer1Type: string;
+  offer1Title: string;
+  offer1Subtitle: string;
+  offer1Code: string;
+  offer1Badge: string;
+  offer1BgColor: string;
+  offer2Type: string;
+  offer2Title: string;
+  offer2Subtitle: string;
+  offer2Code: string;
+  offer2Badge: string;
+  offer2BgColor: string;
+  delaySeconds: number;
+}
 
 export function OfferPopup() {
   const [isOpen, setIsOpen] = useState(false);
+  const [popupData, setPopupData] = useState<OfferPopupData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if popup has been shown in this session
-    const hasSeenPopup = sessionStorage.getItem('offerPopupShown');
+    // Fetch popup data from API
+    const fetchPopupData = async () => {
+      try {
+        const response = await api.get('/products/offer-popup');
+        if (response.data.success && response.data.data) {
+          const data = response.data.data as OfferPopupData;
+          setPopupData(data);
 
-    if (!hasSeenPopup) {
-      // Show popup after a short delay
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-        sessionStorage.setItem('offerPopupShown', 'true');
-      }, 1500); // Show after 1.5 seconds
+          // Check if popup should be shown
+          if (data.isActive) {
+            const hasSeenPopup = sessionStorage.getItem('offerPopupShown');
 
-      return () => clearTimeout(timer);
-    }
+            if (!hasSeenPopup) {
+              // Show popup after configured delay
+              const timer = setTimeout(() => {
+                setIsOpen(true);
+                sessionStorage.setItem('offerPopupShown', 'true');
+              }, (data.delaySeconds || 2) * 1000);
+
+              return () => clearTimeout(timer);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load offer popup:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPopupData();
   }, []);
 
   const handleClose = () => {
     setIsOpen(false);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !popupData || loading) return null;
+
+  // Helper function to get color classes
+  const getBgColorClasses = (color: string, type: 'bg' | 'border' | 'text') => {
+    const colorMap: Record<string, Record<string, string>> = {
+      red: {
+        bg: 'bg-gradient-to-br from-red-50 to-orange-50',
+        border: 'border-red-600',
+        text: 'text-red-600'
+      },
+      green: {
+        bg: 'bg-gradient-to-br from-green-50 to-emerald-50',
+        border: 'border-green-600',
+        text: 'text-green-600'
+      },
+      blue: {
+        bg: 'bg-gradient-to-br from-blue-50 to-cyan-50',
+        border: 'border-blue-600',
+        text: 'text-blue-600'
+      },
+      purple: {
+        bg: 'bg-gradient-to-br from-purple-50 to-pink-50',
+        border: 'border-purple-600',
+        text: 'text-purple-600'
+      },
+      orange: {
+        bg: 'bg-gradient-to-br from-orange-50 to-yellow-50',
+        border: 'border-orange-600',
+        text: 'text-orange-600'
+      }
+    };
+
+    return colorMap[color]?.[type] || colorMap['red'][type];
+  };
 
   return (
     <>
@@ -58,86 +134,84 @@ export function OfferPopup() {
             <div className="relative">
               <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 mx-auto mb-2 sm:mb-3 text-yellow-400 animate-bounce" />
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-wider mb-1 sm:mb-2">
-                EXCLUSIVE OFFERS!
+                {popupData.title}
               </h2>
               <p className="text-sm sm:text-base font-bold text-yellow-400 uppercase tracking-wide">
-                Limited Time Only
+                {popupData.subtitle}
               </p>
             </div>
           </div>
 
           {/* Offers Grid */}
           <div className="p-4 sm:p-6 md:p-8 grid md:grid-cols-2 gap-4 sm:gap-6">
-            {/* 50% OFF Offer */}
-            <div className="bg-gradient-to-br from-red-50 to-orange-50 border-4 border-red-600 p-4 sm:p-6 relative overflow-hidden group hover:shadow-xl transition-shadow">
-              <div className="absolute top-0 right-0 bg-red-600 text-white px-3 py-1 text-xs font-black uppercase transform rotate-12 translate-x-2 -translate-y-1">
-                HOT
+            {/* First Offer */}
+            <div className={`${getBgColorClasses(popupData.offer1BgColor, 'bg')} border-4 ${getBgColorClasses(popupData.offer1BgColor, 'border')} p-4 sm:p-6 relative overflow-hidden group hover:shadow-xl transition-shadow`}>
+              <div className={`absolute top-0 right-0 ${getBgColorClasses(popupData.offer1BgColor, 'border').replace('border-', 'bg-')} text-white px-3 py-1 text-xs font-black uppercase transform rotate-12 translate-x-2 -translate-y-1`}>
+                {popupData.offer1Badge}
               </div>
 
               <div className="relative z-10">
-                <div className="bg-red-600 text-white w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-3 sm:mb-4 mx-auto group-hover:scale-110 transition-transform">
+                <div className={`${getBgColorClasses(popupData.offer1BgColor, 'border').replace('border-', 'bg-')} text-white w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-3 sm:mb-4 mx-auto group-hover:scale-110 transition-transform`}>
                   <Tag className="h-7 w-7 sm:h-8 sm:w-8" />
                 </div>
 
-                <h3 className="text-3xl sm:text-4xl md:text-5xl font-black text-red-600 mb-2 text-center">
-                  50% OFF
+                <h3 className={`text-3xl sm:text-4xl md:text-5xl font-black ${getBgColorClasses(popupData.offer1BgColor, 'text')} mb-2 text-center`}>
+                  {popupData.offer1Title}
                 </h3>
 
                 <p className="text-base sm:text-lg font-bold text-center text-gray-800 mb-3 sm:mb-4 uppercase tracking-wide">
-                  On All Products
+                  {popupData.offer1Subtitle}
                 </p>
 
-                <div className="bg-white border-2 border-red-600 p-3 rounded mb-3 sm:mb-4">
+                <div className={`bg-white border-2 ${getBgColorClasses(popupData.offer1BgColor, 'border')} p-3 rounded mb-3 sm:mb-4`}>
                   <p className="text-xs sm:text-sm font-bold text-center text-gray-700 mb-2">
                     USE COUPON CODE:
                   </p>
-                  <div className="bg-red-600 text-white px-3 sm:px-4 py-2 rounded text-center">
+                  <div className={`${getBgColorClasses(popupData.offer1BgColor, 'border').replace('border-', 'bg-')} text-white px-3 sm:px-4 py-2 rounded text-center`}>
                     <code className="text-base sm:text-lg md:text-xl font-black tracking-wider">
-                      SAVE50
+                      {popupData.offer1Code}
                     </code>
                   </div>
                 </div>
 
                 <p className="text-xs text-center text-gray-600 italic">
-                  Apply at checkout to get 50% discount
+                  Apply at checkout to get {popupData.offer1Type === 'PERCENTAGE' ? 'discount' : 'your offer'}
                 </p>
               </div>
             </div>
 
-            {/* BOGO Offer */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-4 border-green-600 p-4 sm:p-6 relative overflow-hidden group hover:shadow-xl transition-shadow">
-              <div className="absolute top-0 right-0 bg-green-600 text-white px-3 py-1 text-xs font-black uppercase transform rotate-12 translate-x-2 -translate-y-1">
-                NEW
+            {/* Second Offer */}
+            <div className={`${getBgColorClasses(popupData.offer2BgColor, 'bg')} border-4 ${getBgColorClasses(popupData.offer2BgColor, 'border')} p-4 sm:p-6 relative overflow-hidden group hover:shadow-xl transition-shadow`}>
+              <div className={`absolute top-0 right-0 ${getBgColorClasses(popupData.offer2BgColor, 'border').replace('border-', 'bg-')} text-white px-3 py-1 text-xs font-black uppercase transform rotate-12 translate-x-2 -translate-y-1`}>
+                {popupData.offer2Badge}
               </div>
 
               <div className="relative z-10">
-                <div className="bg-green-600 text-white w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-3 sm:mb-4 mx-auto group-hover:scale-110 transition-transform">
+                <div className={`${getBgColorClasses(popupData.offer2BgColor, 'border').replace('border-', 'bg-')} text-white w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-3 sm:mb-4 mx-auto group-hover:scale-110 transition-transform`}>
                   <Gift className="h-7 w-7 sm:h-8 sm:w-8" />
                 </div>
 
-                <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-green-600 mb-2 text-center leading-tight">
-                  BUY 1 GET 1
-                  <br />
-                  <span className="text-3xl sm:text-4xl md:text-5xl">FREE!</span>
+                <h3 className={`text-xl sm:text-2xl md:text-3xl font-black ${getBgColorClasses(popupData.offer2BgColor, 'text')} mb-2 text-center leading-tight`}>
+                  {popupData.offer2Title}
                 </h3>
 
                 <p className="text-base sm:text-lg font-bold text-center text-gray-800 mb-3 sm:mb-4 uppercase tracking-wide">
-                  Double Your Purchase
+                  {popupData.offer2Subtitle}
                 </p>
 
-                <div className="bg-white border-2 border-green-600 p-3 rounded mb-3 sm:mb-4">
+                <div className={`bg-white border-2 ${getBgColorClasses(popupData.offer2BgColor, 'border')} p-3 rounded mb-3 sm:mb-4`}>
                   <p className="text-xs sm:text-sm font-bold text-center text-gray-700 mb-2">
                     USE COUPON CODE:
                   </p>
-                  <div className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded text-center">
+                  <div className={`${getBgColorClasses(popupData.offer2BgColor, 'border').replace('border-', 'bg-')} text-white px-3 sm:px-4 py-2 rounded text-center`}>
                     <code className="text-base sm:text-lg md:text-xl font-black tracking-wider">
-                      BOGO2024
+                      {popupData.offer2Code}
                     </code>
                   </div>
                 </div>
 
                 <p className="text-xs text-center text-gray-600 italic">
-                  Buy any item and get another one free!
+                  {popupData.offer2Type === 'BOGO' ? 'Buy any item and get another one free!' : 'Apply at checkout to get your offer'}
                 </p>
               </div>
             </div>

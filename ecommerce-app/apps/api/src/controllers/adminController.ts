@@ -876,3 +876,121 @@ export const updateHomepageBanners = asyncHandler(async (req: AuthRequest, res: 
     data: results,
   });
 });
+
+// Offer Popup Management
+export const getOfferPopup = asyncHandler(async (req: Request, res: Response) => {
+  const popup = await prisma.offerPopup.findFirst({
+    orderBy: { createdAt: 'desc' },
+  });
+
+  res.json({
+    success: true,
+    data: popup,
+  });
+});
+
+export const updateOfferPopup = asyncHandler(async (req: Request, res: Response) => {
+  const {
+    id,
+    isActive,
+    imageUrl,
+    title,
+    subtitle,
+    offer1Type,
+    offer1Title,
+    offer1Subtitle,
+    offer1Code,
+    offer1Badge,
+    offer1BgColor,
+    offer2Type,
+    offer2Title,
+    offer2Subtitle,
+    offer2Code,
+    offer2Badge,
+    offer2BgColor,
+    delaySeconds,
+  } = req.body;
+
+  if (!id) {
+    throw new AppError('Popup ID is required', 400);
+  }
+
+  const updatedPopup = await prisma.offerPopup.update({
+    where: { id },
+    data: {
+      isActive,
+      imageUrl,
+      title,
+      subtitle,
+      offer1Type,
+      offer1Title,
+      offer1Subtitle,
+      offer1Code,
+      offer1Badge,
+      offer1BgColor,
+      offer2Type,
+      offer2Title,
+      offer2Subtitle,
+      offer2Code,
+      offer2Badge,
+      offer2BgColor,
+      delaySeconds,
+    },
+  });
+
+  res.json({
+    success: true,
+    message: 'Offer popup updated successfully',
+    data: updatedPopup,
+  });
+});
+
+export const createOfferPopup = asyncHandler(async (req: Request, res: Response) => {
+  const {
+    isActive,
+    imageUrl,
+    title,
+    subtitle,
+    offer1Type,
+    offer1Title,
+    offer1Subtitle,
+    offer1Code,
+    offer1Badge,
+    offer1BgColor,
+    offer2Type,
+    offer2Title,
+    offer2Subtitle,
+    offer2Code,
+    offer2Badge,
+    offer2BgColor,
+    delaySeconds,
+  } = req.body;
+
+  const popup = await prisma.offerPopup.create({
+    data: {
+      isActive,
+      imageUrl,
+      title,
+      subtitle,
+      offer1Type,
+      offer1Title,
+      offer1Subtitle,
+      offer1Code,
+      offer1Badge,
+      offer1BgColor,
+      offer2Type,
+      offer2Title,
+      offer2Subtitle,
+      offer2Code,
+      offer2Badge,
+      offer2BgColor,
+      delaySeconds,
+    },
+  });
+
+  res.json({
+    success: true,
+    message: 'Offer popup created successfully',
+    data: popup,
+  });
+});

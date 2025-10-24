@@ -15,6 +15,7 @@ import {
   updateProductVariant,
   deleteProductVariant,
   getFeaturedProducts,
+  getActiveOfferPopup,
 } from '../controllers/productController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { validate, validateQuery } from '../middleware/validation';
@@ -27,6 +28,7 @@ router.get('/', validateQuery(productQuerySchema), getProducts);
 router.get('/featured', getFeaturedProducts);
 router.get('/search', searchProducts);
 router.get('/categories-filter', getCategoriesForFilter);
+router.get('/offer-popup', getActiveOfferPopup);
 router.get('/slug/:slug', getProductBySlug);
 router.get('/:id', getProductById);
 

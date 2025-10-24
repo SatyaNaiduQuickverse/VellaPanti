@@ -18,6 +18,9 @@ import {
   updateFeaturedCollections,
   getHomepageBanners,
   updateHomepageBanners,
+  getOfferPopup,
+  createOfferPopup,
+  updateOfferPopup,
 } from '../controllers/adminController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { validate } from '../middleware/validation';
@@ -62,5 +65,10 @@ router.put('/featured-collections', updateFeaturedCollections);
 // Homepage Banners Management
 router.get('/homepage-banners', getHomepageBanners);
 router.put('/homepage-banners', updateHomepageBanners);
+
+// Offer Popup Management
+router.get('/offer-popup', getOfferPopup);
+router.post('/offer-popup', createOfferPopup);
+router.put('/offer-popup', updateOfferPopup);
 
 export default router;

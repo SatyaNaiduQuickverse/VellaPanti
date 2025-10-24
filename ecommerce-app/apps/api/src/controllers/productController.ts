@@ -32,6 +32,7 @@ export const getFeaturedProducts = asyncHandler(async (req: Request, res: Respon
               price: true,
               salePrice: true,
               stock: true,
+              images: true,
             },
           },
           _count: {
@@ -86,6 +87,7 @@ export const getFeaturedProducts = asyncHandler(async (req: Request, res: Respon
             price: true,
             salePrice: true,
             stock: true,
+            images: true,
           },
         },
         _count: {
@@ -196,6 +198,7 @@ export const getProducts = asyncHandler(async (req: Request, res: Response) => {
             price: true,
             salePrice: true,
             stock: true,
+            images: true,
           },
         },
         reviews: {
@@ -1062,5 +1065,18 @@ export const deleteProductVariant = asyncHandler(async (req: Request, res: Respo
   res.json({
     success: true,
     message: 'Product variant deleted successfully',
+  });
+});
+
+// Get active offer popup (public endpoint)
+export const getActiveOfferPopup = asyncHandler(async (req: Request, res: Response) => {
+  const popup = await prisma.offerPopup.findFirst({
+    where: { isActive: true },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  res.json({
+    success: true,
+    data: popup,
   });
 });

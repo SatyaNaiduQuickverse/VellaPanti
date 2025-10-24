@@ -7,17 +7,97 @@ import { useAuthStore } from '@/stores/authStore';
 import { useCart } from '@/hooks/useCart';
 import { api, handleApiResponse } from '@/lib/api';
 import { Button } from '@ecommerce/ui';
-import { ArrowLeft, CreditCard, Truck, Shield, Package } from 'lucide-react';
+import { ArrowLeft, CreditCard, Truck, Shield, Package, Tag, X, Gift } from 'lucide-react';
 import Link from 'next/link';
+import { applyCoupon as applyCouponUtil } from '@/lib/couponUtils';
+import type { Coupon } from '@ecommerce/types';
+import toast from 'react-hot-toast';
 
 export default function CheckoutPage() {
-  const { items, total, itemCount } = useCartStore();
+  const { items, subtotal, discount, total, itemCount, appliedCoupon, applyCoupon, removeCoupon } = useCartStore();
   const { isAuthenticated } = useAuthStore();
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
   // Load cart data if authenticated
   const { isLoading } = useCart();
+
+  // Mock coupons for testing (in production, fetch from API)
+  const mockCoupons: Coupon[] = [
+    {
+      id: '1',
+      code: 'SAVE50',
+      type: 'PERCENTAGE',
+      discountPercentage: 50,
+      applicability: 'ALL',
+      status: 'ACTIVE',
+      usedCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: '2',
+      code: 'BOGO2024',
+      type: 'BOGO',
+      applicability: 'ALL',
+      status: 'ACTIVE',
+      usedCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: '3',
+      code: 'FLAT50',
+      type: 'PERCENTAGE',
+      discountPercentage: 50,
+      applicability: 'ALL',
+      minPurchaseAmount: 500,
+      status: 'ACTIVE',
+      usedCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  ];
+
+  const handleApplyCoupon = () => {
+    if (!couponCode.trim()) {
+      toast.error('Please enter a coupon code');
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+
+    // Find coupon (in production, call API)
+    const coupon = mockCoupons.find(
+      c => c.code.toUpperCase() === couponCode.trim().toUpperCase()
+    );
+
+    if (!coupon) {
+      toast.error('Invalid coupon code');
+      setIsApplyingCoupon(false);
+      return;
+    }
+
+    // Apply coupon using utility
+    const result = applyCouponUtil(coupon, items);
+
+    if (result.success && result.appliedCoupon) {
+      applyCoupon(result.appliedCoupon);
+      toast.success(result.message);
+      setCouponCode('');
+    } else {
+      toast.error(result.message);
+    }
+
+    setIsApplyingCoupon(false);
+  };
+
+  const handleRemoveCoupon = () => {
+    removeCoupon();
+    toast.success('Coupon removed');
+  };
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -288,12 +368,91 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
+              {/* Coupon Section */}
+              {!appliedCoupon ? (
+                <div className="mb-6">
+                  <label className="block text-sm font-bold mb-2 text-gray-300">Have a Coupon?</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
+                      placeholder="Enter code"
+                      className="flex-1 px-3 py-2 bg-white text-black font-bold border-2 border-white rounded uppercase"
+                      disabled={isApplyingCoupon}
+                    />
+                    <Button
+                      onClick={handleApplyCoupon}
+                      disabled={isApplyingCoupon || !couponCode.trim()}
+                      className="bg-green-600 text-white hover:bg-green-700 font-black uppercase tracking-wider px-4"
+                    >
+                      <Tag className="h-4 w-4 mr-2" />
+                      Apply
+                    </Button>
+                  </div>
+                  <p className="mt-2 text-xs text-gray-400">
+                    Try: SAVE50 (50% off) or BOGO2024 (Buy 1 Get 1)
+                  </p>
+                </div>
+              ) : (
+                <div className="mb-6 bg-green-600 p-3 rounded border-2 border-green-400">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {appliedCoupon.coupon.type === 'BOGO' ? (
+                        <Gift className="h-5 w-5" />
+                      ) : (
+                        <Tag className="h-5 w-5" />
+                      )}
+                      <div>
+                        <p className="font-black text-sm">{appliedCoupon.coupon.code}</p>
+                        <p className="text-xs">
+                          {appliedCoupon.coupon.type === 'BOGO'
+                            ? 'Buy 1 Get 1 Free'
+                            : `${appliedCoupon.coupon.discountPercentage}% OFF`}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={handleRemoveCoupon}
+                      className="text-white hover:bg-green-700 p-1"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               {/* Pricing Breakdown */}
               <div className="space-y-3 mb-6 pt-6 border-t border-white/20">
                 <div className="flex justify-between">
                   <span className="font-bold">Subtotal ({itemCount} items):</span>
-                  <span className="font-black">₹{total.toFixed(2)}</span>
+                  <span className="font-black">₹{subtotal.toFixed(2)}</span>
                 </div>
+
+                {appliedCoupon && discount > 0 && (
+                  <div className="flex justify-between text-green-400">
+                    <span className="font-bold">Discount ({appliedCoupon.coupon.code}):</span>
+                    <span className="font-black">-₹{discount.toFixed(2)}</span>
+                  </div>
+                )}
+
+                {appliedCoupon?.freeItems && appliedCoupon.freeItems.length > 0 && (
+                  <div className="bg-green-600/20 p-3 rounded border border-green-400">
+                    <p className="font-bold text-green-400 mb-2 flex items-center gap-2">
+                      <Gift className="h-4 w-4" />
+                      Free Items (BOGO):
+                    </p>
+                    {appliedCoupon.freeItems.map((item, index) => (
+                      <p key={index} className="text-xs text-gray-300">
+                        • {item.product?.name} x{item.quantity}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
                 <div className="flex justify-between">
                   <span className="font-bold">Shipping:</span>
                   <span className="font-black text-green-400">
@@ -309,6 +468,11 @@ export default function CheckoutPage() {
                     <span className="font-black">Total:</span>
                     <span className="font-black">₹{finalTotal.toFixed(2)}</span>
                   </div>
+                  {appliedCoupon && discount > 0 && (
+                    <p className="text-xs text-green-400 mt-1 text-right">
+                      You saved ₹{discount.toFixed(2)}!
+                    </p>
+                  )}
                 </div>
               </div>
 

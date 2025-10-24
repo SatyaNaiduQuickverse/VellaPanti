@@ -286,7 +286,7 @@ export default function HomePage() {
                 DEEPEST BLACK TEES
               </h2>
               <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-300">
-                Classic, Strong, Understated Power
+                CLASSIC • STRONG • UNDERSTATED POWER
               </p>
             </div>
 
@@ -383,7 +383,7 @@ export default function HomePage() {
                 PUREST WHITE TEES
               </h2>
               <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-600">
-                Clean, Bright, Effortless Style
+                CLEAN • BRIGHT • EFFORTLESS STYLE
               </p>
             </div>
 
