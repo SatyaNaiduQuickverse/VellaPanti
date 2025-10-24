@@ -11,7 +11,8 @@ import {
   FolderOpen,
   Image,
   Star,
-  Upload
+  Upload,
+  Book
 } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 
@@ -25,6 +26,7 @@ const navigation = [
   { name: 'Homepage', href: '/admin/homepage', icon: Image },
   { name: 'Featured', href: '/admin/featured', icon: Star },
   { name: 'Collections', href: '/admin/collections', icon: FolderOpen },
+  { name: 'Documentation', href: '/admin/docs', icon: Book },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
