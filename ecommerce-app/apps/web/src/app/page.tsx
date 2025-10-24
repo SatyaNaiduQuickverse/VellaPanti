@@ -10,6 +10,7 @@ import { useHomepageBanners } from '@/hooks/useHomepageBanners';
 import { ProductCard } from '@/components/products/product-card';
 import { CategoryGrid } from '@/components/categories/category-grid';
 import { ImageCarousel } from '@/components/carousel/image-carousel';
+import { OfferPopup } from '@/components/offers/OfferPopup';
 import { Suspense } from 'react';
 
 // All Products Grid Component
@@ -100,6 +101,9 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Offer Popup */}
+      <OfferPopup />
+
       {/* Single Hero Carousel */}
       <section className="h-[400px] sm:h-[500px] md:h-[550px] lg:h-[600px] relative overflow-hidden">
         {carouselLoading ? (
