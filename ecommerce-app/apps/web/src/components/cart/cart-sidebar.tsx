@@ -135,7 +135,7 @@ export function CartSidebar() {
                       {/* Price Information */}
                       <div className="flex items-center gap-2 mb-2">
                         <span className="font-black text-lg text-green-600">
-                          ${(() => {
+                          ₹{(() => {
                             let price = 0;
                             if (item.productVariant) {
                               price = item.productVariant.salePrice || item.productVariant.price || 0;

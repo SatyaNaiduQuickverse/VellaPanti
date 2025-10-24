@@ -240,7 +240,7 @@ export default function CartPage() {
                             <div>
                               <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                                 <span className="text-xl sm:text-2xl font-black text-green-600">
-                                  ${(() => {
+                                  ₹{(() => {
                                     let price = 0;
                                     if (item.productVariant) {
                                       price = item.productVariant.salePrice || item.productVariant.price || 0;
