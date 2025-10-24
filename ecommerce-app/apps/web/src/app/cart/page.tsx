@@ -430,19 +430,16 @@ export default function CartPage() {
                 </div>
 
                 <div className="space-y-3 sm:space-y-4">
-                  <Link href="/checkout">
-                    <Button className="w-full bg-white text-black hover:bg-gray-200 py-3 sm:py-4 text-base sm:text-lg font-black uppercase tracking-wider">
+                  <Link href="/checkout" className="block">
+                    <button className="w-full bg-white text-black hover:bg-gray-200 py-3 sm:py-4 text-base sm:text-lg font-black uppercase tracking-wider rounded transition-colors">
                       Proceed to Checkout
-                    </Button>
+                    </button>
                   </Link>
 
-                  <Link href="/products">
-                    <Button
-                      variant="outline"
-                      className="w-full border-2 border-white text-white hover:bg-white hover:text-black font-black uppercase tracking-wider py-3 sm:py-4 text-sm sm:text-base"
-                    >
+                  <Link href="/products" className="block">
+                    <button className="w-full border-2 border-white text-white hover:bg-white hover:text-black font-black uppercase tracking-wider py-3 sm:py-4 text-sm sm:text-base rounded transition-colors">
                       Continue Shopping
-                    </Button>
+                    </button>
                   </Link>
                 </div>
 

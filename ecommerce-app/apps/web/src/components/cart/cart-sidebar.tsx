@@ -243,19 +243,16 @@ export function CartSidebar() {
             </div>
 
             <div className="space-y-3">
-              <Link href="/cart" onClick={closeCart}>
-                <Button
-                  variant="outline"
-                  className="w-full border-2 border-black text-black hover:bg-black hover:text-white font-black uppercase tracking-wider"
-                >
+              <Link href="/cart" onClick={closeCart} className="block">
+                <button className="w-full border-2 border-black text-black hover:bg-black hover:text-white font-black uppercase tracking-wider py-3 rounded transition-colors">
                   View Cart
-                </Button>
+                </button>
               </Link>
 
-              <Link href="/checkout" onClick={closeCart}>
-                <Button className="w-full bg-black text-white hover:bg-gray-800 font-black uppercase tracking-wider">
+              <Link href="/checkout" onClick={closeCart} className="block">
+                <button className="w-full bg-black text-white hover:bg-gray-800 font-black uppercase tracking-wider py-3 rounded transition-colors">
                   Checkout
-                </Button>
+                </button>
               </Link>
             </div>
           </div>
