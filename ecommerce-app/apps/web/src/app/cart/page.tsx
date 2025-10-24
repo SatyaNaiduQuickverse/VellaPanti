@@ -437,7 +437,7 @@ export default function CartPage() {
                   </Link>
 
                   <Link href="/products" className="block">
-                    <button className="w-full border-2 border-white text-white hover:bg-white hover:text-black font-black uppercase tracking-wider py-3 sm:py-4 text-sm sm:text-base rounded transition-colors">
+                    <button className="w-full border-2 border-white bg-transparent text-white hover:bg-white hover:text-black font-black uppercase tracking-wider py-3 sm:py-4 text-sm sm:text-base rounded">
                       Continue Shopping
                     </button>
                   </Link>
