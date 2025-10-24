@@ -1,8 +1,36 @@
 import { create } from 'zustand';
-import type { CartItem } from '@ecommerce/types';
+import type { CartItem, AppliedCoupon } from '@ecommerce/types';
+
+// Helper function to get correct price from cart item
+const getItemPrice = (item: CartItem): number => {
+  if (item.productVariant) {
+    // Use variant sale price if available, otherwise variant price
+    return item.productVariant.salePrice || item.productVariant.price || 0;
+  } else if (item.product) {
+    // Use product sale price if available, otherwise base price
+    return item.product.baseSalePrice || item.product.basePrice || 0;
+  }
+  return 0;
+};
+
+// Calculate subtotal (before discounts)
+const calculateSubtotal = (items: CartItem[]): number => {
+  return items.reduce((sum, item) => {
+    const price = getItemPrice(item);
+    return sum + (price * item.quantity);
+  }, 0);
+};
+
+// Calculate total with coupon discount
+const calculateTotal = (subtotal: number, discount: number): number => {
+  return Math.max(0, subtotal - discount);
+};
 
 interface CartState {
   items: CartItem[];
+  appliedCoupon?: AppliedCoupon;
+  subtotal: number;
+  discount: number;
   total: number;
   itemCount: number;
   isOpen: boolean;
@@ -11,6 +39,9 @@ interface CartState {
   updateItem: (itemId: string, quantity: number) => void;
   removeItem: (itemId: string) => void;
   clearCart: () => void;
+  applyCoupon: (coupon: AppliedCoupon) => void;
+  removeCoupon: () => void;
+  recalculateTotals: () => void;
   openCart: () => void;
   closeCart: () => void;
   toggleCart: () => void;
@@ -18,19 +49,27 @@ interface CartState {
 
 export const useCartStore = create<CartState>((set, get) => ({
   items: [],
+  appliedCoupon: undefined,
+  subtotal: 0,
+  discount: 0,
   total: 0,
   itemCount: 0,
   isOpen: false,
-  setCart: (items, total, itemCount) =>
+
+  setCart: (items, total, itemCount) => {
+    const subtotal = calculateSubtotal(items);
     set({
       items,
+      subtotal,
       total,
       itemCount,
-    }),
+    });
+  },
+
   addItem: (item) => {
     const { items } = get();
     const existingItem = items.find((i) => i.id === item.id);
-    
+
     if (existingItem) {
       set({
         items: items.map((i) =>
@@ -40,20 +79,13 @@ export const useCartStore = create<CartState>((set, get) => ({
     } else {
       set({ items: [...items, item] });
     }
-    
-    // Recalculate totals
-    const newItems = get().items;
-    const newTotal = newItems.reduce((sum, i) => {
-      const price = (i.product as any)?.salePrice || (i.product as any)?.basePrice || (i.product as any)?.price || 0;
-      return sum + (price * i.quantity);
-    }, 0);
-    const newItemCount = newItems.reduce((sum, i) => sum + i.quantity, 0);
-    
-    set({ total: newTotal, itemCount: newItemCount });
+
+    get().recalculateTotals();
   },
+
   updateItem: (itemId, quantity) => {
     const { items } = get();
-    
+
     if (quantity <= 0) {
       set({ items: items.filter((i) => i.id !== itemId) });
     } else {
@@ -63,38 +95,46 @@ export const useCartStore = create<CartState>((set, get) => ({
         ),
       });
     }
-    
-    // Recalculate totals
-    const newItems = get().items;
-    const newTotal = newItems.reduce((sum, i) => {
-      const price = (i.product as any)?.salePrice || (i.product as any)?.basePrice || (i.product as any)?.price || 0;
-      return sum + (price * i.quantity);
-    }, 0);
-    const newItemCount = newItems.reduce((sum, i) => sum + i.quantity, 0);
-    
-    set({ total: newTotal, itemCount: newItemCount });
+
+    get().recalculateTotals();
   },
+
   removeItem: (itemId) => {
     const { items } = get();
-    const newItems = items.filter((i) => i.id !== itemId);
-    const newTotal = newItems.reduce((sum, i) => {
-      const price = (i.product as any)?.salePrice || (i.product as any)?.basePrice || (i.product as any)?.price || 0;
-      return sum + (price * i.quantity);
-    }, 0);
-    const newItemCount = newItems.reduce((sum, i) => sum + i.quantity, 0);
-    
-    set({
-      items: newItems,
-      total: newTotal,
-      itemCount: newItemCount,
-    });
+    set({ items: items.filter((i) => i.id !== itemId) });
+    get().recalculateTotals();
   },
+
   clearCart: () =>
     set({
       items: [],
+      appliedCoupon: undefined,
+      subtotal: 0,
+      discount: 0,
       total: 0,
       itemCount: 0,
     }),
+
+  applyCoupon: (coupon: AppliedCoupon) => {
+    set({ appliedCoupon: coupon });
+    get().recalculateTotals();
+  },
+
+  removeCoupon: () => {
+    set({ appliedCoupon: undefined, discount: 0 });
+    get().recalculateTotals();
+  },
+
+  recalculateTotals: () => {
+    const { items, appliedCoupon } = get();
+    const subtotal = calculateSubtotal(items);
+    const discount = appliedCoupon?.discountAmount || 0;
+    const total = calculateTotal(subtotal, discount);
+    const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
+
+    set({ subtotal, discount, total, itemCount });
+  },
+
   openCart: () => set({ isOpen: true }),
   closeCart: () => set({ isOpen: false }),
   toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),

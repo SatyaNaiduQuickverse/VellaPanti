@@ -118,6 +118,45 @@ export interface CartItem {
   updatedAt: Date;
 }
 
+// Coupon Types
+export type CouponType = 'PERCENTAGE' | 'BOGO';
+export type CouponStatus = 'ACTIVE' | 'INACTIVE' | 'EXPIRED';
+export type CouponApplicability = 'ALL' | 'CATEGORY' | 'PRODUCT';
+
+export interface Coupon {
+  id: string;
+  code: string;
+  type: CouponType;
+  discountPercentage?: number; // For PERCENTAGE type (e.g., 50 for 50% off)
+  applicability: CouponApplicability;
+  categoryId?: string; // For category-specific coupons
+  productId?: string; // For product-specific coupons
+  minPurchaseAmount?: number;
+  maxDiscountAmount?: number;
+  startDate?: Date;
+  endDate?: Date;
+  status: CouponStatus;
+  usageLimit?: number;
+  usedCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface AppliedCoupon {
+  coupon: Coupon;
+  discountAmount: number;
+  freeItems?: CartItem[]; // For BOGO coupons
+}
+
+export interface CartWithCoupon {
+  items: CartItem[];
+  appliedCoupon?: AppliedCoupon;
+  subtotal: number;
+  discount: number;
+  total: number;
+  itemCount: number;
+}
+
 export interface Order {
   id: string;
   userId: string;
@@ -229,6 +268,17 @@ export interface AddToCartRequest {
 
 export interface UpdateCartItemRequest {
   quantity: number;
+}
+
+export interface ApplyCouponRequest {
+  code: string;
+}
+
+export interface ApplyCouponResponse {
+  success: boolean;
+  message: string;
+  appliedCoupon?: AppliedCoupon;
+  cart?: CartWithCoupon;
 }
 
 // Order Types

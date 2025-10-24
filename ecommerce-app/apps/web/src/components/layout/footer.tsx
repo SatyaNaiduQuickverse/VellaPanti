@@ -3,23 +3,23 @@ import Link from 'next/link';
 export function Footer() {
   return (
     <footer className="bg-black text-white mt-auto">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {/* Company Info */}
-          <div className="space-y-4">
-            <h3 className="text-3xl font-black text-white uppercase tracking-tight">
+          <div className="space-y-3 sm:space-y-4">
+            <h3 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
               VELLA<span className="border-b-2 border-white pb-1">PANTI</span>
             </h3>
-            <p className="text-gray-300 text-sm font-bold uppercase tracking-wide">
-              STREET CULTURE • RAP AESTHETICS • GEN Z VIBES<br/>
+            <p className="text-gray-300 text-xs sm:text-sm font-bold uppercase tracking-wide">
+              STREET CULTURE • RAP AESTHETICS • GEN Z VIBES<br className="hidden sm:block"/>
               AUTHENTIC • BOLD • UNAPOLOGETIC
             </p>
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-4">
-            <h4 className="font-black uppercase tracking-wider text-white">QUICK LINKS</h4>
-            <ul className="space-y-2 text-sm">
+          <div className="space-y-3 sm:space-y-4">
+            <h4 className="font-black uppercase tracking-wider text-white text-sm sm:text-base">QUICK LINKS</h4>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
               <li>
                 <Link href="/products" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
                   DROPS
@@ -44,9 +44,9 @@ export function Footer() {
           </div>
 
           {/* Customer Service */}
-          <div className="space-y-4">
-            <h4 className="font-black uppercase tracking-wider text-white">SUPPORT</h4>
-            <ul className="space-y-2 text-sm">
+          <div className="space-y-3 sm:space-y-4">
+            <h4 className="font-black uppercase tracking-wider text-white text-sm sm:text-base">SUPPORT</h4>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
               <li>
                 <Link href="/support" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
                   HELP
@@ -71,9 +71,9 @@ export function Footer() {
           </div>
 
           {/* Account */}
-          <div className="space-y-4">
-            <h4 className="font-black uppercase tracking-wider text-white">MY ACCOUNT</h4>
-            <ul className="space-y-2 text-sm">
+          <div className="space-y-3 sm:space-y-4">
+            <h4 className="font-black uppercase tracking-wider text-white text-sm sm:text-base">MY ACCOUNT</h4>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
               <li>
                 <Link href="/profile" className="text-gray-300 hover:text-white transition-colors font-bold uppercase tracking-wide">
                   PROFILE
@@ -98,8 +98,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t-2 border-white mt-12 pt-8 text-center text-sm text-white">
-          <p className="font-black uppercase tracking-wider">&copy; 2024 VELLAPANTI. ALL RIGHTS RESERVED. | STREET CULTURE • AUTHENTIC STYLE</p>
+        <div className="border-t-2 border-white mt-8 sm:mt-10 lg:mt-12 pt-6 sm:pt-8 text-center text-xs sm:text-sm text-white">
+          <p className="font-black uppercase tracking-wider">&copy; 2024 VELLAPANTI. ALL RIGHTS RESERVED.<br className="sm:hidden"/> <span className="hidden sm:inline">|</span> STREET CULTURE • AUTHENTIC STYLE</p>
         </div>
       </div>
     </footer>
