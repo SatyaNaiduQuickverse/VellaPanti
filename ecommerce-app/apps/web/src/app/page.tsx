@@ -279,10 +279,10 @@ export default function HomePage() {
           <div className="p-4 sm:p-6 md:p-8 lg:p-16 min-h-screen flex flex-col">
             <div className="mb-8 sm:mb-10 lg:mb-12 text-center">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider">
-                STREET
+                DEEPEST BLACK TEES
               </h2>
               <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-300">
-                CULTURE · AUTHENTIC · UNDERGROUND
+                Classic, Strong, Understated Power
               </p>
             </div>
 
@@ -303,9 +303,9 @@ export default function HomePage() {
               </Suspense>
             </div>
 
-            {/* Featured Street Products */}
+            {/* Featured Black Tees */}
             <div className="mb-6 sm:mb-8">
-              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center">FEATURED STREET</h3>
+              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center">FEATURED BLACK TEES</h3>
               {blackFeaturedLoading ? (
                 <div className="grid grid-cols-2 gap-4 sm:gap-6">
                   {[...Array(8)].map((_, index) => (
@@ -323,30 +323,18 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="text-center py-6 sm:py-8 text-gray-300">
-                  <p className="text-base sm:text-lg font-bold">No featured street products selected</p>
+                  <p className="text-base sm:text-lg font-bold">No featured black tees selected</p>
                   <p className="text-xs sm:text-sm">Configure featured products in admin panel</p>
                 </div>
               )}
             </div>
 
-            {/* Black Tees Section */}
-            <div className="mb-8 sm:mb-10 lg:mb-12">
-              <div className="text-center py-6 sm:py-8 border-t border-b border-gray-700">
-                <h3 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2 sm:mb-3 tracking-wider">
-                  DEEPEST BLACK TEES
-                </h3>
-                <p className="text-sm sm:text-base md:text-lg font-bold tracking-wide text-gray-300">
-                  Classic, Strong, Understated Power
-                </p>
-              </div>
-            </div>
 
-
-            {/* View All Street Products Button */}
+            {/* View All Black Tees Button */}
             <div className="text-center mb-8 sm:mb-10 lg:mb-12">
               <Link href="/products?theme=BLACK&limit=30">
                 <Button className="bg-white text-black font-black py-2 px-6 sm:py-3 sm:px-8 text-xs sm:text-sm uppercase tracking-wider">
-                  View All Street Products
+                  View All Black Tees
                 </Button>
               </Link>
             </div>
@@ -354,14 +342,14 @@ export default function HomePage() {
             <div className="mt-auto pt-6 sm:pt-8">
               <div className="border-t border-gray-700 pt-6 sm:pt-8 mb-6 sm:mb-8">
                 <h4 className="text-base sm:text-lg font-black mb-4 sm:mb-6 text-center tracking-wider text-gray-300">
-                  DISCOVER STREET CULTURE
+                  DISCOVER BLACK COLLECTION
                 </h4>
               </div>
               <div className="space-y-2 sm:space-y-3">
                 <Link href="/categories?theme=BLACK" className="group block">
                   <Button className="w-full bg-white text-black hover:bg-gray-900 hover:text-white font-black py-3 px-4 sm:py-4 sm:px-6 text-sm sm:text-base uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border-2 border-white hover:border-gray-900">
                     <span className="flex items-center justify-center">
-                      EXPLORE STREET
+                      EXPLORE BLACK TEES
                       <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
@@ -388,10 +376,10 @@ export default function HomePage() {
           <div className="p-4 sm:p-6 md:p-8 lg:p-16 min-h-screen flex flex-col">
             <div className="mb-8 sm:mb-10 lg:mb-12 text-center">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider">
-                PREMIUM
+                PUREST WHITE TEES
               </h2>
               <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-600">
-                CLEAN · MINIMAL · REFINED
+                Clean, Bright, Effortless Style
               </p>
             </div>
 
@@ -412,9 +400,9 @@ export default function HomePage() {
               </Suspense>
             </div>
 
-            {/* Featured Premium Products */}
+            {/* Featured White Tees */}
             <div className="mb-6 sm:mb-8">
-              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center">FEATURED PREMIUM</h3>
+              <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center">FEATURED WHITE TEES</h3>
               {whiteFeaturedLoading ? (
                 <div className="grid grid-cols-2 gap-4 sm:gap-6">
                   {[...Array(8)].map((_, index) => (
@@ -432,30 +420,18 @@ export default function HomePage() {
                 </div>
               ) : (
                 <div className="text-center py-6 sm:py-8 text-gray-500">
-                  <p className="text-base sm:text-lg font-bold">No featured premium products selected</p>
+                  <p className="text-base sm:text-lg font-bold">No featured white tees selected</p>
                   <p className="text-xs sm:text-sm">Configure featured products in admin panel</p>
                 </div>
               )}
             </div>
 
-            {/* White Tees Section */}
-            <div className="mb-8 sm:mb-10 lg:mb-12">
-              <div className="text-center py-6 sm:py-8 border-t border-b border-gray-300">
-                <h3 className="text-2xl sm:text-3xl md:text-4xl font-black mb-2 sm:mb-3 tracking-wider">
-                  PUREST WHITE TEES
-                </h3>
-                <p className="text-sm sm:text-base md:text-lg font-bold tracking-wide text-gray-600">
-                  Clean, Bright, Effortless Style
-                </p>
-              </div>
-            </div>
 
-
-            {/* View All Premium Products Button */}
+            {/* View All White Tees Button */}
             <div className="text-center mb-8 sm:mb-10 lg:mb-12">
               <Link href="/products?theme=WHITE&limit=30">
                 <Button variant="outline" className="border-2 border-gray-400 text-black hover:bg-black hover:text-white font-black py-2 px-6 sm:py-3 sm:px-8 text-xs sm:text-sm uppercase tracking-wider transition-all duration-300">
-                  View All Premium Products
+                  View All White Tees
                 </Button>
               </Link>
             </div>
@@ -463,14 +439,14 @@ export default function HomePage() {
             <div className="mt-auto pt-6 sm:pt-8">
               <div className="border-t border-gray-300 pt-6 sm:pt-8 mb-6 sm:mb-8">
                 <h4 className="text-base sm:text-lg font-black mb-4 sm:mb-6 text-center tracking-wider text-gray-600">
-                  PREMIUM EXPERIENCE
+                  WHITE COLLECTION EXPERIENCE
                 </h4>
               </div>
               <div className="space-y-2 sm:space-y-3">
                 <Link href="/categories?theme=WHITE" className="group block">
                   <Button className="w-full bg-black text-white hover:bg-white hover:text-black font-black py-3 px-4 sm:py-4 sm:px-6 text-sm sm:text-base uppercase tracking-wider transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border-2 border-black hover:border-gray-300">
                     <span className="flex items-center justify-center">
-                      EXPLORE PREMIUM
+                      EXPLORE WHITE TEES
                       <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
