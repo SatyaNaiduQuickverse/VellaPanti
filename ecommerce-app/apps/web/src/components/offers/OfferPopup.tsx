@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X, Tag, Gift, Sparkles, ShoppingBag } from 'lucide-react';
+import { X, Tag, Gift, Zap, ShoppingBag, Sparkles } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import Link from 'next/link';
 import { api } from '@/lib/api';
@@ -72,200 +72,187 @@ export function OfferPopup() {
 
   if (!isOpen || !popupData || loading) return null;
 
-  // Helper function to get color classes
-  const getBgColorClasses = (color: string, type: 'bg' | 'border' | 'text') => {
-    const colorMap: Record<string, Record<string, string>> = {
-      red: {
-        bg: 'bg-gradient-to-br from-red-50 to-orange-50',
-        border: 'border-red-600',
-        text: 'text-red-600'
-      },
-      green: {
-        bg: 'bg-gradient-to-br from-green-50 to-emerald-50',
-        border: 'border-green-600',
-        text: 'text-green-600'
-      },
-      blue: {
-        bg: 'bg-gradient-to-br from-blue-50 to-cyan-50',
-        border: 'border-blue-600',
-        text: 'text-blue-600'
-      },
-      purple: {
-        bg: 'bg-gradient-to-br from-purple-50 to-pink-50',
-        border: 'border-purple-600',
-        text: 'text-purple-600'
-      },
-      orange: {
-        bg: 'bg-gradient-to-br from-orange-50 to-yellow-50',
-        border: 'border-orange-600',
-        text: 'text-orange-600'
-      }
-    };
-
-    return colorMap[color]?.[type] || colorMap['red'][type];
-  };
-
   return (
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 animate-fadeIn"
+        className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 animate-fadeIn"
         onClick={handleClose}
       />
 
       {/* Popup Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 pointer-events-none">
         <div
-          className="bg-white border-4 border-black max-w-2xl w-full relative pointer-events-auto animate-scaleIn shadow-2xl"
+          className="bg-black max-w-5xl w-full relative pointer-events-auto animate-scaleIn shadow-2xl overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close Button */}
           <button
             onClick={handleClose}
-            className="absolute -top-3 -right-3 bg-black text-white rounded-full p-2 hover:bg-gray-800 transition-colors z-10 border-4 border-white shadow-lg"
+            className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-white text-black rounded-full p-2 hover:bg-gray-200 transition-all z-20 shadow-xl hover:scale-110"
             aria-label="Close"
           >
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5 sm:h-6 sm:w-6" />
           </button>
 
-          {/* Header Banner */}
-          <div className="bg-black text-white p-4 sm:p-6 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-transparent to-yellow-400/20 animate-pulse" />
-            <div className="relative">
-              <Sparkles className="h-8 w-8 sm:h-10 sm:w-10 mx-auto mb-2 sm:mb-3 text-yellow-400 animate-bounce" />
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-wider mb-1 sm:mb-2">
-                {popupData.title}
-              </h2>
-              <p className="text-sm sm:text-base font-bold text-yellow-400 uppercase tracking-wide">
-                {popupData.subtitle}
-              </p>
-            </div>
-          </div>
+          <div className="grid lg:grid-cols-2 min-h-[500px] sm:min-h-[600px]">
+            {/* Left Side - Fashion Image */}
+            <div className="relative hidden lg:block">
+              {/* Fashion Background Image */}
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage: popupData.imageUrl
+                    ? `url(${popupData.imageUrl})`
+                    : 'url(/images/products/skull-beats-1.png)',
+                  filter: 'grayscale(100%) contrast(1.1)'
+                }}
+              />
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
 
-          {/* Offers Grid */}
-          <div className="p-4 sm:p-6 md:p-8 grid md:grid-cols-2 gap-4 sm:gap-6">
-            {/* First Offer */}
-            <div className={`${getBgColorClasses(popupData.offer1BgColor, 'bg')} border-4 ${getBgColorClasses(popupData.offer1BgColor, 'border')} p-4 sm:p-6 relative overflow-hidden group hover:shadow-xl transition-shadow`}>
-              <div className={`absolute top-0 right-0 ${getBgColorClasses(popupData.offer1BgColor, 'border').replace('border-', 'bg-')} text-white px-3 py-1 text-xs font-black uppercase transform rotate-12 translate-x-2 -translate-y-1`}>
-                {popupData.offer1Badge}
+              {/* Branding Text */}
+              <div className="absolute inset-0 flex flex-col justify-center p-8 sm:p-12">
+                <div className="transform -rotate-2">
+                  <h3 className="text-white text-4xl sm:text-5xl md:text-6xl font-black uppercase tracking-tighter mb-4 drop-shadow-2xl">
+                    VELLAPANTI
+                  </h3>
+                  <p className="text-white text-lg sm:text-xl font-bold uppercase tracking-widest drop-shadow-xl">
+                    STREET CULTURE
+                  </p>
+                  <div className="w-24 h-1 bg-white mt-4" />
+                </div>
               </div>
+            </div>
 
-              <div className="relative z-10">
-                <div className={`${getBgColorClasses(popupData.offer1BgColor, 'border').replace('border-', 'bg-')} text-white w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-3 sm:mb-4 mx-auto group-hover:scale-110 transition-transform`}>
-                  <Tag className="h-7 w-7 sm:h-8 sm:w-8" />
+            {/* Right Side - Offers Content */}
+            <div className="bg-white relative overflow-hidden">
+              {/* Diagonal Stripe Pattern */}
+              <div
+                className="absolute inset-0 opacity-5"
+                style={{
+                  backgroundImage: 'repeating-linear-gradient(45deg, black, black 10px, transparent 10px, transparent 20px)'
+                }}
+              />
+
+              <div className="relative p-6 sm:p-8 md:p-10 h-full flex flex-col">
+                {/* Header */}
+                <div className="text-center mb-6 sm:mb-8">
+                  <div className="inline-block bg-black text-white px-4 py-2 mb-4">
+                    <Zap className="h-5 w-5 sm:h-6 sm:w-6 inline-block mr-2" />
+                    <span className="text-xs sm:text-sm font-black uppercase tracking-wider">
+                      {popupData.subtitle}
+                    </span>
+                  </div>
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tighter text-black mb-2">
+                    {popupData.title}
+                  </h2>
+                  <div className="w-20 h-1 bg-black mx-auto" />
                 </div>
 
-                <h3 className={`text-3xl sm:text-4xl md:text-5xl font-black ${getBgColorClasses(popupData.offer1BgColor, 'text')} mb-2 text-center`}>
-                  {popupData.offer1Title}
-                </h3>
+                {/* Offers Grid */}
+                <div className="flex-1 grid gap-4 sm:gap-6 mb-6 sm:mb-8">
+                  {/* First Offer - 50% OFF */}
+                  <div className="bg-black border-4 border-white p-6 relative group hover:border-gray-300 transition-all">
+                    <div className="absolute top-0 right-0 bg-white text-black px-3 py-1 text-xs font-black uppercase transform rotate-3 translate-x-2 -translate-y-2">
+                      {popupData.offer1Badge}
+                    </div>
 
-                <p className="text-base sm:text-lg font-bold text-center text-gray-800 mb-3 sm:mb-4 uppercase tracking-wide">
-                  {popupData.offer1Subtitle}
-                </p>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="bg-white text-black w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Tag className="h-8 w-8" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-4xl sm:text-5xl font-black text-white mb-1 tracking-tighter">
+                          {popupData.offer1Title}
+                        </h3>
+                        <p className="text-sm font-bold text-gray-300 uppercase tracking-wide">
+                          {popupData.offer1Subtitle}
+                        </p>
+                      </div>
+                    </div>
 
-                <div className={`bg-white border-2 ${getBgColorClasses(popupData.offer1BgColor, 'border')} p-3 rounded mb-3 sm:mb-4`}>
-                  <p className="text-xs sm:text-sm font-bold text-center text-gray-700 mb-2">
-                    USE COUPON CODE:
-                  </p>
-                  <div className={`${getBgColorClasses(popupData.offer1BgColor, 'border').replace('border-', 'bg-')} text-white px-3 sm:px-4 py-2 rounded text-center`}>
-                    <code className="text-base sm:text-lg md:text-xl font-black tracking-wider">
-                      {popupData.offer1Code}
-                    </code>
+                    <div className="bg-white p-4 mb-3">
+                      <p className="text-xs font-bold text-center text-gray-700 mb-2 uppercase tracking-wide">
+                        Coupon Code
+                      </p>
+                      <div className="bg-black text-white px-4 py-3 text-center border-2 border-dashed border-gray-300">
+                        <code className="text-xl sm:text-2xl font-black tracking-widest">
+                          {popupData.offer1Code}
+                        </code>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-center text-gray-400 italic">
+                      Valid on all products • No minimum purchase
+                    </p>
+                  </div>
+
+                  {/* Second Offer - BOGO */}
+                  <div className="bg-white border-4 border-black p-6 relative group hover:bg-gray-50 transition-all">
+                    <div className="absolute top-0 right-0 bg-black text-white px-3 py-1 text-xs font-black uppercase transform rotate-3 translate-x-2 -translate-y-2">
+                      {popupData.offer2Badge}
+                    </div>
+
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="bg-black text-white w-16 h-16 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Gift className="h-8 w-8" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-2xl sm:text-3xl font-black text-black mb-1 tracking-tighter leading-tight">
+                          {popupData.offer2Title}
+                        </h3>
+                        <p className="text-sm font-bold text-gray-700 uppercase tracking-wide">
+                          {popupData.offer2Subtitle}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="bg-black p-4 mb-3 border-4 border-gray-800">
+                      <p className="text-xs font-bold text-center text-white mb-2 uppercase tracking-wide">
+                        Coupon Code
+                      </p>
+                      <div className="bg-white text-black px-4 py-3 text-center">
+                        <code className="text-xl sm:text-2xl font-black tracking-widest">
+                          {popupData.offer2Code}
+                        </code>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-center text-gray-600 italic">
+                      Buy any item, get lowest priced item free
+                    </p>
                   </div>
                 </div>
 
-                <p className="text-xs text-center text-gray-600 italic">
-                  Apply at checkout to get {popupData.offer1Type === 'PERCENTAGE' ? 'discount' : 'your offer'}
-                </p>
-              </div>
-            </div>
-
-            {/* Second Offer */}
-            <div className={`${getBgColorClasses(popupData.offer2BgColor, 'bg')} border-4 ${getBgColorClasses(popupData.offer2BgColor, 'border')} p-4 sm:p-6 relative overflow-hidden group hover:shadow-xl transition-shadow`}>
-              <div className={`absolute top-0 right-0 ${getBgColorClasses(popupData.offer2BgColor, 'border').replace('border-', 'bg-')} text-white px-3 py-1 text-xs font-black uppercase transform rotate-12 translate-x-2 -translate-y-1`}>
-                {popupData.offer2Badge}
-              </div>
-
-              <div className="relative z-10">
-                <div className={`${getBgColorClasses(popupData.offer2BgColor, 'border').replace('border-', 'bg-')} text-white w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-3 sm:mb-4 mx-auto group-hover:scale-110 transition-transform`}>
-                  <Gift className="h-7 w-7 sm:h-8 sm:w-8" />
+                {/* CTA Buttons */}
+                <div className="space-y-3">
+                  <Link href="/products" className="block" onClick={handleClose}>
+                    <Button className="w-full bg-black text-white hover:bg-gray-800 font-black uppercase tracking-wider py-4 text-base border-2 border-black hover:border-gray-600 transition-all">
+                      <ShoppingBag className="h-5 w-5 mr-2" />
+                      Shop Now
+                    </Button>
+                  </Link>
+                  <Button
+                    onClick={handleClose}
+                    className="w-full bg-white text-black hover:bg-gray-100 font-black uppercase tracking-wider py-4 text-base border-2 border-black"
+                  >
+                    Continue Browsing
+                  </Button>
                 </div>
 
-                <h3 className={`text-xl sm:text-2xl md:text-3xl font-black ${getBgColorClasses(popupData.offer2BgColor, 'text')} mb-2 text-center leading-tight`}>
-                  {popupData.offer2Title}
-                </h3>
-
-                <p className="text-base sm:text-lg font-bold text-center text-gray-800 mb-3 sm:mb-4 uppercase tracking-wide">
-                  {popupData.offer2Subtitle}
-                </p>
-
-                <div className={`bg-white border-2 ${getBgColorClasses(popupData.offer2BgColor, 'border')} p-3 rounded mb-3 sm:mb-4`}>
-                  <p className="text-xs sm:text-sm font-bold text-center text-gray-700 mb-2">
-                    USE COUPON CODE:
-                  </p>
-                  <div className={`${getBgColorClasses(popupData.offer2BgColor, 'border').replace('border-', 'bg-')} text-white px-3 sm:px-4 py-2 rounded text-center`}>
-                    <code className="text-base sm:text-lg md:text-xl font-black tracking-wider">
-                      {popupData.offer2Code}
-                    </code>
+                {/* Footer Note */}
+                <div className="mt-6 pt-6 border-t-2 border-gray-200">
+                  <div className="flex items-center justify-center gap-2 text-black">
+                    <Sparkles className="h-4 w-4" />
+                    <p className="text-xs font-black uppercase tracking-wide">
+                      Limited Time Offers
+                    </p>
+                    <Sparkles className="h-4 w-4" />
                   </div>
                 </div>
-
-                <p className="text-xs text-center text-gray-600 italic">
-                  {popupData.offer2Type === 'BOGO' ? 'Buy any item and get another one free!' : 'Apply at checkout to get your offer'}
-                </p>
               </div>
             </div>
-          </div>
-
-          {/* How to Use Section */}
-          <div className="bg-gray-100 p-4 sm:p-6 border-t-4 border-black">
-            <h4 className="text-base sm:text-lg font-black uppercase text-center mb-3 sm:mb-4 text-black">
-              How to Redeem:
-            </h4>
-            <div className="grid sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <div className="text-center">
-                <div className="bg-black text-white w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 font-black">
-                  1
-                </div>
-                <p className="text-xs sm:text-sm font-bold">Add items to cart</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-black text-white w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 font-black">
-                  2
-                </div>
-                <p className="text-xs sm:text-sm font-bold">Enter coupon code</p>
-              </div>
-              <div className="text-center">
-                <div className="bg-black text-white w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 font-black">
-                  3
-                </div>
-                <p className="text-xs sm:text-sm font-bold">Enjoy your savings!</p>
-              </div>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <Link href="/products" className="flex-1" onClick={handleClose}>
-                <Button className="w-full bg-black text-white hover:bg-gray-800 font-black uppercase tracking-wider py-3 sm:py-4 text-sm sm:text-base">
-                  <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                  Shop Now
-                </Button>
-              </Link>
-              <Button
-                onClick={handleClose}
-                variant="outline"
-                className="flex-1 border-2 border-black text-black hover:bg-black hover:text-white font-black uppercase tracking-wider py-3 sm:py-4 text-sm sm:text-base"
-              >
-                Maybe Later
-              </Button>
-            </div>
-          </div>
-
-          {/* Footer Note */}
-          <div className="bg-black text-white p-2 sm:p-3 text-center">
-            <p className="text-xs sm:text-sm font-bold">
-              ⚡ Hurry! These offers won't last forever
-            </p>
           </div>
         </div>
       </div>

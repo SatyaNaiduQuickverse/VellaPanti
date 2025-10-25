@@ -130,10 +130,10 @@ export function CategoryGrid({ limit, theme, featured = false }: CategoryGridPro
 
   if (!mounted || isLoading) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-0">
+      <div className="grid grid-cols-2 gap-4 sm:gap-6">
         {[...Array(Math.min(limit || 6, 6))].map((_, index) => (
           <div key={index} className="animate-pulse">
-            <div className="bg-gray-700 aspect-[4/3] border border-black"></div>
+            <div className="bg-gray-700 aspect-[4/3] border border-black rounded-lg"></div>
           </div>
         ))}
       </div>
@@ -155,23 +155,23 @@ export function CategoryGrid({ limit, theme, featured = false }: CategoryGridPro
   }
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-3 gap-0">
+    <div className="grid grid-cols-2 gap-4 sm:gap-6">
       {displayCategories.map((category: any) => (
         <Link
           key={category.id}
           href={`/categories/${category.slug}?theme=${category.theme || ''}`}
           className="group cursor-pointer"
         >
-          <div className="relative overflow-hidden bg-black aspect-[4/3] group-hover:bg-white group-hover:shadow-2xl transition-all duration-300 border border-black">
+          <div className="relative overflow-hidden bg-black aspect-[4/3] group-hover:bg-white group-hover:shadow-2xl transition-all duration-300 border border-black rounded-lg">
             <Image
               src={category.image || '/placeholder-category.svg'}
               alt={category.name}
               fill
-              className="object-cover group-hover:scale-110 transition-transform duration-500 grayscale group-hover:grayscale-0 filter contrast-125"
+              className="object-cover group-hover:scale-110 transition-transform duration-500 grayscale group-hover:grayscale-0 filter contrast-125 rounded-lg"
               loading="lazy"
-              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 33vw"
+              sizes="(max-width: 768px) 50vw, 50vw"
             />
-            <div className="absolute inset-0 bg-black/60 group-hover:bg-white/90 transition-all duration-300" />
+            <div className="absolute inset-0 bg-black/60 group-hover:bg-white/90 transition-all duration-300 rounded-lg" />
             <div className="absolute inset-0 flex items-center justify-center">
               <h3 className="text-white group-hover:text-black font-black text-sm sm:text-base md:text-lg lg:text-xl text-center px-3 sm:px-4 uppercase tracking-wider transition-colors leading-tight">
                 {category.name}

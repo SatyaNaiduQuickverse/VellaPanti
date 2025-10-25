@@ -66,10 +66,10 @@ export default function CategoriesPage() {
 
         {/* Category Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6">
             {[...Array(8)].map((_, index) => (
               <div key={index} className="animate-pulse">
-                <div className={`${theme === 'BLACK' ? 'bg-gray-700' : 'bg-gray-200'} aspect-[3/4] border-2 ${styles.border} rounded-lg`}></div>
+                <div className={`${theme === 'BLACK' ? 'bg-gray-700' : 'bg-gray-200'} aspect-[4/3] border-2 ${styles.border} rounded-lg`}></div>
               </div>
             ))}
           </div>
