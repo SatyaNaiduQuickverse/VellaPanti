@@ -92,6 +92,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
       password: hashedPassword,
       name,
       role: 'USER',
+      isEmailVerified: true, // Auto-verify for now
     },
     include: {
       addresses: true,

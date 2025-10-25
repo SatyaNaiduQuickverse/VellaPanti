@@ -52,6 +52,7 @@ export const config = {
     secure: process.env.EMAIL_SECURE === 'true',
     user: process.env.EMAIL_USER || '',
     password: process.env.EMAIL_PASSWORD || '',
+    supportEmail: process.env.EMAIL_SUPPORT || 'support@vellapanti.com',
   },
   
   // Environment

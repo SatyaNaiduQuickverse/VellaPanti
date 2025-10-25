@@ -167,9 +167,8 @@ export default function CheckoutPage() {
     return null;
   }
 
-  const tax = total * 0.08; // 8% tax
   const shipping: number = 0; // Free shipping
-  const finalTotal = total + tax + shipping;
+  const finalTotal = total + shipping;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -458,10 +457,6 @@ export default function CheckoutPage() {
                   <span className="font-black text-green-400">
                     {shipping === 0 ? 'FREE' : `₹${shipping.toFixed(2)}`}
                   </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-bold">Tax:</span>
-                  <span className="font-black">₹{tax.toFixed(2)}</span>
                 </div>
                 <div className="border-t border-white/20 pt-3">
                   <div className="flex justify-between text-xl">

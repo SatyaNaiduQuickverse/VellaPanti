@@ -30,6 +30,7 @@ export const useLogin = () => {
 
 export const useRegister = () => {
   const { setAuth, setLoading } = useAuthStore();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (data: RegisterRequest): Promise<AuthResponse> => {
@@ -41,6 +42,7 @@ export const useRegister = () => {
       setAuth(data);
       setLoading(false);
       toast.success('Registration successful!');
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
     },
     onError: (error) => {
       setLoading(false);

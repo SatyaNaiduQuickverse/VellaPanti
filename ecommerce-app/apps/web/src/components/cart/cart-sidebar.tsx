@@ -239,7 +239,7 @@ export function CartSidebar() {
                 <span className="font-bold uppercase tracking-wide">Subtotal:</span>
                 <span className="text-2xl font-black">₹{total.toFixed(2)}</span>
               </div>
-              <p className="text-sm text-gray-600">Shipping and taxes calculated at checkout</p>
+              <p className="text-sm text-gray-600">Shipping calculated at checkout</p>
             </div>
 
             <div className="space-y-3">

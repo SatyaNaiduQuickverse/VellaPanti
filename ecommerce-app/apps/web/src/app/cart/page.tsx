@@ -412,10 +412,6 @@ export default function CartPage() {
                     <span className="font-bold">Shipping:</span>
                     <span className="font-black text-green-400">FREE</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="font-bold">Tax:</span>
-                    <span className="font-black text-xs sm:text-sm md:text-base">Calculated at checkout</span>
-                  </div>
                   <div className="border-t border-white/20 pt-3 sm:pt-4">
                     <div className="flex justify-between text-lg sm:text-xl">
                       <span className="font-black">Total:</span>
