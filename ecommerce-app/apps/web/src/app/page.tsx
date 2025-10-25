@@ -294,8 +294,8 @@ export default function HomePage() {
             <div className="mb-8 sm:mb-10 lg:mb-12">
               <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center">COLLECTIONS</h3>
               <Suspense fallback={
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                  {[...Array(3)].map((_, index) => (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                  {[...Array(4)].map((_, index) => (
                     <div key={index} className="animate-pulse">
                       <div className="bg-gray-700 aspect-square rounded mb-2 sm:mb-3"></div>
                       <div className="h-3 bg-gray-700 rounded"></div>
@@ -303,7 +303,7 @@ export default function HomePage() {
                   ))}
                 </div>
               }>
-                <CategoryGrid limit={3} theme="BLACK" featured={true} />
+                <CategoryGrid limit={4} theme="BLACK" featured={true} />
               </Suspense>
             </div>
 
@@ -391,8 +391,8 @@ export default function HomePage() {
             <div className="mb-8 sm:mb-10 lg:mb-12">
               <h3 className="text-xl sm:text-2xl font-black mb-4 sm:mb-6 tracking-wider text-center">COLLECTIONS</h3>
               <Suspense fallback={
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                  {[...Array(3)].map((_, index) => (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                  {[...Array(4)].map((_, index) => (
                     <div key={index} className="animate-pulse">
                       <div className="bg-gray-200 aspect-square rounded mb-2 sm:mb-3"></div>
                       <div className="h-3 bg-gray-200 rounded"></div>
@@ -400,7 +400,7 @@ export default function HomePage() {
                   ))}
                 </div>
               }>
-                <CategoryGrid limit={3} theme="WHITE" featured={true} />
+                <CategoryGrid limit={4} theme="WHITE" featured={true} />
               </Suspense>
             </div>
 
