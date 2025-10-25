@@ -283,7 +283,7 @@ export default function HomePage() {
           <div className="p-4 sm:p-6 md:p-8 lg:p-16 min-h-screen flex flex-col">
             <div className="mb-8 sm:mb-10 lg:mb-12 text-center">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider">
-                DEEPEST BLACK TEES
+                DEEPEST<br />BLACK TEES
               </h2>
               <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-300">
                 CLASSIC • STRONG • UNDERSTATED POWER
@@ -380,7 +380,7 @@ export default function HomePage() {
           <div className="p-4 sm:p-6 md:p-8 lg:p-16 min-h-screen flex flex-col">
             <div className="mb-8 sm:mb-10 lg:mb-12 text-center">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider">
-                PUREST WHITE TEES
+                PUREST<br />WHITE TEES
               </h2>
               <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-600">
                 CLEAN • BRIGHT • EFFORTLESS STYLE
