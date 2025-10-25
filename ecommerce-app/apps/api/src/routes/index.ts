@@ -11,8 +11,12 @@ import adminRoutes from './adminRoutes';
 import supportRoutes from './supportRoutes';
 import wishlistRoutes from './wishlistRoutes';
 import bulkUploadRoutes from './bulkUploadRoutes';
+import { getPublicSiteSettings } from '../controllers/adminController';
 
 export function setupRoutes(app: Express) {
+  // Public settings endpoint (no auth required)
+  app.get('/api/settings', getPublicSiteSettings);
+
   // API routes
   app.use('/api/auth', authRoutes);
   app.use('/api/users', userRoutes);

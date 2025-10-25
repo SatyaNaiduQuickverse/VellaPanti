@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@ecommerce/ui';
 import { ArrowLeft, Mail, Phone, MessageCircle, Clock, Send, CheckCircle, AlertCircle, HelpCircle, Package, CreditCard, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 interface SupportTicket {
   subject: string;
@@ -22,6 +23,8 @@ export default function ContactSupportPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { data: settingsData } = useSiteSettings();
+  const settings = settingsData?.data;
 
   const supportCategories = [
     { id: 'orders', name: 'Order Issues', icon: Package, description: 'Problems with your orders, shipping, or delivery' },
@@ -143,7 +146,7 @@ export default function ContactSupportPage() {
                   </div>
                   <div>
                     <h3 className="font-black uppercase tracking-wide text-sm">Email Support</h3>
-                    <p className="text-gray-600">support@vellapanti.com</p>
+                    <p className="text-gray-600">{settings?.support_email || 'support@vellapanti.com'}</p>
                     <p className="text-xs text-gray-500 mt-1">Response within 24 hours</p>
                   </div>
                 </div>
@@ -154,21 +157,32 @@ export default function ContactSupportPage() {
                   </div>
                   <div>
                     <h3 className="font-black uppercase tracking-wide text-sm">Phone Support</h3>
-                    <p className="text-gray-600">+1 (555) 123-4567</p>
-                    <p className="text-xs text-gray-500 mt-1">Mon-Fri 9AM-6PM EST</p>
+                    <p className="text-gray-600">{settings?.support_phone || '+1 (555) 123-4567'}</p>
+                    <p className="text-xs text-gray-500 mt-1">{settings?.business_hours || 'Mon-Fri 9AM-6PM EST'}</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="bg-black p-2 rounded">
-                    <MessageCircle className="h-5 w-5 text-white" />
+{settings?.whatsapp_enabled && settings?.whatsapp_number && (
+                  <div className="flex items-start gap-4">
+                    <div className="bg-green-500 p-2 rounded">
+                      <MessageCircle className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-black uppercase tracking-wide text-sm">WhatsApp Support</h3>
+                      <p className="text-gray-600 mb-2">Instant messaging support</p>
+                      <a
+                        href={`https://wa.me/${settings.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hi, I need support with VellaPanti`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button className="bg-green-500 text-white hover:bg-green-600 font-black uppercase tracking-wider text-xs py-2">
+                          <MessageCircle className="h-3 w-3 mr-2" />
+                          Chat Now
+                        </Button>
+                      </a>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-black uppercase tracking-wide text-sm">Live Chat</h3>
-                    <p className="text-gray-600">Available on website</p>
-                    <p className="text-xs text-gray-500 mt-1">Mon-Fri 9AM-6PM EST</p>
-                  </div>
-                </div>
+                )}
 
                 <div className="flex items-start gap-4">
                   <div className="bg-black p-2 rounded">

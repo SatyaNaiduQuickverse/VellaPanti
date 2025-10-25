@@ -21,6 +21,8 @@ import {
   getOfferPopup,
   createOfferPopup,
   updateOfferPopup,
+  getSiteSettings,
+  updateSiteSettings,
 } from '../controllers/adminController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { validate } from '../middleware/validation';
@@ -70,5 +72,9 @@ router.put('/homepage-banners', updateHomepageBanners);
 router.get('/offer-popup', getOfferPopup);
 router.post('/offer-popup', createOfferPopup);
 router.put('/offer-popup', updateOfferPopup);
+
+// Site Settings Management
+router.get('/settings', getSiteSettings);
+router.put('/settings', updateSiteSettings);
 
 export default router;

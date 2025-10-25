@@ -994,3 +994,68 @@ export const createOfferPopup = asyncHandler(async (req: Request, res: Response)
     data: popup,
   });
 });
+// Site Settings Management
+
+// Get site settings (Admin)
+export const getSiteSettings = asyncHandler(async (req: Request, res: Response) => {
+  const settings = await prisma.$queryRaw`
+    SELECT * FROM site_settings WHERE id = 'default'
+  `;
+
+  res.json({
+    success: true,
+    data: (settings as any[])[0] || null,
+  });
+});
+
+// Update site settings (Admin)
+export const updateSiteSettings = asyncHandler(async (req: Request, res: Response) => {
+  const {
+    whatsapp_number,
+    whatsapp_enabled,
+    support_email,
+    support_phone,
+    business_hours,
+  } = req.body;
+
+  const settings = await prisma.$executeRaw`
+    UPDATE site_settings 
+    SET 
+      whatsapp_number = ${whatsapp_number},
+      whatsapp_enabled = ${whatsapp_enabled},
+      support_email = ${support_email},
+      support_phone = ${support_phone},
+      business_hours = ${business_hours},
+      "updatedAt" = CURRENT_TIMESTAMP
+    WHERE id = 'default'
+  `;
+
+  const updatedSettings = await prisma.$queryRaw`
+    SELECT * FROM site_settings WHERE id = 'default'
+  `;
+
+  res.json({
+    success: true,
+    message: 'Site settings updated successfully',
+    data: (updatedSettings as any[])[0],
+  });
+});
+
+// Get public site settings (No auth required)
+export const getPublicSiteSettings = asyncHandler(async (req: Request, res: Response) => {
+  const settings = await prisma.$queryRaw`
+    SELECT 
+      whatsapp_number,
+      whatsapp_enabled,
+      support_email,
+      support_phone,
+      business_hours
+    FROM site_settings 
+    WHERE id = 'default'
+  `;
+
+  res.json({
+    success: true,
+    data: (settings as any[])[0] || null,
+  });
+});

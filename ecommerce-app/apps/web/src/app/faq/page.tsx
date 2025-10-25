@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ChevronDown, ChevronUp, HelpCircle, Package, CreditCard, RotateCcw, Truck, Shield, Mail } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, HelpCircle, Package, CreditCard, RotateCcw, Truck, Shield, Mail, MessageCircle } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
+import { useSiteSettings } from '@/hooks/useSiteSettings';
 
 interface FAQItem {
   question: string;
@@ -14,6 +15,8 @@ interface FAQItem {
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const { data: settingsData } = useSiteSettings();
+  const settings = settingsData?.data;
 
   const faqData: FAQItem[] = [
     // Orders & Shopping
@@ -243,6 +246,18 @@ export default function FAQPage() {
               Can't find the answer you're looking for? Our customer support team is here to help.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {settings?.whatsapp_enabled && settings?.whatsapp_number && (
+                <a
+                  href={`https://wa.me/${settings.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hi, I need help with VellaPanti`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button className="bg-green-500 text-white hover:bg-green-600 font-black uppercase tracking-wider">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Chat on WhatsApp
+                  </Button>
+                </a>
+              )}
               <Link href="/support">
                 <Button className="bg-white text-black hover:bg-gray-200 font-black uppercase tracking-wider">
                   Contact Support
@@ -256,10 +271,10 @@ export default function FAQPage() {
             </div>
             <div className="mt-8 pt-6 border-t border-gray-700">
               <p className="text-sm text-gray-400">
-                <strong>Email:</strong> support@vellapanti.com | <strong>Phone:</strong> +1 (555) 123-4567
+                <strong>Email:</strong> {settings?.support_email || 'support@vellapanti.com'} | <strong>Phone:</strong> {settings?.support_phone || '+1 (555) 123-4567'}
               </p>
               <p className="text-xs text-gray-500 mt-2">
-                Monday - Friday: 9AM - 6PM EST | Response time: 4-6 hours
+                {settings?.business_hours || 'Monday - Friday: 9AM - 6PM EST'} | Response time: 4-6 hours
               </p>
             </div>
           </div>
