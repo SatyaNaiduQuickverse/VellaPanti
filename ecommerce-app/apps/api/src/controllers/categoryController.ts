@@ -4,6 +4,48 @@ import { asyncHandler, AppError } from '../middleware/errorHandler';
 import type { AuthRequest } from '../middleware/auth';
 import { imageService } from '../services/uploadService';
 
+// Helper function to sort sizes in logical order
+const sortSizes = (sizes: string[]): string[] => {
+  const sizeOrder: { [key: string]: number } = {
+    'XXS': 1,
+    'XS': 2,
+    'S': 3,
+    'M': 4,
+    'L': 5,
+    'XL': 6,
+    'XXL': 7,
+    'XXXL': 8,
+    '2XL': 7,
+    '3XL': 8,
+    '4XL': 9,
+    '5XL': 10,
+  };
+
+  return sizes.sort((a, b) => {
+    const aUpper = a.toUpperCase();
+    const bUpper = b.toUpperCase();
+
+    // Both are standard sizes
+    if (sizeOrder[aUpper] && sizeOrder[bUpper]) {
+      return sizeOrder[aUpper] - sizeOrder[bUpper];
+    }
+
+    // Both are numeric
+    const aNum = parseFloat(a);
+    const bNum = parseFloat(b);
+    if (!isNaN(aNum) && !isNaN(bNum)) {
+      return aNum - bNum;
+    }
+
+    // One is standard size, one is not
+    if (sizeOrder[aUpper]) return -1;
+    if (sizeOrder[bUpper]) return 1;
+
+    // Alphabetical fallback
+    return a.localeCompare(b);
+  });
+};
+
 export const getCategories = asyncHandler(async (req: Request, res: Response) => {
   const { theme } = req.query;
 
@@ -295,7 +337,7 @@ export const getCategoryProducts = asyncHandler(async (req: Request, res: Respon
       totalStock,
       variantOptions: {
         colors: Array.from(variantOptions.colors),
-        sizes: Array.from(variantOptions.sizes),
+        sizes: sortSizes(Array.from(variantOptions.sizes)),
         materials: Array.from(variantOptions.materials),
       },
     };

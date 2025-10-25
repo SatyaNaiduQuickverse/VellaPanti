@@ -5,6 +5,48 @@ import type { PaginatedResponse, Product } from '@ecommerce/types';
 import { imageService } from '../services/uploadService';
 import type { AuthRequest } from '../middleware/auth';
 
+// Helper function to sort sizes in logical order
+const sortSizes = (sizes: string[]): string[] => {
+  const sizeOrder: { [key: string]: number } = {
+    'XXS': 1,
+    'XS': 2,
+    'S': 3,
+    'M': 4,
+    'L': 5,
+    'XL': 6,
+    'XXL': 7,
+    'XXXL': 8,
+    '2XL': 7,
+    '3XL': 8,
+    '4XL': 9,
+    '5XL': 10,
+  };
+
+  return sizes.sort((a, b) => {
+    const aUpper = a.toUpperCase();
+    const bUpper = b.toUpperCase();
+
+    // Both are standard sizes
+    if (sizeOrder[aUpper] && sizeOrder[bUpper]) {
+      return sizeOrder[aUpper] - sizeOrder[bUpper];
+    }
+
+    // Both are numeric
+    const aNum = parseFloat(a);
+    const bNum = parseFloat(b);
+    if (!isNaN(aNum) && !isNaN(bNum)) {
+      return aNum - bNum;
+    }
+
+    // One is standard size, one is not
+    if (sizeOrder[aUpper]) return -1;
+    if (sizeOrder[bUpper]) return 1;
+
+    // Alphabetical fallback
+    return a.localeCompare(b);
+  });
+};
+
 // Get featured products for homepage
 export const getFeaturedProducts = asyncHandler(async (req: Request, res: Response) => {
   const { theme } = req.query as { theme?: 'BLACK' | 'WHITE' };
@@ -322,7 +364,7 @@ export const getProductBySlug = asyncHandler(async (req: Request, res: Response)
   // Group variants by attribute for easier frontend consumption
   const variantOptions = {
     colors: [...new Set(product.variants.map(v => v.color).filter(Boolean))],
-    sizes: [...new Set(product.variants.map(v => v.size).filter(Boolean))],
+    sizes: sortSizes([...new Set(product.variants.map(v => v.size).filter(Boolean))]),
     materials: [...new Set(product.variants.map(v => v.material).filter(Boolean))],
   };
 

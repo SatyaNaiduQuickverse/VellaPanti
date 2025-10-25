@@ -511,7 +511,14 @@ export default function ProductPage({ params }: ProductPageProps) {
                   <Truck className="h-4 w-4 text-blue-600" />
                   <div>
                     <span className="text-blue-700 font-semibold block text-xs">Delivery</span>
-                    <span className="text-blue-600 text-xs">By Oct 2</span>
+                    <span className="text-blue-600 text-xs">By {(() => {
+                      const deliveryDate = new Date();
+                      deliveryDate.setDate(deliveryDate.getDate() + 5);
+                      return deliveryDate.toLocaleDateString('en-IN', {
+                        month: 'short',
+                        day: 'numeric'
+                      });
+                    })()}</span>
                   </div>
                 </div>
               </div>

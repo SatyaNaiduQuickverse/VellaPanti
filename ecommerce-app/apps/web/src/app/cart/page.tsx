@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { applyCoupon as applyCouponUtil } from '@/lib/couponUtils';
 import type { Coupon } from '@ecommerce/types';
 import toast from 'react-hot-toast';
+import { api } from '@/lib/api';
 
 export default function CartPage() {
   const { items, subtotal, discount, total, itemCount, appliedCoupon, applyCoupon, removeCoupon } = useCartStore();
@@ -21,9 +22,29 @@ export default function CartPage() {
   const clearCart = useClearCart();
   const [couponCode, setCouponCode] = useState('');
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [bogoConfig, setBogoConfig] = useState({ bogoBuyQty: 1, bogoGetQty: 1 });
 
   // Load cart data if authenticated
   const { isLoading } = useCart();
+
+  // Fetch BOGO configuration from offer popup
+  useEffect(() => {
+    const fetchBogoConfig = async () => {
+      try {
+        const response = await api.get('/products/offer-popup');
+        if (response.data.success && response.data.data) {
+          setBogoConfig({
+            bogoBuyQty: response.data.data.bogoBuyQty || 1,
+            bogoGetQty: response.data.data.bogoGetQty || 1,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch BOGO config:', error);
+      }
+    };
+
+    fetchBogoConfig();
+  }, []);
 
   // Mock coupons for testing (in production, fetch from API)
   const mockCoupons: Coupon[] = [
@@ -81,8 +102,8 @@ export default function CartPage() {
       return;
     }
 
-    // Apply coupon using utility
-    const result = applyCouponUtil(coupon, items);
+    // Apply coupon using utility with BOGO configuration
+    const result = applyCouponUtil(coupon, items, bogoConfig);
 
     if (result.success && result.appliedCoupon) {
       applyCoupon(result.appliedCoupon);

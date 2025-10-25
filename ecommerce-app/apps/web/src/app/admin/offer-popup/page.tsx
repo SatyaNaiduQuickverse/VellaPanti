@@ -26,6 +26,8 @@ interface OfferPopup {
   offer2Code: string;
   offer2Badge: string;
   offer2BgColor: string;
+  bogoBuyQty: number;
+  bogoGetQty: number;
   delaySeconds: number;
 }
 
@@ -47,6 +49,8 @@ export default function OfferPopupManagement() {
     offer2Code: 'BOGO2024',
     offer2Badge: 'NEW',
     offer2BgColor: 'green',
+    bogoBuyQty: 1,
+    bogoGetQty: 1,
     delaySeconds: 2,
   });
 
@@ -374,6 +378,55 @@ export default function OfferPopupManagement() {
                   <option value="purple">Purple</option>
                   <option value="orange">Orange</option>
                 </select>
+              </div>
+            </div>
+
+            {/* BOGO Configuration */}
+            <div className="mt-6 bg-yellow-50 p-4 rounded border-2 border-yellow-300">
+              <h3 className="text-lg font-black uppercase mb-4 flex items-center gap-2">
+                <Gift className="h-5 w-5" />
+                BOGO Offer Rules
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Configure the BOGO (Buy One Get One) offer rules. For example: Buy 2 Get 1 Free, Buy 3 Get 2 Free, etc.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold uppercase mb-2">Buy Quantity</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={popup.bogoBuyQty}
+                    onChange={(e) => updateField('bogoBuyQty', parseInt(e.target.value) || 1)}
+                    className="w-full border-2 border-black px-4 py-2 font-bold"
+                    placeholder="1"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Number of items customer must buy</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold uppercase mb-2">Get Free Quantity</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={popup.bogoGetQty}
+                    onChange={(e) => updateField('bogoGetQty', parseInt(e.target.value) || 1)}
+                    className="w-full border-2 border-black px-4 py-2 font-bold"
+                    placeholder="1"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Number of items customer gets free</p>
+                </div>
+              </div>
+
+              <div className="mt-4 p-3 bg-white border-2 border-yellow-300 rounded">
+                <p className="text-sm font-bold">
+                  Current Rule: Buy {popup.bogoBuyQty} Get {popup.bogoGetQty} Free
+                </p>
+                <p className="text-xs text-gray-600 mt-1">
+                  This applies to same-category products in the cart
+                </p>
               </div>
             </div>
           </div>

@@ -103,9 +103,13 @@ export const calculate50PercentOff = (
 };
 
 // Calculate BOGO (Buy One Get One Free)
+// This works across products in the same category
+// Supports configurable rules like Buy 2 Get 1 Free, Buy 3 Get 2 Free, etc.
 export const calculateBOGO = (
   coupon: Coupon,
-  items: CartItem[]
+  items: CartItem[],
+  bogoBuyQty: number = 1,
+  bogoGetQty: number = 1
 ): AppliedCoupon => {
   const applicableItems = getApplicableItems(coupon, items);
 
@@ -113,32 +117,80 @@ export const calculateBOGO = (
     return { coupon, discountAmount: 0, freeItems: [] };
   }
 
-  // For BOGO: customer pays for the higher-priced items, gets lower-priced items free
-  // Sort by price (highest first)
-  const sortedItems = [...applicableItems].sort((a, b) => {
-    const priceA = getItemPrice(a);
-    const priceB = getItemPrice(b);
-    return priceB - priceA;
+  // Expand cart items into individual units with their details
+  interface Unit {
+    item: CartItem;
+    price: number;
+    categoryId?: string;
+  }
+
+  const units: Unit[] = [];
+  applicableItems.forEach(item => {
+    const price = getItemPrice(item);
+    const categoryId = item.product?.categoryId;
+
+    // Create individual units for each quantity
+    for (let i = 0; i < item.quantity; i++) {
+      units.push({ item, price, categoryId });
+    }
   });
 
-  let freeItems: CartItem[] = [];
+  // Always group by category and apply BOGO within each category
+  // This ensures BOGO works for same category products only
   let discountAmount = 0;
+  const freeUnits = new Map<string, number>(); // Track free quantity per product
 
-  // For each item, calculate how many free items they get
-  sortedItems.forEach(item => {
-    const quantity = item.quantity;
-    const price = getItemPrice(item);
+  // Group units by category
+  const categorizedUnits = new Map<string, Unit[]>();
 
-    // For every 2 items, 1 is free (rounded down)
-    const freeQuantity = Math.floor(quantity / 2);
+  units.forEach(unit => {
+    const catId = unit.categoryId || 'no-category';
+    if (!categorizedUnits.has(catId)) {
+      categorizedUnits.set(catId, []);
+    }
+    categorizedUnits.get(catId)!.push(unit);
+  });
 
-    if (freeQuantity > 0) {
+  // Calculate the group size for BOGO (buy + get free)
+  const groupSize = bogoBuyQty + bogoGetQty;
+
+  // Apply BOGO to each category group
+  categorizedUnits.forEach((categoryUnits) => {
+    // Only apply BOGO if there are enough items in this category
+    if (categoryUnits.length < groupSize) {
+      return;
+    }
+
+    // Sort by price descending (most expensive first)
+    categoryUnits.sort((a, b) => b.price - a.price);
+
+    // Process units in groups
+    for (let i = 0; i < categoryUnits.length; i += groupSize) {
+      const group = categoryUnits.slice(i, i + groupSize);
+
+      // Only apply discount if we have a complete group
+      if (group.length === groupSize) {
+        // The last 'bogoGetQty' items in the group are free (the cheapest ones)
+        const freeItemsInGroup = group.slice(bogoBuyQty);
+
+        freeItemsInGroup.forEach(freeUnit => {
+          discountAmount += freeUnit.price;
+          const itemId = freeUnit.item.id;
+          freeUnits.set(itemId, (freeUnits.get(itemId) || 0) + 1);
+        });
+      }
+    }
+  });
+
+  // Build free items array
+  const freeItems: CartItem[] = [];
+  freeUnits.forEach((quantity, itemId) => {
+    const item = applicableItems.find(i => i.id === itemId);
+    if (item && quantity > 0) {
       freeItems.push({
         ...item,
-        quantity: freeQuantity,
+        quantity,
       });
-
-      discountAmount += price * freeQuantity;
     }
   });
 
@@ -152,7 +204,8 @@ export const calculateBOGO = (
 // Apply coupon to cart
 export const applyCoupon = (
   coupon: Coupon,
-  items: CartItem[]
+  items: CartItem[],
+  bogoConfig?: { bogoBuyQty: number; bogoGetQty: number }
 ): { success: boolean; message: string; appliedCoupon?: AppliedCoupon } => {
   // Validate coupon
   const validation = isCouponValid(coupon);
@@ -183,7 +236,9 @@ export const applyCoupon = (
   if (coupon.type === 'PERCENTAGE') {
     appliedCoupon = calculate50PercentOff(coupon, items);
   } else if (coupon.type === 'BOGO') {
-    appliedCoupon = calculateBOGO(coupon, items);
+    const bogoBuyQty = bogoConfig?.bogoBuyQty || 1;
+    const bogoGetQty = bogoConfig?.bogoGetQty || 1;
+    appliedCoupon = calculateBOGO(coupon, items, bogoBuyQty, bogoGetQty);
   } else {
     return { success: false, message: 'Invalid coupon type' };
   }

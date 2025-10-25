@@ -279,6 +279,10 @@ export const createOrder = asyncHandler(async (req: AuthRequest, res: Response) 
       }
     }
 
+    // Calculate estimated delivery (5 business days from now)
+    const estimatedDeliveryDate = new Date();
+    estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + 5);
+
     // Create order
     const newOrder = await tx.order.create({
       data: {
@@ -290,6 +294,7 @@ export const createOrder = asyncHandler(async (req: AuthRequest, res: Response) 
         shippingState: shippingAddress.state,
         shippingZipCode: shippingAddress.zipCode,
         shippingCountry: shippingAddress.country,
+        estimatedDelivery: estimatedDeliveryDate,
         items: {
           create: orderItems,
         },
