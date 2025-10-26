@@ -393,3 +393,16 @@ enum TicketPriority {
   HIGH
   URGENT
 }
+
+model SiteSettings {
+  id              String   @id @default("default")
+  whatsappNumber  String?  @map("whatsapp_number")
+  whatsappEnabled Boolean  @default(false) @map("whatsapp_enabled")
+  supportEmail    String?  @map("support_email")
+  supportPhone    String?  @map("support_phone")
+  businessHours   String?  @map("business_hours")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("site_settings")
+}
