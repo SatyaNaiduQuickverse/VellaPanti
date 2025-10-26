@@ -132,6 +132,46 @@ export default function CheckoutPage() {
     }
   }, [isAuthenticated, isLoading, items.length, router]);
 
+  // Function to initiate Cashfree payment using their SDK
+  const initiateCashfreePayment = (sessionId: string, orderId: string) => {
+    try {
+      const cashfree = (window as any).Cashfree({
+        mode: 'production', // Use 'sandbox' for testing
+      });
+
+      const checkoutOptions = {
+        paymentSessionId: sessionId,
+        returnUrl: `https://www.vellapanti.co.in/api/payments/callback?order_id=${orderId}`,
+      };
+
+      console.log('[Checkout] Opening Cashfree payment modal...', checkoutOptions);
+
+      cashfree.checkout(checkoutOptions).then((result: any) => {
+        if (result.error) {
+          console.error('[Checkout] Cashfree payment error:', result.error);
+          toast.error(result.error.message || 'Payment failed. Please try again.');
+          setIsProcessing(false);
+        }
+        if (result.redirect) {
+          console.log('[Checkout] Payment requires redirect');
+          // Payment will redirect automatically
+        }
+        if (result.paymentDetails) {
+          console.log('[Checkout] Payment completed:', result.paymentDetails);
+          router.push(`/order-success?orderId=${orderId}`);
+        }
+      }).catch((error: any) => {
+        console.error('[Checkout] Cashfree checkout error:', error);
+        toast.error('Payment gateway error. Please try again.');
+        setIsProcessing(false);
+      });
+    } catch (error: any) {
+      console.error('[Checkout] Failed to initialize Cashfree:', error);
+      toast.error('Failed to open payment gateway. Please try again.');
+      setIsProcessing(false);
+    }
+  };
+
   const handleCheckout = async () => {
     setIsProcessing(true);
 
@@ -186,8 +226,29 @@ export default function CheckoutPage() {
           });
           const payment = handleApiResponse<{ paymentLink: string; paymentSessionId: string }>(paymentResponse);
 
-          // Redirect to Cashfree payment page
-          window.location.href = payment.paymentLink;
+          console.log('[Checkout] Payment session created:', {
+            sessionId: payment.paymentSessionId,
+            paymentLink: payment.paymentLink,
+          });
+
+          // Use Cashfree Drop SDK for production-ready integration
+          // Load Cashfree SDK dynamically if not already loaded
+          if (!(window as any).Cashfree) {
+            const script = document.createElement('script');
+            script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+            script.onload = () => {
+              console.log('[Checkout] Cashfree SDK loaded, initiating payment...');
+              initiateCashfreePayment(payment.paymentSessionId, order.id);
+            };
+            script.onerror = () => {
+              console.error('[Checkout] Failed to load Cashfree SDK');
+              toast.error('Failed to load payment gateway. Please try again.');
+              setIsProcessing(false);
+            };
+            document.head.appendChild(script);
+          } else {
+            initiateCashfreePayment(payment.paymentSessionId, order.id);
+          }
         } catch (paymentError: any) {
           console.error('Payment initiation error:', paymentError);
           toast.error(paymentError.message || 'Failed to initiate payment. Please try again.');
