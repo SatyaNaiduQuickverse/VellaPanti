@@ -186,7 +186,8 @@ export const paymentCallback = asyncHandler(async (req: Request, res: Response) 
   const { order_id } = req.query;
 
   if (!order_id || typeof order_id !== 'string') {
-    return res.redirect('https://www.vellapanti.co.in/payment/failed');
+    // Redirect to home page if order_id is missing
+    return res.redirect('https://www.vellapanti.co.in/');
   }
 
   try {
@@ -195,7 +196,8 @@ export const paymentCallback = asyncHandler(async (req: Request, res: Response) 
     });
 
     if (!order) {
-      return res.redirect('https://www.vellapanti.co.in/payment/failed');
+      // Redirect to home page if order not found
+      return res.redirect('https://www.vellapanti.co.in/');
     }
 
     // Check payment status
@@ -225,9 +227,11 @@ export const paymentCallback = asyncHandler(async (req: Request, res: Response) 
       }
     }
 
-    return res.redirect(`https://www.vellapanti.co.in/payment/pending?orderId=${order_id}`);
+    // Payment cancelled or pending - redirect to home page
+    return res.redirect('https://www.vellapanti.co.in/');
   } catch (error) {
     console.error('[Payment] Callback error:', error);
-    return res.redirect('https://www.vellapanti.co.in/payment/failed');
+    // Redirect to home page on any error
+    return res.redirect('https://www.vellapanti.co.in/');
   }
 });
