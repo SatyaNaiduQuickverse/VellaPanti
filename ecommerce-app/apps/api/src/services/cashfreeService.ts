@@ -187,9 +187,11 @@ class CashfreeService {
    * Get payment link for customer
    */
   getPaymentLink(paymentSessionId: string): string {
-    // For Cashfree API v2023-08-01, use the checkout.cashfree.com domain
+    // For Cashfree API v2023-08-01
+    // Production uses payments.cashfree.com/pay
+    // Sandbox uses sandbox.cashfree.com/pg/view
     const baseUrl = config.cashfree.environment === 'PRODUCTION'
-      ? 'https://payments.cashfree.com/order'
+      ? 'https://payments.cashfree.com/pay'
       : 'https://sandbox.cashfree.com/pg/view';
 
     return `${baseUrl}/${paymentSessionId}`;

@@ -197,7 +197,7 @@ export const paymentCallback = asyncHandler(async (req: Request, res: Response) 
 
     // Check payment status
     if (order.paymentStatus === 'COMPLETED') {
-      return res.redirect(`https://www.vellapanti.co.in/order/success?orderId=${order_id}`);
+      return res.redirect(`https://www.vellapanti.co.in/order-success?orderId=${order_id}`);
     }
 
     // If not completed, verify with Cashfree
@@ -215,7 +215,7 @@ export const paymentCallback = asyncHandler(async (req: Request, res: Response) 
             },
           });
 
-          return res.redirect(`https://www.vellapanti.co.in/order/success?orderId=${order_id}`);
+          return res.redirect(`https://www.vellapanti.co.in/order-success?orderId=${order_id}`);
         }
       } catch (error) {
         console.error('[Payment] Callback verification error:', error);

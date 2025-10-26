@@ -204,11 +204,8 @@ export default function CheckoutPage() {
     }
   };
 
-  if (!isAuthenticated()) {
-    return null;
-  }
-
-  if (isLoading) {
+  // Show loading state consistently on server and client
+  if (!isAuthenticated() || isLoading || items.length === 0) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
@@ -217,10 +214,6 @@ export default function CheckoutPage() {
         </div>
       </div>
     );
-  }
-
-  if (items.length === 0) {
-    return null;
   }
 
   const shipping: number = 0; // Free shipping
