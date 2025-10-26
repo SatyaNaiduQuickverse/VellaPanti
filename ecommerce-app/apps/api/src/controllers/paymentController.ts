@@ -79,8 +79,11 @@ export const initiatePayment = asyncHandler(async (req: AuthRequest, res: Respon
       },
     });
 
-    // Generate payment link
-    const paymentLink = cashfreeService.getPaymentLink(paymentSession.paymentSessionId);
+    // Generate payment link (use checkoutUrl from Cashfree if provided)
+    const paymentLink = cashfreeService.getPaymentLink(
+      paymentSession.paymentSessionId,
+      paymentSession.checkoutUrl
+    );
 
     res.json({
       success: true,

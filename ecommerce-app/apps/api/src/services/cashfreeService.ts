@@ -14,6 +14,7 @@ export interface PaymentSessionResponse {
   paymentSessionId: string;
   orderStatus: string;
   cfOrderId: string;
+  checkoutUrl?: string; // Optional checkout URL from Cashfree
 }
 
 export interface OrderStatusResponse {
@@ -101,6 +102,7 @@ class CashfreeService {
         paymentSessionId: response.data.payment_session_id,
         orderStatus: response.data.order_status,
         cfOrderId: response.data.cf_order_id || response.data.order_id,
+        checkoutUrl: response.data.checkout_url, // Extract checkout URL if provided
       };
     } catch (error: any) {
       console.error('[Cashfree] Create order error - Full details:');
@@ -185,11 +187,17 @@ class CashfreeService {
 
   /**
    * Get payment link for customer
+   * For API v2023-08-01, construct the hosted checkout page URL
    */
-  getPaymentLink(paymentSessionId: string): string {
-    // For Cashfree API v2023-08-01
-    // Production uses payments.cashfree.com/pay
-    // Sandbox uses sandbox.cashfree.com/pg/view
+  getPaymentLink(paymentSessionId: string, checkoutUrl?: string): string {
+    // If Cashfree provided a checkout_url in the response, use that
+    if (checkoutUrl) {
+      return checkoutUrl;
+    }
+
+    // Otherwise, construct the hosted checkout URL for API v2023-08-01
+    // The correct format is to use the session ID with the payments domain
+    // Ref: https://docs.cashfree.com/reference/pg-new-apis-endpoint
     const baseUrl = config.cashfree.environment === 'PRODUCTION'
       ? 'https://payments.cashfree.com/pay'
       : 'https://sandbox.cashfree.com/pg/view';
