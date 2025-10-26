@@ -54,7 +54,20 @@ export const config = {
     password: process.env.EMAIL_PASSWORD || '',
     supportEmail: process.env.EMAIL_SUPPORT || 'support@vellapanti.com',
   },
-  
+
+  // Cashfree Payment Gateway
+  cashfree: {
+    appId: process.env.CASHFREE_APP_ID || '',
+    secretKey: process.env.CASHFREE_SECRET_KEY || '',
+    environment: (process.env.CASHFREE_ENV || 'SANDBOX') as 'PRODUCTION' | 'SANDBOX',
+    apiVersion: '2023-08-01',
+  },
+
+  // API URLs
+  api: {
+    baseUrl: process.env.API_URL || 'http://localhost:3062',
+  },
+
   // Environment
   env: process.env.NODE_ENV || 'development',
   isDevelopment: process.env.NODE_ENV === 'development',

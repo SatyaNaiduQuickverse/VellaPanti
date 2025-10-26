@@ -31,15 +31,21 @@ export const getProfile = asyncHandler(async (req: AuthRequest, res: Response) =
 
 export const updateProfile = asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.user!.id;
-  const { name } = req.body;
+  const { name, phone } = req.body;
+
+  // Build update data object
+  const updateData: { name?: string; phone?: string } = {};
+  if (name !== undefined) updateData.name = name;
+  if (phone !== undefined) updateData.phone = phone;
 
   const user = await prisma.user.update({
     where: { id: userId },
-    data: { name },
+    data: updateData,
     select: {
       id: true,
       email: true,
       name: true,
+      phone: true,
       role: true,
       createdAt: true,
       updatedAt: true,

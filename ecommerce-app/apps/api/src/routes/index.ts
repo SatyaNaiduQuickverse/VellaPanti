@@ -11,6 +11,8 @@ import adminRoutes from './adminRoutes';
 import supportRoutes from './supportRoutes';
 import wishlistRoutes from './wishlistRoutes';
 import bulkUploadRoutes from './bulkUploadRoutes';
+import paymentRoutes from './paymentRoutes';
+import webhookRoutes from './webhookRoutes';
 import { getPublicSiteSettings } from '../controllers/adminController';
 
 export function setupRoutes(app: Express) {
@@ -30,6 +32,8 @@ export function setupRoutes(app: Express) {
   app.use('/api/support', supportRoutes);
   app.use('/api/wishlist', wishlistRoutes);
   app.use('/api/bulk-upload', bulkUploadRoutes);
+  app.use('/api/payments', paymentRoutes);
+  app.use('/api/webhooks', webhookRoutes);
 
   // 404 handler for unmatched routes
   app.use('*', (req, res) => {

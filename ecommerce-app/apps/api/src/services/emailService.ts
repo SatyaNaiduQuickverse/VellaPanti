@@ -416,74 +416,237 @@ VellaPanti Team
 
     const html = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Email Verification</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - VellaPanti</title>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #ffffff; }
-        .header { background-color: #000000; padding: 30px 20px; text-align: center; }
-        .header h1 { color: #ffffff; margin: 0; font-size: 28px; }
-        .content { padding: 30px 20px; }
-        .otp-box {
-            background: linear-gradient(135deg, #000000 0%, #333333 100%);
-            color: white;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #000000;
+            padding: 20px;
+        }
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #000000;
+        }
+        .email-container {
+            background-color: #ffffff;
+            border: 4px solid #000000;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #000000;
+            padding: 40px 20px;
             text-align: center;
-            padding: 30px;
-            margin: 30px 0;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-bottom: 4px solid #ffffff;
+        }
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 36px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+        .header p {
+            color: #ffffff;
+            margin: 10px 0 0 0;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+        .content {
+            padding: 40px 30px;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .greeting {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .message {
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            color: #333333;
+        }
+        .otp-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .otp-label {
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #666666;
+            margin-bottom: 15px;
+        }
+        .otp-box {
+            background-color: #000000;
+            border: 4px solid #000000;
+            padding: 30px 20px;
+            margin: 20px auto;
+            max-width: 400px;
+            position: relative;
+        }
+        .otp-box::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: #000000;
+            z-index: -1;
         }
         .otp-code {
-            font-size: 42px;
-            font-weight: bold;
-            letter-spacing: 8px;
+            font-size: 48px;
+            font-weight: 900;
+            letter-spacing: 12px;
             color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            padding: 10px;
         }
-        .warning {
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
+        .divider {
+            height: 2px;
+            background-color: #000000;
+            margin: 30px 0;
+        }
+        .warning-box {
+            background-color: #f8f8f8;
+            border-left: 4px solid #000000;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .warning-box strong {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .warning-box p {
+            font-size: 14px;
+            color: #333333;
+            margin: 0;
+        }
+        .info-text {
+            font-size: 14px;
+            color: #666666;
+            text-align: center;
             margin: 20px 0;
         }
         .footer {
+            background-color: #000000;
+            color: #ffffff;
             text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 14px;
-            border-top: 1px solid #eeeeee;
+            padding: 30px 20px;
+            border-top: 4px solid #ffffff;
+        }
+        .footer-brand {
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        .footer-tagline {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            margin-bottom: 20px;
+        }
+        .footer-note {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+        @media only screen and (max-width: 600px) {
+            .content {
+                padding: 30px 20px;
+            }
+            .otp-code {
+                font-size: 36px;
+                letter-spacing: 8px;
+            }
+            .header h1 {
+                font-size: 28px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>VellaPanti</h1>
-        </div>
-
-        <div class="content">
-            <p>Dear ${customerName},</p>
-            <p>Welcome to <strong>VellaPanti</strong>! We're excited to have you join our streetwear community.</p>
-
-            <p>Please use the following verification code to complete your registration:</p>
-
-            <div class="otp-box">
-                <p style="margin: 0 0 10px 0; font-size: 14px; opacity: 0.9;">Your Verification Code</p>
-                <div class="otp-code">${otp}</div>
+    <div class="email-wrapper">
+        <div class="email-container">
+            <!-- Header -->
+            <div class="header">
+                <h1>VELLAPANTI</h1>
+                <p>Street Culture • Authentic Style</p>
             </div>
 
-            <div class="warning">
-                <strong>⏱ Security Notice:</strong> This verification code will expire in 10 minutes for security reasons.
+            <!-- Content -->
+            <div class="content">
+                <div class="greeting">
+                    Hello ${customerName},
+                </div>
+
+                <div class="message">
+                    Welcome to <strong>VellaPanti</strong>! We're thrilled to have you join our streetwear community.
+                    <br><br>
+                    To complete your registration and unlock exclusive access to our collections, please verify your email address using the code below.
+                </div>
+
+                <!-- OTP Section -->
+                <div class="otp-section">
+                    <div class="otp-label">
+                        Your Verification Code
+                    </div>
+                    <div class="otp-box">
+                        <div class="otp-code">${otp}</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Warning Box -->
+                <div class="warning-box">
+                    <strong>⏱ Important Security Notice</strong>
+                    <p>This verification code will expire in <strong>10 minutes</strong>. Please complete your registration promptly to ensure your code remains valid.</p>
+                </div>
+
+                <div class="info-text">
+                    If you didn't request this code, you can safely ignore this email.<br>
+                    Your account will not be created without verification.
+                </div>
             </div>
 
-            <p>If you did not request this verification code, please ignore this email.</p>
-        </div>
-
-        <div class="footer">
-            <p>Best regards,<br><strong>VellaPanti Team</strong></p>
-            <p style="color: #999; font-size: 12px;">This is an automated email. Please do not reply.</p>
+            <!-- Footer -->
+            <div class="footer">
+                <div class="footer-brand">VELLAPANTI</div>
+                <div class="footer-tagline">Premium Streetwear • Limited Drops</div>
+                <div class="footer-note">
+                    This is an automated message. Please do not reply to this email.<br>
+                    © ${new Date().getFullYear()} VellaPanti. All rights reserved.
+                </div>
+            </div>
         </div>
     </div>
 </body>

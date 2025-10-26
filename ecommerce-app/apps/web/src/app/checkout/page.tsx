@@ -21,6 +21,7 @@ export default function CheckoutPage() {
   const [couponCode, setCouponCode] = useState('');
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [bogoConfig, setBogoConfig] = useState({ bogoBuyQty: 1, bogoGetQty: 1 });
+  const [paymentMethod, setPaymentMethod] = useState<'CASH_ON_DELIVERY' | 'ONLINE'>('CASH_ON_DELIVERY');
 
   // Load cart data if authenticated
   const { isLoading } = useCart();
@@ -137,13 +138,31 @@ export default function CheckoutPage() {
     try {
       // Get form data
       const formData = new FormData(document.getElementById('checkout-form') as HTMLFormElement);
+      const phoneNumber = formData.get('phone') as string;
+
+      // Validate phone number for online payments
+      if (paymentMethod === 'ONLINE' && (!phoneNumber || phoneNumber.length < 10)) {
+        toast.error('Valid phone number is required for online payment');
+        setIsProcessing(false);
+        return;
+      }
+
+      // Step 1: Update user phone number if provided and online payment selected
+      if (paymentMethod === 'ONLINE' && phoneNumber) {
+        try {
+          await api.put('/users/profile', { phone: phoneNumber });
+        } catch (phoneUpdateError) {
+          console.warn('Failed to update phone number:', phoneUpdateError);
+          // Continue anyway - we'll use the phone from the form
+        }
+      }
 
       const shippingAddress = {
         street: `${formData.get('address')}, ${formData.get('firstName')} ${formData.get('lastName')}`,
         city: formData.get('city') as string,
-        state: formData.get('state') || formData.get('city') as string, // Use city as state for now
+        state: formData.get('state') || formData.get('city') as string,
         zipCode: formData.get('zipCode') as string,
-        country: 'India', // Default country
+        country: 'India',
       };
 
       const orderData = {
@@ -155,15 +174,32 @@ export default function CheckoutPage() {
         })),
       };
 
-      const response = await api.post('/orders', orderData);
-      const result = handleApiResponse<{ id: string }>(response);
+      // Step 2: Create order
+      const orderResponse = await api.post('/orders', orderData);
+      const order = handleApiResponse<{ id: string }>(orderResponse);
 
-      // Clear cart and redirect to success page
-      router.push(`/order-success?orderId=${result.id}`);
+      // Step 3: If online payment, initiate payment
+      if (paymentMethod === 'ONLINE') {
+        try {
+          const paymentResponse = await api.post('/payments/initiate', {
+            orderId: order.id,
+          });
+          const payment = handleApiResponse<{ paymentLink: string; paymentSessionId: string }>(paymentResponse);
+
+          // Redirect to Cashfree payment page
+          window.location.href = payment.paymentLink;
+        } catch (paymentError: any) {
+          console.error('Payment initiation error:', paymentError);
+          toast.error(paymentError.message || 'Failed to initiate payment. Please try again.');
+          setIsProcessing(false);
+        }
+      } else {
+        // COD - redirect to success page
+        router.push(`/order-success?orderId=${order.id}`);
+      }
     } catch (error: any) {
       console.error('Checkout error:', error);
-      alert('Failed to place order. Please try again.');
-    } finally {
+      toast.error(error.message || 'Failed to place order. Please try again.');
       setIsProcessing(false);
     }
   };
@@ -288,41 +324,65 @@ export default function CheckoutPage() {
               </h2>
 
               <div className="space-y-4">
-                <div className="border-2 border-green-600 bg-green-50 p-4">
+                <div
+                  className={`border-2 p-4 cursor-pointer transition-all ${
+                    paymentMethod === 'CASH_ON_DELIVERY'
+                      ? 'border-green-600 bg-green-50'
+                      : 'border-gray-300 bg-white hover:border-gray-400'
+                  }`}
+                  onClick={() => setPaymentMethod('CASH_ON_DELIVERY')}
+                >
                   <div className="flex items-center">
                     <input
                       type="radio"
                       id="cod"
                       name="paymentMethod"
                       value="CASH_ON_DELIVERY"
-                      defaultChecked
+                      checked={paymentMethod === 'CASH_ON_DELIVERY'}
+                      onChange={(e) => setPaymentMethod('CASH_ON_DELIVERY')}
                       className="mr-3"
                     />
-                    <label htmlFor="cod" className="font-bold text-green-800 uppercase tracking-wide">
+                    <label htmlFor="cod" className={`font-bold uppercase tracking-wide cursor-pointer ${
+                      paymentMethod === 'CASH_ON_DELIVERY' ? 'text-green-800' : 'text-gray-700'
+                    }`}>
                       Cash on Delivery (COD)
                     </label>
                   </div>
-                  <p className="text-sm text-green-600 mt-2 ml-6">
+                  <p className={`text-sm mt-2 ml-6 ${
+                    paymentMethod === 'CASH_ON_DELIVERY' ? 'text-green-600' : 'text-gray-500'
+                  }`}>
                     Pay when your order is delivered to your doorstep
                   </p>
                 </div>
 
-                <div className="border-2 border-gray-300 bg-gray-100 p-4 opacity-50">
+                <div
+                  className={`border-2 p-4 cursor-pointer transition-all ${
+                    paymentMethod === 'ONLINE'
+                      ? 'border-blue-600 bg-blue-50'
+                      : 'border-gray-300 bg-white hover:border-gray-400'
+                  }`}
+                  onClick={() => setPaymentMethod('ONLINE')}
+                >
                   <div className="flex items-center">
                     <input
                       type="radio"
                       id="online"
                       name="paymentMethod"
                       value="ONLINE"
-                      disabled
+                      checked={paymentMethod === 'ONLINE'}
+                      onChange={(e) => setPaymentMethod('ONLINE')}
                       className="mr-3"
                     />
-                    <label htmlFor="online" className="font-bold text-gray-600 uppercase tracking-wide">
+                    <label htmlFor="online" className={`font-bold uppercase tracking-wide cursor-pointer ${
+                      paymentMethod === 'ONLINE' ? 'text-blue-800' : 'text-gray-700'
+                    }`}>
                       Online Payment
                     </label>
                   </div>
-                  <p className="text-sm text-gray-500 mt-2 ml-6">
-                    Credit/Debit Card, UPI, Net Banking (Coming Soon)
+                  <p className={`text-sm mt-2 ml-6 ${
+                    paymentMethod === 'ONLINE' ? 'text-blue-600' : 'text-gray-500'
+                  }`}>
+                    Credit/Debit Card, UPI, Net Banking - Secure Payment via Cashfree
                   </p>
                 </div>
               </div>
