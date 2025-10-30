@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, ShoppingCart, Heart } from 'lucide-react';
+import { ShoppingCart, Heart } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import { useAddToCart } from '@/hooks/useCart';
 import { useAuthStore } from '@/stores/authStore';
@@ -10,6 +10,7 @@ import { useWishlist, useToggleWishlist } from '@/hooks/useWishlist';
 import type { Product } from '@ecommerce/types';
 import toast from 'react-hot-toast';
 import { useState, useEffect } from 'react';
+import { SizeSelectionModal } from './size-selection-modal';
 
 interface ProductCardProps {
   product: Product;
@@ -22,6 +23,7 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
   const { data: wishlistData } = useWishlist();
   const toggleWishlist = useToggleWishlist();
   const [mounted, setMounted] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Check if product is in wishlist
   const wishlistItems = wishlistData?.data || [];
@@ -44,14 +46,33 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
       return;
     }
 
-    // For products with variants, just use the first variant
-    // If user needs specific variant selection, they can go to product page
-    const variantId = product.variants?.[0]?.id;
+    // Check if product has variants (sizes/colors)
+    const hasVariants = product.variants && product.variants.length > 0 &&
+      (product.variantOptions?.sizes?.length > 0 || product.variantOptions?.colors?.length > 0);
 
+    if (hasVariants) {
+      // Show modal for size/color selection
+      setIsModalOpen(true);
+    } else {
+      // No variants, add directly
+      const variantId = product.variants?.[0]?.id;
+      addToCart.mutate({
+        productId: product.id,
+        productVariantId: variantId || undefined,
+        quantity: 1,
+      });
+    }
+  };
+
+  const handleAddToCartFromModal = (variantId: string) => {
     addToCart.mutate({
       productId: product.id,
-      productVariantId: variantId || undefined,
+      productVariantId: variantId,
       quantity: 1,
+    }, {
+      onSuccess: () => {
+        setIsModalOpen(false);
+      }
     });
   };
 
@@ -242,32 +263,6 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
           </h3>
         </Link>
 
-        {/* Rating - Fixed height to prevent asymmetry */}
-        <div className="h-5 flex items-center gap-2">
-          {product.averageRating ? (
-            <>
-              <div className="flex items-center">
-                {[...Array(5)].map((_, index) => (
-                  <Star
-                    key={index}
-                    className={`h-3 w-3 ${
-                      index < Math.floor(product.averageRating!)
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-gray-300'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className={`text-xs ${config.textSecondary} font-bold`}>
-                ({product.reviewCount || 0})
-              </span>
-            </>
-          ) : (
-            <span className={`text-xs ${config.textSecondary} font-bold opacity-60`}>
-              No reviews yet
-            </span>
-          )}
-        </div>
 
         {/* Price */}
         <div className="flex items-center gap-2 flex-wrap">
@@ -357,6 +352,15 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
           )}
         </div>
       </div>
+
+      {/* Size Selection Modal */}
+      <SizeSelectionModal
+        product={product}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onAddToCart={handleAddToCartFromModal}
+        isLoading={addToCart.isPending}
+      />
     </div>
   );
 }

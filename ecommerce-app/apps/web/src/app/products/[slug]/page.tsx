@@ -4,12 +4,11 @@ import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, ShoppingCart, ChevronRight, Plus, Minus, Heart, Shield, Truck, RefreshCw } from 'lucide-react';
+import { ShoppingCart, ChevronRight, Plus, Minus, Heart, Shield, Truck, RefreshCw, Star } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import { useProduct, useProducts } from '@/hooks/useProducts';
 import { useAddToCart } from '@/hooks/useCart';
 import { useAuthStore } from '@/stores/authStore';
-import { ReviewsList } from '@/components/reviews/reviews-list';
 import { ProductCard } from '@/components/products/product-card';
 import toast from 'react-hot-toast';
 
@@ -362,27 +361,6 @@ export default function ProductPage({ params }: ProductPageProps) {
             <div className="bg-white rounded-lg p-6 shadow-md border">
               <h1 className="text-2xl font-semibold mb-3 text-gray-900 leading-tight tracking-tight">{product.name}</h1>
             
-              {/* Rating */}
-              {product.averageRating && (
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="flex items-center bg-yellow-50 px-2 py-1 rounded-md border border-yellow-200">
-                    {[...Array(5)].map((_, index) => (
-                      <Star
-                        key={index}
-                        className={`h-4 w-4 ${
-                          index < Math.floor(product.averageRating!)
-                            ? 'fill-yellow-500 text-yellow-500'
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <div className="text-sm">
-                    <span className="font-semibold text-gray-900">{(product.averageRating || 0).toFixed(1)}</span>
-                    <span className="text-gray-600 ml-1">({product.reviewCount || 0} reviews)</span>
-                  </div>
-                </div>
-              )}
 
               {/* Price */}
               <div className="bg-gray-50 rounded-lg p-4 mb-4">
@@ -714,15 +692,6 @@ export default function ProductPage({ params }: ProductPageProps) {
           </div>
         </div>
 
-        {/* Reviews Section - Compact */}
-        <div className="mt-6">
-          <div className="bg-white rounded-lg p-4 shadow-sm border">
-            <h2 className="text-lg font-semibold mb-3 text-gray-900">Customer Reviews</h2>
-            <div className="max-h-80 overflow-hidden">
-              <ReviewsList productId={product.id} />
-            </div>
-          </div>
-        </div>
 
         {/* Recommended Products */}
         {recommendedProducts.length > 0 && (
