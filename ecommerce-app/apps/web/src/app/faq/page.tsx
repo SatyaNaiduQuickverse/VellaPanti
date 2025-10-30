@@ -19,136 +19,114 @@ export default function FAQPage() {
   const settings = settingsData?.data;
 
   const faqData: FAQItem[] = [
-    // Orders & Shopping
+    // General & Brand Identity
     {
-      category: 'orders',
-      question: 'How do I place an order?',
-      answer: 'Browse our collections, select your desired products, choose your size and color, and click "Add to Cart". Once you\'re ready, go to your cart, review your items, and proceed to checkout. You\'ll need to provide shipping information and payment details to complete your order.',
+      category: 'general',
+      question: 'What does "Vellapanti" mean?',
+      answer: 'VELLAPANTI — converting its initial interpretation of being lazy or unproductive to something that is COOL & POSITIVE, getting you close to the VIBE & the LIFE that has been a dream to many.',
     },
     {
-      category: 'orders',
-      question: 'Can I modify or cancel my order after placing it?',
-      answer: 'You can modify or cancel your order within 1 hour of placement. After that, your order enters our fulfillment process and cannot be changed. Contact our support team immediately at support@vellapanti.com if you need to make changes.',
+      category: 'general',
+      question: 'What is the Vellapanti mission?',
+      answer: 'To give you the comfiest canvas for your creative slacking. We design threads for the dreamer, the schemer, and the master of procrastination. Wear the mood.',
     },
     {
-      category: 'orders',
-      question: 'How do I track my order?',
-      answer: 'Once your order ships, you\'ll receive a tracking number via email. You can also track your order by logging into your account and visiting the "My Orders" section. Click on any order to view its current status and tracking information.',
-    },
-    {
-      category: 'orders',
-      question: 'What payment methods do you accept?',
-      answer: 'We accept all major credit cards (Visa, MasterCard, American Express, Discover), debit cards, UPI, net banking, and digital wallets. All payments are processed securely through our encrypted payment gateway.',
-    },
-
-    // Shipping & Delivery
-    {
-      category: 'shipping',
-      question: 'What are your shipping options and costs?',
-      answer: 'We offer Standard Shipping (5-7 business days) for ₹99 and Express Shipping (2-3 business days) for ₹199. Free standard shipping is available on orders above ₹999. International shipping is available to select countries with rates calculated at checkout.',
-    },
-    {
-      category: 'shipping',
-      question: 'How long does shipping take?',
-      answer: 'Standard shipping takes 5-7 business days, while Express shipping takes 2-3 business days. International orders typically arrive within 10-15 business days. Processing time is 1-2 business days before shipment.',
-    },
-    {
-      category: 'shipping',
-      question: 'Do you ship internationally?',
-      answer: 'Yes! We ship to select international destinations. International shipping costs and delivery times vary by location and are calculated at checkout. Please note that customs duties and import taxes are the responsibility of the recipient.',
-    },
-    {
-      category: 'shipping',
-      question: 'What if my package is lost or damaged?',
-      answer: 'If your package is lost in transit or arrives damaged, please contact us immediately at support@vellapanti.com with your order number and photos of any damage. We\'ll work with you to resolve the issue quickly, either by reshipping or providing a full refund.',
-    },
-
-    // Returns & Exchanges
-    {
-      category: 'returns',
-      question: 'What is your return policy?',
-      answer: 'We offer a 30-day return policy from the date of delivery. Items must be unworn, unwashed, and in original condition with all tags attached. To initiate a return, visit your order history and select "Request Return". We\'ll provide a prepaid return label for eligible returns.',
-    },
-    {
-      category: 'returns',
-      question: 'How do I return or exchange an item?',
-      answer: 'Log into your account, go to "My Orders", select the order containing the item you want to return, and click "Request Return/Exchange". Choose your reason, select the items, and we\'ll email you a prepaid return label. Pack the items securely and drop them off at any authorized courier location.',
-    },
-    {
-      category: 'returns',
-      question: 'When will I receive my refund?',
-      answer: 'Refunds are processed within 5-7 business days after we receive and inspect your returned items. The refund will be credited to your original payment method. Please allow an additional 3-5 business days for the amount to reflect in your account.',
-    },
-    {
-      category: 'returns',
-      question: 'What items are not eligible for return?',
-      answer: 'Sale items marked as "Final Sale", intimate apparel, earrings, and personalized items cannot be returned. Items that are worn, washed, damaged, or missing tags are also not eligible for return.',
-    },
-    {
-      category: 'returns',
-      question: 'Do you offer exchanges?',
-      answer: 'Yes! We offer exchanges for different sizes or colors. Select "Exchange" when initiating your return request. The replacement item will be shipped once we receive your original item. If the new item has a different price, we\'ll charge or refund the difference.',
+      category: 'general',
+      question: 'What kind of products do you sell?',
+      answer: 'Right now, we are focused on the ultimate staple: premium, high-quality t-shirts in our signature collections: Deepest Black Tees (Black Tees) and Purest White Tees (White Tees). We plan to expand our range to other essentials soon!',
     },
 
     // Products & Sizing
     {
       category: 'products',
-      question: 'How do I know what size to order?',
-      answer: 'Refer to our detailed size guide available on each product page. Measurements are provided for chest, waist, length, and sleeves. If you\'re between sizes, we recommend sizing up for a relaxed fit or sizing down for a fitted look. Our customer support team can also help with size recommendations.',
+      question: 'What material are the t-shirts made of?',
+      answer: 'Our t-shirts are typically made from 100% premium combed cotton (or a high-quality cotton blend for specific styles) to ensure they\'re soft, breathable, and perfect for a long session of vellapanti.',
     },
     {
       category: 'products',
-      question: 'How do I care for my VellaPanti products?',
-      answer: 'Most items are machine washable in cold water with like colors. Turn garments inside out before washing and avoid bleach. Tumble dry on low heat or hang to dry. Iron on low heat if needed. Check individual product care labels for specific instructions.',
+      question: 'How do I find the right size?',
+      answer: 'You should see a detailed Size Chart on every product page. We generally offer a comfortable, true-to-size fit. Pro Tip: If you\'re debating between two sizes for maximum chill, size up!',
     },
     {
       category: 'products',
-      question: 'Are your products true to size?',
-      answer: 'Our products generally run true to size, but fits may vary slightly by collection. The BLACK collection tends to have a slightly oversized/street fit, while the WHITE collection has a more fitted/premium cut. Check the size guide and product reviews for specific fitting information.',
-    },
-    {
-      category: 'products',
-      question: 'When will sold-out items be restocked?',
-      answer: 'Restocks depend on product demand and availability. Sign up for restock notifications on product pages to be alerted when items are back in stock. Popular items typically restock within 4-6 weeks.',
+      question: 'How should I care for my Vellapanti tee?',
+      answer: 'To keep your tee looking fresh for all your idle moments:\n• Wash inside out with cold water.\n• Do not bleach or dry clean.\n• Tumble dry low or, better yet, hang dry (it\'s less effort).\n• Iron inside out, and never directly on the print.',
     },
 
-    // Account & General
+    // Orders, Shipping, & Payment
     {
-      category: 'account',
-      question: 'Do I need an account to place an order?',
-      answer: 'No, you can checkout as a guest. However, creating an account allows you to track orders, save addresses, store payment methods, view order history, and receive exclusive member benefits and early access to new collections.',
+      category: 'orders',
+      question: 'How can I track my order?',
+      answer: 'Once your order ships (usually within 1-2 business days), you will receive a shipping confirmation email that includes a tracking number and a link to the carrier\'s website.',
     },
     {
-      category: 'account',
-      question: 'How do I reset my password?',
-      answer: 'Click "Forgot Password" on the login page, enter your registered email address, and we\'ll send you a password reset link. Follow the instructions in the email to create a new password. If you don\'t receive the email, check your spam folder.',
+      category: 'orders',
+      question: 'How long will it take for my order to arrive?',
+      answer: 'Our standard delivery time is typically 5-7 business days after the order has been shipped, depending on your location. You\'ll be notified if there are any vellapanti-related delays.',
     },
     {
-      category: 'account',
-      question: 'How can I update my account information?',
-      answer: 'Log into your account and click on "Profile" or "Account Settings". From there, you can update your personal information, email address, phone number, and saved addresses. Changes are saved automatically.',
-    },
-    {
-      category: 'account',
-      question: 'Is my personal information secure?',
-      answer: 'Absolutely. We use industry-standard SSL encryption to protect your personal and payment information. We never store complete credit card details on our servers, and we comply with all data protection regulations. Read our Privacy Policy for more details.',
+      category: 'orders',
+      question: 'What payment methods do you accept?',
+      answer: 'We accept all major credit/debit cards, UPI Payments and Net Banking.',
     },
 
-    // Promotions & Discounts
+    // Returns & Exchanges
     {
-      category: 'promotions',
-      question: 'How do I use a promo code?',
-      answer: 'Enter your promo code in the "Promo Code" field during checkout and click "Apply". The discount will be reflected in your order total. Promo codes cannot be combined with other offers unless specified and may have minimum purchase requirements.',
+      category: 'returns',
+      question: 'What is your return and exchange policy?',
+      answer: 'We maintain a strict NO RETURN and NO EXCHANGE policy for all items sold. All sales are considered final once the purchase is complete.',
     },
     {
-      category: 'promotions',
-      question: 'Can I use multiple discount codes on one order?',
-      answer: 'Generally, only one promo code can be used per order. However, some site-wide automatic discounts may apply in addition to your promo code. The best available discount will be automatically applied at checkout.',
+      category: 'returns',
+      question: 'Is there any exception to the No Exchange policy?',
+      answer: 'Yes, but only in the case of a verified manufacturing defect.',
     },
     {
-      category: 'promotions',
-      question: 'Do you offer student or military discounts?',
-      answer: 'Yes! We offer a 15% student discount and 10% military discount year-round. Verify your status through our partner verification service during checkout to receive your discount. Contact support@vellapanti.com for assistance.',
+      category: 'returns',
+      question: 'How do I qualify for an exchange due to a manufacturing defect?',
+      answer: 'You must meet these two non-negotiable conditions:\n1. You must provide a continuous, unedited, start-to-finish UNBOXING VIDEO that clearly shows the sealed package and the defect as the item is removed.\n2. You must notify us of the defect within 48 hours of the delivery date.',
+    },
+    {
+      category: 'returns',
+      question: 'What if the t-shirt doesn\'t fit? Can I exchange it?',
+      answer: 'No. We cannot accept exchanges for issues related to fit, size preference, or buyer\'s remorse. Please double-check our detailed size chart before placing your order.',
+    },
+    {
+      category: 'returns',
+      question: 'What constitutes a manufacturing defect?',
+      answer: 'This includes things like holes, broken seams, or major print errors that occurred during the production process. Normal wear and tear, or damage caused after opening, will not qualify.',
+    },
+
+    // Shipping Information
+    {
+      category: 'shipping',
+      question: 'What is your order processing time?',
+      answer: 'All orders are typically processed and dispatched from our warehouse within 1-2 business days (Monday to Friday, excluding public holidays).',
+    },
+    {
+      category: 'shipping',
+      question: 'How do I track my shipment?',
+      answer: 'Once your order is dispatched, you will receive a confirmation email and/or SMS containing your unique Tracking Number and a link to monitor your shipment\'s journey.',
+    },
+    {
+      category: 'shipping',
+      question: 'What are the delivery timelines?',
+      answer: 'Metro Cities (Mumbai, Delhi, Bangalore, etc.): 2-4 Business Days\nNon-Metro / Rest of India: 4-7 Business Days\n\nNote: Delivery to remote locations or during peak festive/sale periods may take an additional 2-3 days. Your tracking link will always provide the most current ETA.',
+    },
+    {
+      category: 'shipping',
+      question: 'Where do you ship?',
+      answer: 'We currently ship across all major cities and towns within India.',
+    },
+    {
+      category: 'shipping',
+      question: 'What should I know about my shipping address?',
+      answer: 'Please ensure your shipping address, pincode, and contact number are complete and accurate at the time of checkout. We cannot change the address once the order has been dispatched.',
+    },
+    {
+      category: 'shipping',
+      question: 'Can my order arrive in multiple packages?',
+      answer: 'In rare cases, if you order multiple items, they may arrive in separate packages with separate tracking numbers, at no extra cost to you.',
     },
   ];
 
@@ -236,44 +214,45 @@ export default function FAQPage() {
         </div>
 
         {/* Still Need Help Section */}
-        <div className="bg-black text-white p-8 border-2 border-black">
+        <div className="bg-black text-white p-4 sm:p-8 border-2 border-black">
           <div className="max-w-3xl mx-auto text-center">
-            <HelpCircle className="h-12 w-12 mx-auto mb-4" />
-            <h2 className="text-3xl font-black uppercase tracking-tight mb-4">
+            <HelpCircle className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-4" />
+            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-4">
               Still Need Help?
             </h2>
-            <p className="text-gray-300 mb-6">
+            <p className="text-gray-300 mb-6 text-sm sm:text-base px-2">
               Can't find the answer you're looking for? Our customer support team is here to help.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
               {settings?.whatsapp_enabled && settings?.whatsapp_number && (
                 <a
                   href={`https://wa.me/${settings.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hi, I need help with VellaPanti`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="w-full sm:w-auto max-w-full"
                 >
-                  <Button className="bg-green-500 text-white hover:bg-green-600 font-black uppercase tracking-wider">
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Chat on WhatsApp
+                  <Button className="w-full sm:w-auto bg-green-500 text-white hover:bg-green-600 font-black uppercase text-xs sm:text-sm px-4 py-3 inline-flex items-center justify-center gap-2">
+                    <MessageCircle className="h-4 w-4 flex-shrink-0" />
+                    <span>WhatsApp</span>
                   </Button>
                 </a>
               )}
-              <Link href="/support">
-                <Button className="bg-white text-black hover:bg-gray-200 font-black uppercase tracking-wider">
+              <Link href="/support" className="w-full sm:w-auto max-w-full">
+                <Button className="w-full sm:w-auto bg-white text-black hover:bg-gray-200 font-black uppercase text-xs sm:text-sm px-4 py-3">
                   Contact Support
                 </Button>
               </Link>
-              <Link href="/returns">
-                <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-black font-bold uppercase tracking-wide">
-                  View Return Policy
+              <Link href="/returns" className="w-full sm:w-auto max-w-full">
+                <Button className="w-full sm:w-auto bg-transparent border-2 border-white text-white font-bold uppercase text-xs sm:text-sm px-4 py-3">
+                  Return Policy
                 </Button>
               </Link>
             </div>
-            <div className="mt-8 pt-6 border-t border-gray-700">
-              <p className="text-sm text-gray-400">
+            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-700">
+              <p className="text-xs sm:text-sm text-gray-400 break-words px-2">
                 <strong>Email:</strong> {settings?.support_email || 'support@vellapanti.com'} | <strong>Phone:</strong> {settings?.support_phone || '+1 (555) 123-4567'}
               </p>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 mt-2 px-2">
                 {settings?.business_hours || 'Monday - Friday: 9AM - 6PM EST'} | Response time: 4-6 hours
               </p>
             </div>
