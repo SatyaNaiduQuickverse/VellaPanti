@@ -682,10 +682,10 @@ export const updateCarouselImages = asyncHandler(async (req: AuthRequest, res: R
   const carouselImagesData = images.map((image: any, index: number) => ({
     src: image.src,
     alt: image.alt,
-    bottomLeftTitle: image.title || '',
-    bottomLeftDescription: image.description || '',
-    centerTitle: image.title || '',
-    centerDescription: image.description || '',
+    bottomLeftTitle: image.title || null,
+    bottomLeftDescription: image.description || null,
+    centerTitle: image.title || null,
+    centerDescription: image.description || null,
     position: index,
     isActive: true,
   }));
