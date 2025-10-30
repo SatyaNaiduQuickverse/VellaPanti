@@ -101,9 +101,35 @@ export const getFeaturedProducts = asyncHandler(async (req: Request, res: Respon
           ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
           : null;
 
+        // Group variants by attribute for easier frontend consumption
+        const variants = fp.product.variants || [];
+        const variantOptions = {
+          colors: [...new Set(variants.map(v => v.color).filter(Boolean))],
+          sizes: sortSizes([...new Set(variants.map(v => v.size).filter(Boolean))]),
+          materials: [...new Set(variants.map(v => v.material).filter(Boolean))],
+        };
+
+        // Calculate total stock
+        const totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
+
+        // Calculate price range
+        const prices = variants.map(v => v.price);
+        const salePrices = variants.map(v => v.salePrice).filter((p): p is number => p !== null && p !== undefined);
+        const priceRange = {
+          min: prices.length > 0 ? (salePrices.length > 0 ? Math.min(...salePrices) : Math.min(...prices)) : fp.product.basePrice || 0,
+          max: prices.length > 0 ? Math.max(...prices) : fp.product.basePrice || 0,
+          saleMin: salePrices.length > 0 ? Math.min(...salePrices) : fp.product.baseSalePrice || undefined,
+          saleMax: salePrices.length > 0 ? Math.max(...salePrices) : fp.product.baseSalePrice || undefined,
+          hasVariablePrice: prices.length > 0 ? Math.min(...prices) !== Math.max(...prices) : false,
+        };
+
         return {
           ...fp.product,
           averageRating,
+          reviewCount: reviews.length,
+          variantOptions,
+          totalStock,
+          priceRange,
         };
       })
     );
@@ -152,9 +178,35 @@ export const getFeaturedProducts = asyncHandler(async (req: Request, res: Respon
           ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
           : null;
 
+        // Group variants by attribute for easier frontend consumption
+        const variants = product.variants || [];
+        const variantOptions = {
+          colors: [...new Set(variants.map(v => v.color).filter(Boolean))],
+          sizes: sortSizes([...new Set(variants.map(v => v.size).filter(Boolean))]),
+          materials: [...new Set(variants.map(v => v.material).filter(Boolean))],
+        };
+
+        // Calculate total stock
+        const totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
+
+        // Calculate price range
+        const prices = variants.map(v => v.price);
+        const salePrices = variants.map(v => v.salePrice).filter((p): p is number => p !== null && p !== undefined);
+        const priceRange = {
+          min: prices.length > 0 ? (salePrices.length > 0 ? Math.min(...salePrices) : Math.min(...prices)) : product.basePrice || 0,
+          max: prices.length > 0 ? Math.max(...prices) : product.basePrice || 0,
+          saleMin: salePrices.length > 0 ? Math.min(...salePrices) : product.baseSalePrice || undefined,
+          saleMax: salePrices.length > 0 ? Math.max(...salePrices) : product.baseSalePrice || undefined,
+          hasVariablePrice: prices.length > 0 ? Math.min(...prices) !== Math.max(...prices) : false,
+        };
+
         return {
           ...product,
           averageRating,
+          reviewCount: reviews.length,
+          variantOptions,
+          totalStock,
+          priceRange,
         };
       })
     );
@@ -280,6 +332,13 @@ export const getProducts = asyncHandler(async (req: Request, res: Response) => {
       totalStock = variants.reduce((sum, v) => sum + v.stock, 0);
     }
 
+    // Group variants by attribute for easier frontend consumption
+    const variantOptions = {
+      colors: [...new Set(variants.map(v => v.color).filter(Boolean))],
+      sizes: sortSizes([...new Set(variants.map(v => v.size).filter(Boolean))]),
+      materials: [...new Set(variants.map(v => v.material).filter(Boolean))],
+    };
+
     return {
       ...product,
       averageRating,
@@ -290,6 +349,7 @@ export const getProducts = asyncHandler(async (req: Request, res: Response) => {
         hasVariablePrice: minPrice !== maxPrice,
       },
       totalStock,
+      variantOptions,
       reviews: undefined, // Remove reviews from response
     };
   });
