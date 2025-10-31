@@ -265,36 +265,18 @@ export default function ContactSupportPage() {
 
               {/* Support Form */}
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block font-bold mb-2 uppercase tracking-wide text-sm text-gray-600">
-                      Subject *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.subject}
-                      onChange={(e) => handleInputChange('subject', e.target.value)}
-                      className="w-full p-3 border-2 border-gray-300 focus:border-black"
-                      placeholder="Brief description of your issue"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold mb-2 uppercase tracking-wide text-sm text-gray-600">
-                      Priority
-                    </label>
-                    <select
-                      value={formData.priority}
-                      onChange={(e) => handleInputChange('priority', e.target.value)}
-                      className="w-full p-3 border-2 border-gray-300 focus:border-black"
-                    >
-                      <option value="low">Low - General inquiry</option>
-                      <option value="medium">Medium - Standard issue</option>
-                      <option value="high">High - Urgent issue</option>
-                      <option value="critical">Critical - Order problem</option>
-                    </select>
-                  </div>
+                <div>
+                  <label className="block font-bold mb-2 uppercase tracking-wide text-sm text-gray-600">
+                    Subject *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.subject}
+                    onChange={(e) => handleInputChange('subject', e.target.value)}
+                    className="w-full p-3 border-2 border-gray-300 focus:border-black"
+                    placeholder="Brief description of your issue"
+                  />
                 </div>
 
                 <div>
