@@ -84,9 +84,9 @@ export default function HomepageManagement() {
       try {
         const url = new URL(value);
         // Check if it's a supported hostname
-        const supportedHosts = ['images.unsplash.com', 'unsplash.com', 'i.postimg.cc', 'localhost'];
+        const supportedHosts = ['images.unsplash.com', 'unsplash.com', 'i.postimg.cc', 'i.ibb.co', 'localhost'];
         if (!supportedHosts.includes(url.hostname)) {
-          toast.error(`Unsupported image host: ${url.hostname}. Please use images.unsplash.com, i.postimg.cc, or localhost.`);
+          toast.error(`Unsupported image host: ${url.hostname}. Please use images.unsplash.com, i.postimg.cc, i.ibb.co, or localhost.`);
           return;
         }
       } catch (error) {
@@ -113,9 +113,9 @@ export default function HomepageManagement() {
       try {
         const url = new URL(value);
         // Check if it's a supported hostname
-        const supportedHosts = ['images.unsplash.com', 'unsplash.com', 'i.postimg.cc', 'localhost'];
+        const supportedHosts = ['images.unsplash.com', 'unsplash.com', 'i.postimg.cc', 'i.ibb.co', 'localhost'];
         if (!supportedHosts.includes(url.hostname)) {
-          toast.error(`Unsupported image host: ${url.hostname}. Please use images.unsplash.com, i.postimg.cc, or localhost.`);
+          toast.error(`Unsupported image host: ${url.hostname}. Please use images.unsplash.com, i.postimg.cc, i.ibb.co, or localhost.`);
           return;
         }
       } catch (error) {
@@ -281,7 +281,7 @@ export default function HomepageManagement() {
                         type="url"
                         value={image.src}
                         onChange={(e) => updateImage(image.id, 'src', e.target.value)}
-                        placeholder="https://images.unsplash.com/photo-example or https://i.postimg.cc/example"
+                        placeholder="https://images.unsplash.com/photo-example or https://i.ibb.co/example"
                         className="w-full px-3 py-2 border-2 border-black focus:outline-none font-medium"
                       />
                     </div>
