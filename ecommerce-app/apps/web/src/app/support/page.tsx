@@ -144,10 +144,17 @@ export default function ContactSupportPage() {
                   <div className="bg-black p-2 rounded">
                     <Mail className="h-5 w-5 text-white" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <h3 className="font-black uppercase tracking-wide text-sm">Email Support</h3>
-                    <p className="text-gray-600">{settings?.support_email || 'support@vellapanti.com'}</p>
-                    <p className="text-xs text-gray-500 mt-1">Response within 24 hours</p>
+                    <p className="text-gray-600 mb-2">Response within 24 hours</p>
+                    <a
+                      href={`mailto:${settings?.support_email || 'support@vellapanti.com'}`}
+                    >
+                      <Button className="bg-black text-white hover:bg-gray-800 font-black uppercase tracking-wider text-xs py-2">
+                        <Mail className="h-3 w-3 mr-2" />
+                        Email Us
+                      </Button>
+                    </a>
                   </div>
                 </div>
 
