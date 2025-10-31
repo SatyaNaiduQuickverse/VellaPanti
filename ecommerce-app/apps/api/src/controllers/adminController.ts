@@ -997,19 +997,33 @@ export const createOfferPopup = asyncHandler(async (req: Request, res: Response)
 // Site Settings Management
 
 // Get site settings (Admin)
-export const getSiteSettings = asyncHandler(async (req: Request, res: Response) => {
-  const settings = await prisma.$queryRaw`
-    SELECT * FROM site_settings WHERE id = 'default'
-  `;
+export const getSiteSettings = asyncHandler(async (_req: Request, res: Response) => {
+  let settings = await prisma.siteSettings.findUnique({
+    where: { id: 'default' },
+  });
+
+  // If no settings exist, create default settings
+  if (!settings) {
+    settings = await prisma.siteSettings.create({
+      data: {
+        id: 'default',
+        whatsappNumber: '',
+        whatsappEnabled: false,
+        supportEmail: 'support@vellapanti.com',
+        supportPhone: '+1 (555) 123-4567',
+        businessHours: 'Monday - Friday: 9AM - 6PM EST',
+      },
+    });
+  }
 
   res.json({
     success: true,
-    data: (settings as any[])[0] || null,
+    data: settings,
   });
 });
 
 // Update site settings (Admin)
-export const updateSiteSettings = asyncHandler(async (req: Request, res: Response) => {
+export const updateSiteSettings = asyncHandler(async (req: AuthRequest, res: Response) => {
   const {
     whatsapp_number,
     whatsapp_enabled,
@@ -1018,44 +1032,70 @@ export const updateSiteSettings = asyncHandler(async (req: Request, res: Respons
     business_hours,
   } = req.body;
 
-  const settings = await prisma.$executeRaw`
-    UPDATE site_settings 
-    SET 
-      whatsapp_number = ${whatsapp_number},
-      whatsapp_enabled = ${whatsapp_enabled},
-      support_email = ${support_email},
-      support_phone = ${support_phone},
-      business_hours = ${business_hours},
-      "updatedAt" = CURRENT_TIMESTAMP
-    WHERE id = 'default'
-  `;
-
-  const updatedSettings = await prisma.$queryRaw`
-    SELECT * FROM site_settings WHERE id = 'default'
-  `;
+  // Use upsert to handle both create and update cases
+  const settings = await prisma.siteSettings.upsert({
+    where: { id: 'default' },
+    create: {
+      id: 'default',
+      whatsappNumber: whatsapp_number || '',
+      whatsappEnabled: whatsapp_enabled || false,
+      supportEmail: support_email || 'support@vellapanti.com',
+      supportPhone: support_phone || '+1 (555) 123-4567',
+      businessHours: business_hours || 'Monday - Friday: 9AM - 6PM EST',
+    },
+    update: {
+      whatsappNumber: whatsapp_number,
+      whatsappEnabled: whatsapp_enabled,
+      supportEmail: support_email,
+      supportPhone: support_phone,
+      businessHours: business_hours,
+    },
+  });
 
   res.json({
     success: true,
     message: 'Site settings updated successfully',
-    data: (updatedSettings as any[])[0],
+    data: settings,
   });
 });
 
 // Get public site settings (No auth required)
-export const getPublicSiteSettings = asyncHandler(async (req: Request, res: Response) => {
-  const settings = await prisma.$queryRaw`
-    SELECT 
-      whatsapp_number,
-      whatsapp_enabled,
-      support_email,
-      support_phone,
-      business_hours
-    FROM site_settings 
-    WHERE id = 'default'
-  `;
+export const getPublicSiteSettings = asyncHandler(async (_req: Request, res: Response) => {
+  let settings = await prisma.siteSettings.findUnique({
+    where: { id: 'default' },
+    select: {
+      whatsappNumber: true,
+      whatsappEnabled: true,
+      supportEmail: true,
+      supportPhone: true,
+      businessHours: true,
+    },
+  });
+
+  // If no settings exist, create default settings
+  if (!settings) {
+    const newSettings = await prisma.siteSettings.create({
+      data: {
+        id: 'default',
+        whatsappNumber: '',
+        whatsappEnabled: false,
+        supportEmail: 'support@vellapanti.com',
+        supportPhone: '+1 (555) 123-4567',
+        businessHours: 'Monday - Friday: 9AM - 6PM EST',
+      },
+    });
+
+    settings = {
+      whatsappNumber: newSettings.whatsappNumber,
+      whatsappEnabled: newSettings.whatsappEnabled,
+      supportEmail: newSettings.supportEmail,
+      supportPhone: newSettings.supportPhone,
+      businessHours: newSettings.businessHours,
+    };
+  }
 
   res.json({
     success: true,
-    data: (settings as any[])[0] || null,
+    data: settings,
   });
 });
