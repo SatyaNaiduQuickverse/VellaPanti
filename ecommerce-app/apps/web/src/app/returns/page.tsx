@@ -335,26 +335,27 @@ export default function ReturnsPage() {
             <p className="text-gray-300 mb-6">
               Our customer support team is here to help with any questions about returns or exchanges.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               {settings?.whatsapp_enabled && settings?.whatsapp_number && (
                 <a
                   href={`https://wa.me/${settings.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hi, I have a question about returns and exchanges`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="w-full sm:w-auto"
                 >
-                  <Button className="bg-green-500 text-white hover:bg-green-600 font-black uppercase tracking-wider">
+                  <Button className="w-full sm:w-auto bg-green-500 text-white hover:bg-green-600 font-black uppercase tracking-wider">
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Chat on WhatsApp
                   </Button>
                 </a>
               )}
-              <Link href="/orders">
-                <Button className="bg-white text-black hover:bg-gray-200 font-black uppercase tracking-wider">
+              <Link href="/orders" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto bg-white text-black hover:bg-gray-200 font-black uppercase tracking-wider">
                   View My Orders
                 </Button>
               </Link>
-              <Link href="/support">
-                <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-black font-bold uppercase tracking-wide">
+              <Link href="/support" className="w-full sm:w-auto">
+                <Button className="w-full sm:w-auto bg-white text-black hover:bg-gray-200 border-2 border-white font-black uppercase tracking-wider">
                   Contact Support
                 </Button>
               </Link>
