@@ -15,12 +15,8 @@ export function useFeaturedCollections(params: FeaturedCollectionsParams = {}) {
         searchParams.append('theme', params.theme);
       }
 
-      console.log('Fetching featured collections with params:', params);
       const url = `/categories/featured?${searchParams.toString()}`;
-      console.log('Featured collections URL:', url);
-
       const response = await api.get(url);
-      console.log('Featured collections response:', response.data);
       return response.data;
     },
     staleTime: 0, // Always refetch from server

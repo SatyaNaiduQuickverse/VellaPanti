@@ -3,7 +3,7 @@
 import { X } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import type { Product } from '@ecommerce/types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 
 interface SizeSelectionModalProps {
   product: Product;
@@ -13,45 +13,58 @@ interface SizeSelectionModalProps {
   isLoading?: boolean;
 }
 
-export function SizeSelectionModal({
+const SizeSelectionModalComponent = ({
   product,
   isOpen,
   onClose,
   onAddToCart,
   isLoading = false,
-}: SizeSelectionModalProps) {
+}: SizeSelectionModalProps) => {
   const [selectedSize, setSelectedSize] = useState<string>('');
   const [selectedColor, setSelectedColor] = useState<string>('');
+
+  // Memoize available variants calculation - MUST be before early return
+  const availableVariants = useMemo(() => {
+    if (!product.variants) return [];
+    return product.variants.filter(v => v.stock > 0);
+  }, [product.variants]);
+
+  const hasColors = product.variantOptions?.colors && product.variantOptions.colors.length > 0;
+  const hasSizes = product.variantOptions?.sizes && product.variantOptions.sizes.length > 0;
 
   useEffect(() => {
     if (isOpen) {
       // Reset selections when modal opens
       setSelectedSize('');
       setSelectedColor('');
-      // Lock body scroll
+      // Lock body scroll and prevent layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = 'hidden';
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+      document.body.style.pointerEvents = 'none'; // Prevent interaction with background
+
+      // Find the modal element and restore pointer events
+      requestAnimationFrame(() => {
+        const modal = document.querySelector('[data-modal="size-selection"]');
+        if (modal instanceof HTMLElement) {
+          modal.style.pointerEvents = 'auto';
+        }
+      });
     } else {
-      // Unlock body scroll
-      document.body.style.overflow = 'unset';
+      // Unlock body scroll and restore interactions
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+      document.body.style.pointerEvents = '';
     }
 
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+      document.body.style.pointerEvents = '';
     };
   }, [isOpen]);
 
   if (!isOpen) return null;
-
-  const hasColors = product.variantOptions?.colors && product.variantOptions.colors.length > 0;
-  const hasSizes = product.variantOptions?.sizes && product.variantOptions.sizes.length > 0;
-
-  // Get available variants based on selections
-  const getAvailableVariants = () => {
-    if (!product.variants) return [];
-    return product.variants.filter(v => v.stock > 0);
-  };
-
-  const availableVariants = getAvailableVariants();
 
   // Check if a size is available based on selected color
   const isSizeAvailable = (size: string) => {
@@ -111,25 +124,34 @@ export function SizeSelectionModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4"
       onClick={handleBackdropClick}
+      data-modal="size-selection"
+      style={{
+        backdropFilter: 'blur(4px)',
+        WebkitBackdropFilter: 'blur(4px)',
+        pointerEvents: 'auto'
+      }}
     >
-      <div className="bg-white rounded-lg shadow-xl w-[90%] sm:w-[80%] md:w-[60%] max-h-[60vh] overflow-y-auto">
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-gray-900 uppercase tracking-wide">
+        <div className="flex-shrink-0 bg-white border-b border-gray-200 p-4 sm:p-5 flex items-center justify-between rounded-t-2xl">
+          <h2 className="text-base sm:text-lg font-bold text-gray-900 uppercase tracking-wide">
             Select Options
           </h2>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
           >
             <X className="h-5 w-5 text-gray-600" />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-4 space-y-6">
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
           {/* Product Info */}
           <div className="flex gap-4">
             <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -247,16 +269,16 @@ export function SizeSelectionModal({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
+        <div className="flex-shrink-0 bg-white border-t border-gray-200 p-4 sm:p-5 rounded-b-2xl">
           <Button
             onClick={handleAddToCart}
             disabled={!selectedVariantId || isLoading}
-            className="w-full bg-black text-white hover:bg-gray-800 font-semibold py-3 transition-all duration-300 uppercase tracking-wide text-sm hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-black text-white hover:bg-gray-800 font-semibold py-3 sm:py-4 transition-all duration-300 uppercase tracking-wide text-sm hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed rounded-xl"
           >
             {isLoading ? 'ADDING TO CART...' : 'ADD TO CART'}
           </Button>
           {(hasColors || hasSizes) && !selectedVariantId && (
-            <p className="text-xs text-red-600 text-center mt-2 font-medium">
+            <p className="text-xs sm:text-sm text-red-600 text-center mt-2 font-medium">
               Please select {hasColors && !selectedColor ? 'a color' : ''}{hasColors && hasSizes && (!selectedColor || !selectedSize) ? ' and ' : ''}{hasSizes && !selectedSize ? 'a size' : ''}
             </p>
           )}
@@ -264,4 +286,7 @@ export function SizeSelectionModal({
       </div>
     </div>
   );
-}
+};
+
+// Export memoized component to prevent unnecessary re-renders
+export const SizeSelectionModal = memo(SizeSelectionModalComponent);

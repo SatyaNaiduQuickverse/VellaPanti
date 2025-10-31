@@ -26,17 +26,6 @@ export default function ProductPage({ params }: ProductPageProps) {
   const [selectedSize, setSelectedSize] = useState<string>('');
 
   const { data: product, isLoading, error, isError } = useProduct(params.slug);
-
-  // Debug logging
-  if (typeof window !== 'undefined') {
-    console.log('Product page state:', {
-      slug: params.slug,
-      isLoading,
-      isError,
-      hasProduct: !!product,
-      error: error?.message
-    });
-  }
   const { data: recommendedData } = useProducts({ limit: 4, sort: 'createdAt', sortOrder: 'desc' });
   const { isAuthenticated } = useAuthStore();
   const addToCart = useAddToCart();

@@ -123,17 +123,12 @@ export const useCategories = (theme?: 'BLACK' | 'WHITE' | null) => {
         const params = theme ? { theme } : {};
         const response = await api.get('/categories', { params });
 
-        console.log(`[useCategories] Fetching categories for theme: ${theme || 'ALL'}`);
-        console.log('[useCategories] Response:', response.data);
-
         // If API returns data, use it
         if (response.data.success && response.data.data && response.data.data.length > 0) {
-          console.log(`[useCategories] Got ${response.data.data.length} categories from API`);
           return response.data;
         }
       } catch (error) {
-        console.error('[useCategories] API error:', error);
-        console.log('[useCategories] Falling back to mock categories');
+        // Silently fall back to mock categories on error
       }
 
       // Fall back to mock categories, filtered by theme
@@ -141,7 +136,6 @@ export const useCategories = (theme?: 'BLACK' | 'WHITE' | null) => {
       if (theme) {
         filteredCategories = mockCategories.filter(cat => cat.theme === theme);
       }
-      console.log(`[useCategories] Using ${filteredCategories.length} mock categories`);
       return { data: filteredCategories };
     },
     staleTime: 1 * 60 * 1000, // 1 minute (reduced for admin pages)

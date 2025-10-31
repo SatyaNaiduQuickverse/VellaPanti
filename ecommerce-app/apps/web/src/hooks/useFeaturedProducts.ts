@@ -20,12 +20,8 @@ export function useFeaturedProducts(params: FeaturedProductsParams = {}) {
         searchParams.append('theme', params.theme);
       }
 
-      console.log('Fetching featured products with params:', params);
       const url = `/products/featured?${searchParams.toString()}`;
-      console.log('Featured products URL:', url);
-
       const response = await api.get(url);
-      console.log('Featured products response:', response.data);
       return response.data;
     },
     staleTime: 0, // Always refetch from server

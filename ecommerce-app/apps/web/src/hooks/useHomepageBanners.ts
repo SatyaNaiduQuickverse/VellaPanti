@@ -10,9 +10,7 @@ export function useHomepageBanners() {
   return useQuery<ApiResponse<any>>({
     queryKey: ['homepageBanners'],
     queryFn: async () => {
-      console.log('Fetching homepage banners');
       const response = await api.get('/categories/homepage-banners');
-      console.log('Homepage banners response:', response.data);
       return response.data;
     },
     staleTime: 0,

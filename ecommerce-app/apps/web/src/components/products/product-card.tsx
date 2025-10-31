@@ -9,7 +9,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { useWishlist, useToggleWishlist } from '@/hooks/useWishlist';
 import type { Product } from '@ecommerce/types';
 import toast from 'react-hot-toast';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { SizeSelectionModal } from './size-selection-modal';
 
 interface ProductCardProps {
@@ -25,15 +25,78 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
   const [mounted, setMounted] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Check if product is in wishlist
-  const wishlistItems = wishlistData?.data || [];
-  const isInWishlist = wishlistItems.some((item: any) => item.product.id === product.id);
+  // Check if product is in wishlist - memoized to prevent recalculation
+  const isInWishlist = useMemo(() => {
+    const wishlistItems = wishlistData?.data || [];
+    return wishlistItems.some((item: any) => item.product.id === product.id);
+  }, [wishlistData?.data, product.id]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const handleAddToCart = () => {
+  // Memoize stock calculation - must be defined before handlers that use it
+  const currentStock = useMemo(() => {
+    if (product.totalStock !== undefined) {
+      return product.totalStock;
+    }
+    if (product.variants?.length) {
+      return product.variants.reduce((sum, v) => sum + v.stock, 0);
+    }
+    return 0;
+  }, [product.totalStock, product.variants]);
+
+  // Memoize price calculations to prevent unnecessary recalculations
+  const displayPrice = useMemo(() => {
+    if (product.priceRange) {
+      return product.priceRange.saleMin || product.priceRange.min || 0;
+    }
+    if (product.variants?.[0]) {
+      return product.variants[0].salePrice || product.variants[0].price || 0;
+    }
+    return product.baseSalePrice || product.basePrice || 0;
+  }, [product.priceRange, product.variants, product.baseSalePrice, product.basePrice]);
+
+  const originalPrice = useMemo(() => {
+    if (product.priceRange) {
+      return product.priceRange.max || 0;
+    }
+    if (product.variants?.[0]) {
+      return product.variants[0].price || 0;
+    }
+    return product.basePrice || 0;
+  }, [product.priceRange, product.variants, product.basePrice]);
+
+  // Memoize discount calculation
+  const hasDiscount = useMemo(() => {
+    if (product.variants?.[0]) {
+      return product.variants[0].salePrice && product.variants[0].salePrice < product.variants[0].price;
+    }
+    if (product.priceRange) {
+      return product.priceRange.saleMin && product.priceRange.saleMin < product.priceRange.min;
+    }
+    return product.baseSalePrice && product.baseSalePrice < (product.basePrice || 0);
+  }, [product.variants, product.priceRange, product.baseSalePrice, product.basePrice]);
+
+  const discountPercentage = useMemo(() => {
+    if (!hasDiscount) return 0;
+
+    if (product.variants?.[0] && product.variants[0].salePrice) {
+      return Math.round(((product.variants[0].price - product.variants[0].salePrice) / product.variants[0].price) * 100);
+    }
+    if (product.priceRange?.saleMin && product.priceRange.min) {
+      return Math.round(((product.priceRange.min - product.priceRange.saleMin) / product.priceRange.min) * 100);
+    }
+    if (product.baseSalePrice && product.basePrice) {
+      return Math.round(((product.basePrice - product.baseSalePrice) / product.basePrice) * 100);
+    }
+    return 0;
+  }, [hasDiscount, product.variants, product.priceRange, product.baseSalePrice, product.basePrice]);
+
+  const hasVariablePrice = product.priceRange?.hasVariablePrice;
+
+  // Handler functions - defined after all values they depend on
+  const handleAddToCart = useCallback(() => {
     if (!mounted) return;
 
     if (!isAuthenticated()) {
@@ -62,9 +125,9 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
         quantity: 1,
       });
     }
-  };
+  }, [mounted, isAuthenticated, currentStock, product, addToCart]);
 
-  const handleAddToCartFromModal = (variantId: string) => {
+  const handleAddToCartFromModal = useCallback((variantId: string) => {
     addToCart.mutate({
       productId: product.id,
       productVariantId: variantId,
@@ -74,9 +137,9 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
         setIsModalOpen(false);
       }
     });
-  };
+  }, [addToCart, product.id]);
 
-  const handleToggleWishlist = (e: React.MouseEvent) => {
+  const handleToggleWishlist = useCallback((e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation when clicking the heart
     if (!mounted) return;
 
@@ -86,104 +149,42 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
     }
 
     toggleWishlist.mutate(product.id);
-  };
+  }, [mounted, isAuthenticated, toggleWishlist, product.id]);
 
-  // Get price from variants or base price
-  const getDisplayPrice = () => {
-    if (product.priceRange) {
-      return product.priceRange.saleMin || product.priceRange.min || 0;
-    }
-    if (product.variants?.[0]) {
-      return product.variants[0].salePrice || product.variants[0].price || 0;
-    }
-    return product.baseSalePrice || product.basePrice || 0;
-  };
-
-  const getOriginalPrice = () => {
-    if (product.priceRange) {
-      return product.priceRange.max || 0;
-    }
-    if (product.variants?.[0]) {
-      return product.variants[0].price || 0;
-    }
-    return product.basePrice || 0;
-  };
-
-  const displayPrice = getDisplayPrice();
-  const originalPrice = getOriginalPrice();
-
-  // Calculate discount properly
-  const hasDiscount = (() => {
-    if (product.variants?.[0]) {
-      return product.variants[0].salePrice && product.variants[0].salePrice < product.variants[0].price;
-    }
-    if (product.priceRange) {
-      return product.priceRange.saleMin && product.priceRange.saleMin < product.priceRange.min;
-    }
-    return product.baseSalePrice && product.baseSalePrice < (product.basePrice || 0);
-  })();
-
-  const discountPercentage = hasDiscount ? (() => {
-    if (product.variants?.[0] && product.variants[0].salePrice) {
-      return Math.round(((product.variants[0].price - product.variants[0].salePrice) / product.variants[0].price) * 100);
-    }
-    if (product.priceRange?.saleMin && product.priceRange.min) {
-      return Math.round(((product.priceRange.min - product.priceRange.saleMin) / product.priceRange.min) * 100);
-    }
-    if (product.baseSalePrice && product.basePrice) {
-      return Math.round(((product.basePrice - product.baseSalePrice) / product.basePrice) * 100);
-    }
-    return 0;
-  })() : 0;
-
-  const hasVariablePrice = product.priceRange?.hasVariablePrice;
-
-  // Get stock from variants or total stock
-  const getStock = () => {
-    if (product.totalStock !== undefined) {
-      return product.totalStock;
-    }
-    if (product.variants?.length) {
-      return product.variants.reduce((sum, v) => sum + v.stock, 0);
-    }
-    return 0;
-  };
-
-  const currentStock = getStock();
-
-  // Theme configuration
-  const themeConfig = {
-    light: {
-      cardBg: 'bg-white',
-      textPrimary: 'text-black',
-      textSecondary: 'text-gray-600',
-      textTertiary: 'text-gray-500',
-      button: {
-        primary: 'bg-black text-white hover:bg-gray-800',
-        wishlist: {
-          default: 'bg-white text-black hover:bg-black hover:text-white',
-          active: 'bg-red-500 text-white hover:bg-red-600'
-        }
+  // Memoize theme configuration to prevent recreation on every render
+  const config = useMemo(() => {
+    const themeConfig = {
+      light: {
+        cardBg: 'bg-white',
+        textPrimary: 'text-black',
+        textSecondary: 'text-gray-600',
+        textTertiary: 'text-gray-500',
+        button: {
+          primary: 'bg-black text-white hover:bg-gray-800',
+          wishlist: {
+            default: 'bg-white text-black hover:bg-black hover:text-white',
+            active: 'bg-red-500 text-white hover:bg-red-600'
+          }
+        },
+        shadow: 'hover:shadow-2xl hover:shadow-black/20'
       },
-      shadow: 'hover:shadow-2xl hover:shadow-black/20'
-    },
-    dark: {
-      cardBg: 'bg-transparent',
-      textPrimary: 'text-white',
-      textSecondary: 'text-gray-300',
-      textTertiary: 'text-gray-400',
-      button: {
-        primary: 'bg-white text-black hover:bg-gray-200',
-        wishlist: {
-          default: 'bg-transparent text-white hover:bg-white hover:text-black border border-gray-600',
-          active: 'bg-red-500 text-white hover:bg-red-600'
-        }
-      },
-      shadow: 'hover:shadow-none'
-    }
-  };
-
-  const config = themeConfig[theme];
+      dark: {
+        cardBg: 'bg-transparent',
+        textPrimary: 'text-white',
+        textSecondary: 'text-gray-300',
+        textTertiary: 'text-gray-400',
+        button: {
+          primary: 'bg-white text-black hover:bg-gray-200',
+          wishlist: {
+            default: 'bg-transparent text-white hover:bg-white hover:text-black border border-gray-600',
+            active: 'bg-red-500 text-white hover:bg-red-600'
+          }
+        },
+        shadow: 'hover:shadow-none'
+      }
+    };
+    return themeConfig[theme];
+  }, [theme]);
 
   return (
     <div className={`group ${config.cardBg} overflow-hidden transition-all duration-500 ${config.shadow} hover:-translate-y-1 flex flex-col h-full`}>
