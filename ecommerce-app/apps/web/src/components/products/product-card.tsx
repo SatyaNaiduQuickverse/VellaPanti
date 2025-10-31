@@ -48,7 +48,7 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
 
     // Check if product has variants (sizes/colors)
     const hasVariants = product.variants && product.variants.length > 0 &&
-      (product.variantOptions?.sizes?.length > 0 || product.variantOptions?.colors?.length > 0);
+      ((product.variantOptions?.sizes?.length ?? 0) > 0 || (product.variantOptions?.colors?.length ?? 0) > 0);
 
     if (hasVariants) {
       // Show modal for size/color selection
@@ -187,7 +187,7 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
 
   return (
     <div className={`group ${config.cardBg} overflow-hidden transition-all duration-500 ${config.shadow} hover:-translate-y-1 flex flex-col h-full`}>
-      <Link href={`/products/${product.slug}`} className="block">
+      <Link href={`/products/${product.slug}`} className="block" prefetch={false}>
         <div className="aspect-square relative overflow-hidden bg-black">
           {(() => {
             const imageUrl = product.images?.[0];
@@ -257,7 +257,7 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
       </Link>
 
       <div className={`p-2 sm:p-3 lg:p-4 space-y-1 sm:space-y-2 lg:space-y-3 ${config.cardBg} flex flex-col flex-1`}>
-        <Link href={`/products/${product.slug}`}>
+        <Link href={`/products/${product.slug}`} prefetch={false}>
           <h3 className={`font-semibold ${config.textPrimary} line-clamp-1 group-hover:opacity-75 transition-colors uppercase tracking-wide text-xs sm:text-sm lg:text-sm leading-tight`}>
             {product.name}
           </h3>

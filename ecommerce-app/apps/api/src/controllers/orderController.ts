@@ -183,7 +183,7 @@ export const getOrderForSuccess = asyncHandler(async (req: AuthRequest, res: Res
 
 export const createOrder = asyncHandler(async (req: AuthRequest, res: Response) => {
   const userId = req.user!.id;
-  const { shippingAddress, items }: CreateOrderRequest = req.body;
+  const { shippingAddress, items, couponCode, discountAmount }: CreateOrderRequest = req.body;
 
   if (items.length === 0) {
     throw new AppError('Order must contain at least one item', 400);
@@ -261,6 +261,12 @@ export const createOrder = asyncHandler(async (req: AuthRequest, res: Response) 
       variantColor: variant?.color || null,
       variantMaterial: variant?.material || null,
     });
+  }
+
+  // Apply discount if provided
+  const subtotal = total;
+  if (discountAmount && discountAmount > 0) {
+    total = Math.max(0, total - discountAmount);
   }
 
   // Create order with transaction

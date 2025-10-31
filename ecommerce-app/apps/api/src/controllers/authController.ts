@@ -81,38 +81,51 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
   });
 
   if (existingUser) {
-    throw new AppError('User with this email already exists', 409);
+    if (existingUser.isEmailVerified) {
+      throw new AppError('User with this email already exists', 409);
+    }
+    // If user exists but not verified, allow resending OTP
+    // Delete the old unverified user and create new one with new OTP
+    await prisma.user.delete({
+      where: { id: existingUser.id },
+    });
   }
 
   const hashedPassword = await bcrypt.hash(password, config.security.bcryptRounds);
 
+  // Generate 6-digit OTP
+  const otp = crypto.randomInt(100000, 999999).toString();
+  const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+
+  // Create user with unverified email and OTP
   const user = await prisma.user.create({
     data: {
       email: email.toLowerCase(),
       password: hashedPassword,
       name,
       role: 'USER',
-      isEmailVerified: true, // Auto-verify for now
-    },
-    include: {
-      addresses: true,
+      isEmailVerified: false,
+      emailOtp: otp,
+      emailOtpExpiry: otpExpiry,
     },
   });
 
-  const { accessToken, refreshToken } = generateTokens(user.id, user.email, user.role);
-
-  const { password: _, ...userWithoutPassword } = user;
-
-  const response: AuthResponse = {
-    user: userWithoutPassword,
-    accessToken,
-    refreshToken,
-  };
+  // Send OTP email
+  try {
+    await emailService.sendOtpEmail(user.email, otp, user.name);
+  } catch (error) {
+    // If email fails, delete the user and throw error
+    await prisma.user.delete({ where: { id: user.id } });
+    throw new AppError('Failed to send verification email. Please try again.', 500);
+  }
 
   res.status(201).json({
     success: true,
-    data: response,
-    message: 'Registration successful',
+    message: 'Registration initiated. Please check your email for verification code.',
+    data: {
+      email: user.email,
+      requiresVerification: true,
+    },
   });
 });
 

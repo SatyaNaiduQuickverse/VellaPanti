@@ -212,6 +212,8 @@ export default function CheckoutPage() {
           productVariantId: item.productVariantId,
           quantity: item.quantity,
         })),
+        couponCode: appliedCoupon?.coupon.code,
+        discountAmount: discount,
       };
 
       // Step 2: Create order

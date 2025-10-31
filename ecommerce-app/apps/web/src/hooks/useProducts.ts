@@ -546,5 +546,14 @@ export const useProduct = (slug: string) => {
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
+    retry: (failureCount, error: any) => {
+      // Don't retry on 404 errors (product not found)
+      if (error?.response?.status === 404) {
+        return false;
+      }
+      // Retry up to 2 times for other errors (network issues, etc.)
+      return failureCount < 2;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
 };

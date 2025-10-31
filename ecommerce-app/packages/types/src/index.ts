@@ -289,6 +289,8 @@ export interface CreateOrderRequest {
     productVariantId?: string;
     quantity: number;
   }>;
+  couponCode?: string;
+  discountAmount?: number;
 }
 
 // Admin Types

@@ -82,13 +82,38 @@ export default function ProductPage({ params }: ProductPageProps) {
     );
   }
 
-  if (error) {
-    console.error('Product page error:', error);
+  // Only show 404 if we've finished loading and explicitly got a 404 error
+  // Don't call notFound() on temporary network errors or loading states
+  if (isError && !isLoading) {
+    const is404 = error?.message?.includes('404') || error?.message?.includes('not found');
+    if (is404) {
+      console.error('Product not found:', error);
+      notFound();
+    }
+    // For other errors (network issues, timeouts, etc.), show error message
+    // This prevents flickering to 404 page on temporary network issues
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center">
+        <div className="text-center px-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Unable to Load Product</h2>
+          <p className="text-gray-600 mb-6">
+            There was an error loading this product. Please try again.
+          </p>
+          <Button onClick={() => window.location.reload()} className="bg-black text-white hover:bg-gray-800">
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!product && !isLoading && !isError) {
     notFound();
   }
 
+  // TypeScript guard: At this point, product must exist or we would have returned/notFound
   if (!product) {
-    notFound();
+    return null;
   }
 
   // Find the current variant based on selected options
