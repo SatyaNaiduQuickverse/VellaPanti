@@ -395,14 +395,42 @@ enum TicketPriority {
 }
 
 model SiteSettings {
-  id              String   @id @default("default")
-  whatsappNumber  String?  @map("whatsapp_number")
-  whatsappEnabled Boolean  @default(false) @map("whatsapp_enabled")
-  supportEmail    String?  @map("support_email")
-  supportPhone    String?  @map("support_phone")
-  businessHours   String?  @map("business_hours")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                 String   @id @default("default")
+  whatsappNumber     String?  @map("whatsapp_number")
+  whatsappEnabled    Boolean  @default(false) @map("whatsapp_enabled")
+  supportEmail       String?  @map("support_email")
+  supportPhone       String?  @map("support_phone")
+  businessHours      String?  @map("business_hours")
+  footerDescription  String?  @map("footer_description")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   @@map("site_settings")
+}
+
+model StoryPage {
+  id                    String   @id @default("default")
+  heroTitle             String   @default("OUR STORY") @map("hero_title")
+  heroSubtitle          String   @default("WHERE IT ALL BEGAN • AUTHENTICITY • REAL VIBES") @map("hero_subtitle")
+
+  section1Title         String   @default("The Beginning") @map("section1_title")
+  section1Content       String   @default("The vision popped up with a conversation between a father and son...") @map("section1_content") @db.Text
+  section1Quote         String?  @map("section1_quote") @db.Text
+
+  section2Title         String   @default("The Revelation") @map("section2_title")
+  section2Content       String   @default("Here are 2 words that made sense...") @map("section2_content") @db.Text
+
+  section3Title         String   @default("What is Vellapanti?") @map("section3_title")
+  section3Content       String   @default("THE VIBE: Sitting with friends...") @map("section3_content") @db.Text
+
+  section4Title         String   @default("Our Mission") @map("section4_title")
+  section4Content       String   @default("So, this is what we are bringing to you!") @map("section4_content") @db.Text
+
+  manifestoTitle        String   @default("We Believe") @map("manifesto_title")
+  manifestoContent      String   @default("WORK HARD,\nHUSTLE HARDER\nBUT WITH A VIBE\nVELLAPANTI!") @map("manifesto_content") @db.Text
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@map("story_page")
 }

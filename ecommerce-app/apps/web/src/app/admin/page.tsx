@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { useQuery } from '@tanstack/react-query';
 import { api, handleApiResponse } from '@/lib/api';
-import { Package, Users, ShoppingCart, TrendingUp, AlertTriangle, Eye, Image, Star, Tag } from 'lucide-react';
+import { Package, Users, ShoppingCart, TrendingUp, AlertTriangle, Eye, Image, Star, Tag, BookOpen } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import Link from 'next/link';
 
@@ -255,6 +255,12 @@ function DashboardContent({ dashboardData, user, error }: {
               <Button variant="outline" className="w-full border-2 border-black text-black hover:bg-black hover:text-white font-black uppercase tracking-wider">
                 <Image className="h-4 w-4 mr-2" />
                 Homepage Setup
+              </Button>
+            </Link>
+            <Link href="/admin/story">
+              <Button variant="outline" className="w-full border-2 border-black text-black hover:bg-black hover:text-white font-black uppercase tracking-wider">
+                <BookOpen className="h-4 w-4 mr-2" />
+                Edit Story Page
               </Button>
             </Link>
             <Link href="/admin/featured">

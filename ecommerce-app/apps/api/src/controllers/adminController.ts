@@ -648,16 +648,10 @@ export const getCarouselImages = asyncHandler(async (req: AuthRequest, res: Resp
     orderBy: { position: 'asc' },
   });
 
-  // Map database fields to frontend expected format for backward compatibility
-  const mappedImages = carouselImages.map(img => ({
-    ...img,
-    title: img.centerTitle || img.bottomLeftTitle || '',
-    description: img.centerDescription || img.bottomLeftDescription || '',
-  }));
-
+  // Return all fields separately
   res.json({
     success: true,
-    data: mappedImages,
+    data: carouselImages,
   });
 });
 
@@ -678,14 +672,14 @@ export const updateCarouselImages = asyncHandler(async (req: AuthRequest, res: R
   // Remove existing carousel images
   await prisma.carouselImage.deleteMany({});
 
-  // Add new carousel images - map old title/description to new schema fields
+  // Add new carousel images with separate center and bottom left fields
   const carouselImagesData = images.map((image: any, index: number) => ({
     src: image.src,
     alt: image.alt,
-    bottomLeftTitle: image.title || null,
-    bottomLeftDescription: image.description || null,
-    centerTitle: image.title || null,
-    centerDescription: image.description || null,
+    bottomLeftTitle: image.bottomLeftTitle || null,
+    bottomLeftDescription: image.bottomLeftDescription || null,
+    centerTitle: image.centerTitle || null,
+    centerDescription: image.centerDescription || null,
     position: index,
     isActive: true,
   }));
@@ -1012,6 +1006,7 @@ export const getSiteSettings = asyncHandler(async (_req: Request, res: Response)
         supportEmail: 'support@vellapanti.com',
         supportPhone: '+1 (555) 123-4567',
         businessHours: 'Monday - Friday: 9AM - 6PM EST',
+        footerDescription: 'STREET CULTURE • RAP AESTHETICS • GEN Z VIBES\nAUTHENTIC • BOLD • UNAPOLOGETIC',
       },
     });
   }
@@ -1030,6 +1025,7 @@ export const updateSiteSettings = asyncHandler(async (req: AuthRequest, res: Res
     support_email,
     support_phone,
     business_hours,
+    footer_description,
   } = req.body;
 
   // Use upsert to handle both create and update cases
@@ -1042,6 +1038,7 @@ export const updateSiteSettings = asyncHandler(async (req: AuthRequest, res: Res
       supportEmail: support_email || 'support@vellapanti.com',
       supportPhone: support_phone || '+1 (555) 123-4567',
       businessHours: business_hours || 'Monday - Friday: 9AM - 6PM EST',
+      footerDescription: footer_description || 'STREET CULTURE • RAP AESTHETICS • GEN Z VIBES\nAUTHENTIC • BOLD • UNAPOLOGETIC',
     },
     update: {
       whatsappNumber: whatsapp_number,
@@ -1049,6 +1046,7 @@ export const updateSiteSettings = asyncHandler(async (req: AuthRequest, res: Res
       supportEmail: support_email,
       supportPhone: support_phone,
       businessHours: business_hours,
+      footerDescription: footer_description,
     },
   });
 
@@ -1097,5 +1095,113 @@ export const getPublicSiteSettings = asyncHandler(async (_req: Request, res: Res
   res.json({
     success: true,
     data: settings,
+  });
+});
+
+// Story Page Management
+
+// Get story page content (Public)
+export const getStoryPage = asyncHandler(async (_req: Request, res: Response) => {
+  let storyPage = await prisma.storyPage.findUnique({
+    where: { id: 'default' },
+  });
+
+  // If no story page exists, create default
+  if (!storyPage) {
+    storyPage = await prisma.storyPage.create({
+      data: {
+        id: 'default',
+        heroTitle: 'OUR STORY',
+        heroSubtitle: 'WHERE IT ALL BEGAN • AUTHENTICITY • REAL VIBES',
+        section1Title: 'The Beginning',
+        section1Content: `The vision popped up with a conversation between a father and son, where the father could see his son working day in and day out in the field of marketing and education, with no assurance of growth or any future prospects.
+
+Father simply quoted,`,
+        section1Quote: `"Kab tak aise velle insaan ki tarah jagah jagah jaa kar dusron ki marketing karta rahega, ya ek ek bache ko padhaane ke liye bhatakta rahega & that too for 20-25K a month. Kal se shop pe aa jaa, mai 50K dunga."`,
+        section2Title: 'The Revelation',
+        section2Content: `Here are 2 words that made sense to the son, i.e., VELLA & DUNIYA.
+
+So, VELLAPANTI is not just a word; rather, it is a part of our daily lifestyle, which many of us in the modern world are not able to experience.`,
+        section3Title: 'What is Vellapanti?',
+        section3Content: `THE VIBE: Sitting with friends on a rooftop in the rainy weather, enjoying fritters with a cup of tea, those late-night talks, spontaneous trips, late-night drives, sharing all the frustrations of daily life.`,
+        section4Title: 'Our Mission',
+        section4Content: `So, this is what we are bringing to you!
+
+VELLAPANTI—converting its initial interpretation of being lazy or unproductive to something that is COOL & POSITIVE, getting you close to the VIBE & the LIFE that has been a dream to many.
+
+Clothes should reflect the kind of life and the actual thoughts that are felt and wished to be lived! It should be communicated to everyone.`,
+        manifestoTitle: 'We Believe',
+        manifestoContent: `WORK HARD,
+HUSTLE HARDER
+BUT WITH A VIBE
+VELLAPANTI!`,
+      },
+    });
+  }
+
+  res.json({
+    success: true,
+    data: storyPage,
+  });
+});
+
+// Update story page content (Admin)
+export const updateStoryPage = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const {
+    hero_title,
+    hero_subtitle,
+    section1_title,
+    section1_content,
+    section1_quote,
+    section2_title,
+    section2_content,
+    section3_title,
+    section3_content,
+    section4_title,
+    section4_content,
+    manifesto_title,
+    manifesto_content,
+  } = req.body;
+
+  // Use upsert to handle both create and update cases
+  const storyPage = await prisma.storyPage.upsert({
+    where: { id: 'default' },
+    create: {
+      id: 'default',
+      heroTitle: hero_title || 'OUR STORY',
+      heroSubtitle: hero_subtitle || 'WHERE IT ALL BEGAN • AUTHENTICITY • REAL VIBES',
+      section1Title: section1_title || 'The Beginning',
+      section1Content: section1_content || '',
+      section1Quote: section1_quote || null,
+      section2Title: section2_title || 'The Revelation',
+      section2Content: section2_content || '',
+      section3Title: section3_title || 'What is Vellapanti?',
+      section3Content: section3_content || '',
+      section4Title: section4_title || 'Our Mission',
+      section4Content: section4_content || '',
+      manifestoTitle: manifesto_title || 'We Believe',
+      manifestoContent: manifesto_content || '',
+    },
+    update: {
+      heroTitle: hero_title,
+      heroSubtitle: hero_subtitle,
+      section1Title: section1_title,
+      section1Content: section1_content,
+      section1Quote: section1_quote,
+      section2Title: section2_title,
+      section2Content: section2_content,
+      section3Title: section3_title,
+      section3Content: section3_content,
+      section4Title: section4_title,
+      section4Content: section4_content,
+      manifestoTitle: manifesto_title,
+      manifestoContent: manifesto_content,
+    },
+  });
+
+  res.json({
+    success: true,
+    message: 'Story page updated successfully',
+    data: storyPage,
   });
 });

@@ -23,6 +23,8 @@ import {
   updateOfferPopup,
   getSiteSettings,
   updateSiteSettings,
+  getStoryPage,
+  updateStoryPage,
 } from '../controllers/adminController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { validate } from '../middleware/validation';
@@ -76,5 +78,9 @@ router.put('/offer-popup', updateOfferPopup);
 // Site Settings Management
 router.get('/settings', getSiteSettings);
 router.put('/settings', updateSiteSettings);
+
+// Story Page Management
+router.get('/story-page', getStoryPage);
+router.put('/story-page', updateStoryPage);
 
 export default router;

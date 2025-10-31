@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@ecommerce/ui';
-import { User, Mail, Calendar, ShoppingBag, Package, ArrowLeft, Settings } from 'lucide-react';
+import { User, Mail, Calendar, ShoppingBag, Package, ArrowLeft, Settings, Info } from 'lucide-react';
 import Link from 'next/link';
 import ContactSupportForm from '@/components/ContactSupportForm';
 
@@ -203,24 +203,34 @@ export default function ProfilePage() {
             {/* Profile Stats */}
             <div className="bg-black text-white p-6">
               <h3 className="text-xl font-black mb-4 uppercase tracking-tight">Account Stats</h3>
+              <p className="text-xs text-gray-400 mb-4">Track your shopping activity and rewards</p>
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="font-bold">Total Orders:</span>
-                  <span className="text-2xl font-black">
-                    {loading ? '...' : accountStats.totalOrders}
-                  </span>
+                <div className="border-b border-gray-700 pb-4">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold">Total Orders:</span>
+                    <span className="text-2xl font-black">
+                      {loading ? '...' : accountStats.totalOrders}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400">Number of orders you've placed with us</p>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-bold">Total Spent:</span>
-                  <span className="text-2xl font-black">
-                    {loading ? '...' : `$₹{accountStats.totalSpent.toFixed(2)}`}
-                  </span>
+                <div className="border-b border-gray-700 pb-4">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold">Total Spent:</span>
+                    <span className="text-2xl font-black">
+                      {loading ? '...' : `₹${accountStats.totalSpent.toFixed(2)}`}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400">Your lifetime spending with VellaPanti</p>
                 </div>
-                <div className="flex justify-between items-center">
-                  <span className="font-bold">Loyalty Points:</span>
-                  <span className="text-2xl font-black">
-                    {loading ? '...' : accountStats.loyaltyPoints}
-                  </span>
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold">Loyalty Points:</span>
+                    <span className="text-2xl font-black">
+                      {loading ? '...' : accountStats.loyaltyPoints}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-400">Earn 1 point per ₹100 spent • Redeem for discounts</p>
                 </div>
               </div>
             </div>

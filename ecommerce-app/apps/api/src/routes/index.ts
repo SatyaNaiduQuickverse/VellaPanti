@@ -13,11 +13,12 @@ import wishlistRoutes from './wishlistRoutes';
 import bulkUploadRoutes from './bulkUploadRoutes';
 import paymentRoutes from './paymentRoutes';
 import webhookRoutes from './webhookRoutes';
-import { getPublicSiteSettings } from '../controllers/adminController';
+import { getPublicSiteSettings, getStoryPage } from '../controllers/adminController';
 
 export function setupRoutes(app: Express) {
   // Public settings endpoint (no auth required)
   app.get('/api/settings', getPublicSiteSettings);
+  app.get('/api/story-page', getStoryPage);
 
   // API routes
   app.use('/api/auth', authRoutes);

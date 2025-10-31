@@ -1,68 +1,154 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+
+interface StoryPageData {
+  heroTitle: string;
+  heroSubtitle: string;
+  section1Title: string;
+  section1Content: string;
+  section1Quote: string | null;
+  section2Title: string;
+  section2Content: string;
+  section3Title: string;
+  section3Content: string;
+  section4Title: string;
+  section4Content: string;
+  manifestoTitle: string;
+  manifestoContent: string;
+}
+
 export default function StoryPage() {
+  const [loading, setLoading] = useState(true);
+  const [content, setContent] = useState<StoryPageData | null>(null);
+
+  useEffect(() => {
+    fetchStoryPage();
+  }, []);
+
+  const fetchStoryPage = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/story-page`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setContent(data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch story page:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-black"></div>
+      </div>
+    );
+  }
+
+  if (!content) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-xl font-bold">Failed to load content</p>
+      </div>
+    );
+  }
+
+  // Split content into paragraphs for proper rendering
+  const renderParagraphs = (text: string) => {
+    return text.split('\n\n').map((paragraph, index) => (
+      <p key={index} className="text-base md:text-lg leading-relaxed text-gray-700 mb-6" style={{ lineHeight: '1.9' }}>
+        {paragraph}
+      </p>
+    ));
+  };
+
+  // Split manifesto content into lines
+  const manifestoLines = content.manifestoContent.split('\n').filter(line => line.trim());
+
   return (
     <div className="min-h-screen bg-white">
-      <div className="pt-20 pb-16">
-        <div className="max-w-4xl mx-auto px-12 md:px-16">
-          <h1 className="text-5xl md:text-6xl font-thin text-center mb-20 text-gray-900" style={{
-            letterSpacing: '8px'
-          }}>
-            STORY
+      {/* Hero Section */}
+      <section className="pt-24 pb-12 bg-black text-white">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-12">
+          <h1 className="text-5xl md:text-7xl font-black text-center mb-6 tracking-wider">
+            {content.heroTitle}
           </h1>
+          <div className="w-32 h-1 bg-white mx-auto"></div>
+          <p className="text-lg md:text-xl text-center mt-8 tracking-wide font-bold text-gray-300">
+            {content.heroSubtitle}
+          </p>
+        </div>
+      </section>
 
-          <div className="space-y-15">
-            <div className="mb-15">
-              <p className="text-lg leading-relaxed text-gray-900 mb-8" style={{ lineHeight: '1.8' }}>
-                The vision popped up with a conversation between a father and son, where the father could see his son working day in and day out in the field of marketing and education, with no assurance of growth or any future prospects.
-              </p>
+      {/* Main Content */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-12">
 
-              <p className="text-lg leading-relaxed text-gray-900 mb-8" style={{ lineHeight: '1.8' }}>
-                Father simply quoted,
-              </p>
+          {/* Section 1 - The Beginning */}
+          <div className="mb-16">
+            <h2 className="text-2xl md:text-3xl font-black mb-8 tracking-wider uppercase text-black">
+              {content.section1Title}
+            </h2>
+            {renderParagraphs(content.section1Content)}
 
-              <div className="my-8 pl-5 border-l-3 border-blue-500 text-gray-600 italic" style={{ lineHeight: '1.8' }}>
-                <p className="text-lg">
-                  "Kab tak aise velle insaan ki tarah jagah jagah jaa kar dusron ki marketing karta rahega, ya ek ek bache ko padhaane ke liye bhatakta rahega & that too for 20-25K a month. Kal se shop pe aa jaa, mai 50K dunga."
+            {content.section1Quote && (
+              <div className="my-10 p-6 md:p-8 border-l-4 border-black bg-gray-50 text-gray-800 italic">
+                <p className="text-base md:text-lg leading-relaxed" style={{ lineHeight: '1.8' }}>
+                  {content.section1Quote}
                 </p>
               </div>
+            )}
+          </div>
 
-              <p className="text-lg leading-relaxed text-gray-900 mb-8" style={{ lineHeight: '1.8' }}>
-                Here are 2 words that made sense to the son, i.e., <span className="font-semibold text-black">VELLA</span> & <span className="font-semibold text-black">DUNIYA</span>.
-              </p>
+          {/* Section 2 - The Revelation */}
+          <div className="mb-16">
+            <h2 className="text-2xl md:text-3xl font-black mb-8 tracking-wider uppercase text-black">
+              {content.section2Title}
+            </h2>
+            {renderParagraphs(content.section2Content)}
+          </div>
 
-              <p className="text-lg leading-relaxed text-gray-900 mb-8" style={{ lineHeight: '1.8' }}>
-                So, <span className="font-semibold text-black">VELLAPANTI</span> is not just a word; rather, it is a part of our daily lifestyle, which many of us in the modern world are not able to experience.
-              </p>
+          {/* Section 3 - What is Vellapanti */}
+          <div className="mb-16 p-8 md:p-10 bg-black text-white rounded-lg">
+            <h2 className="text-2xl md:text-3xl font-black mb-6 tracking-wider uppercase text-center">
+              {content.section3Title}
+            </h2>
+            <p className="text-base md:text-lg leading-relaxed text-gray-300" style={{ lineHeight: '1.9' }}>
+              {content.section3Content}
+            </p>
+          </div>
 
-              <p className="text-lg leading-relaxed text-gray-900 mb-8" style={{ lineHeight: '1.8' }}>
-                <span className="font-semibold text-black">Example:</span> Sitting with friends on a rooftop in the rainy weather, enjoying fritters with a cup of tea, those late-night talks, spontaneous trips, late-night drives, sharing all the frustrations of daily life, etc.
-              </p>
+          {/* Section 4 - Our Mission */}
+          <div className="mb-16">
+            <h2 className="text-2xl md:text-3xl font-black mb-8 tracking-wider uppercase text-black">
+              {content.section4Title}
+            </h2>
+            {renderParagraphs(content.section4Content)}
+          </div>
 
-              <p className="text-lg leading-relaxed text-gray-900 mb-8" style={{ lineHeight: '1.8' }}>
-                So, this is what we are bringing to you!
-              </p>
-
-              <p className="text-lg leading-relaxed text-gray-900 mb-8" style={{ lineHeight: '1.8' }}>
-                <span className="font-semibold text-black">VELLAPANTI</span>—converting its initial interpretation of being lazy or unproductive to something that is <span className="font-semibold text-black">COOL & POSITIVE</span>, getting you close to the <span className="font-semibold text-black">VIBE</span> & the <span className="font-semibold text-black">LIFE</span> that has been a dream to many.
-              </p>
-
-              <p className="text-lg leading-relaxed text-gray-900 mb-8" style={{ lineHeight: '1.8' }}>
-                Clothes should reflect the kind of life and the actual thoughts that are felt and wished to be lived! It should be communicated to everyone.
-              </p>
-
-              <p className="text-lg leading-relaxed text-gray-900 mb-8" style={{ lineHeight: '1.8' }}>
-                <span className="font-semibold text-black">We believe:</span>
-              </p>
-
-              <div className="my-16 p-10 text-center rounded-3xl bg-gradient-to-br from-gray-100 to-gray-200">
-                <p className="text-2xl font-bold text-black" style={{ letterSpacing: '2px' }}>
-                  WORK HARD, HUSTLE HARDER<br />
-                  BUT WITH A VIBE - VELLAPANTI!
-                </p>
-              </div>
+          {/* Manifesto */}
+          <div className="my-16 p-10 md:p-16 text-center bg-black text-white shadow-2xl">
+            <h2 className="text-3xl md:text-4xl font-black mb-6 tracking-wider uppercase">
+              {content.manifestoTitle}
+            </h2>
+            <div className="w-24 h-1 bg-white mx-auto mb-8"></div>
+            <div className="text-2xl md:text-4xl font-black tracking-wider leading-tight">
+              {manifestoLines.map((line, index) => (
+                <span key={index}>
+                  {line}
+                  {index < manifestoLines.length - 1 && <br />}
+                </span>
+              ))}
             </div>
           </div>
+
         </div>
-      </div>
+      </section>
     </div>
   );
 }
