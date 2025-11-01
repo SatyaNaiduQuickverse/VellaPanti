@@ -61,7 +61,7 @@ export default function StoryPage() {
   // Split content into paragraphs for proper rendering
   const renderParagraphs = (text: string) => {
     return text.split('\n\n').map((paragraph, index) => (
-      <p key={index} className="text-base md:text-lg leading-relaxed text-gray-700 mb-6" style={{ lineHeight: '1.9' }}>
+      <p key={index} className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-700 mb-6" style={{ lineHeight: '1.9' }}>
         {paragraph}
       </p>
     ));
@@ -75,11 +75,11 @@ export default function StoryPage() {
       {/* Hero Section */}
       <section className="pt-24 pb-12 bg-black text-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-12">
-          <h1 className="text-5xl md:text-7xl font-black text-center mb-6 tracking-wider">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-center mb-6 tracking-wider">
             {content.heroTitle}
           </h1>
           <div className="w-32 h-1 bg-white mx-auto"></div>
-          <p className="text-lg md:text-xl text-center mt-8 tracking-wide font-bold text-gray-300">
+          <p className="text-base sm:text-lg md:text-xl text-center mt-8 tracking-wide font-bold text-gray-300">
             {content.heroSubtitle}
           </p>
         </div>
@@ -91,14 +91,14 @@ export default function StoryPage() {
 
           {/* Section 1 - The Beginning */}
           <div className="mb-16">
-            <h2 className="text-2xl md:text-3xl font-black mb-8 tracking-wider uppercase text-black">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-8 tracking-wider uppercase text-black">
               {content.section1Title}
             </h2>
             {renderParagraphs(content.section1Content)}
 
             {content.section1Quote && (
-              <div className="my-10 p-6 md:p-8 border-l-4 border-black bg-gray-50 text-gray-800 italic">
-                <p className="text-base md:text-lg leading-relaxed" style={{ lineHeight: '1.8' }}>
+              <div className="my-10 p-4 sm:p-6 md:p-8 border-l-4 border-black bg-gray-50 text-gray-800 italic">
+                <p className="text-sm sm:text-base md:text-lg leading-relaxed" style={{ lineHeight: '1.8' }}>
                   {content.section1Quote}
                 </p>
               </div>
@@ -107,37 +107,37 @@ export default function StoryPage() {
 
           {/* Section 2 - The Revelation */}
           <div className="mb-16">
-            <h2 className="text-2xl md:text-3xl font-black mb-8 tracking-wider uppercase text-black">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-8 tracking-wider uppercase text-black">
               {content.section2Title}
             </h2>
             {renderParagraphs(content.section2Content)}
           </div>
 
           {/* Section 3 - What is Vellapanti */}
-          <div className="mb-16 p-8 md:p-10 bg-black text-white rounded-lg">
-            <h2 className="text-2xl md:text-3xl font-black mb-6 tracking-wider uppercase text-center">
+          <div className="mb-16 p-6 sm:p-8 md:p-10 bg-black text-white rounded-lg">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 tracking-wider uppercase text-center">
               {content.section3Title}
             </h2>
-            <p className="text-base md:text-lg leading-relaxed text-gray-300" style={{ lineHeight: '1.9' }}>
+            <p className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-300" style={{ lineHeight: '1.9' }}>
               {content.section3Content}
             </p>
           </div>
 
           {/* Section 4 - Our Mission */}
           <div className="mb-16">
-            <h2 className="text-2xl md:text-3xl font-black mb-8 tracking-wider uppercase text-black">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-8 tracking-wider uppercase text-black">
               {content.section4Title}
             </h2>
             {renderParagraphs(content.section4Content)}
           </div>
 
           {/* Manifesto */}
-          <div className="my-16 p-10 md:p-16 text-center bg-black text-white shadow-2xl">
-            <h2 className="text-3xl md:text-4xl font-black mb-6 tracking-wider uppercase">
+          <div className="my-16 p-6 sm:p-8 md:p-12 lg:p-16 text-center bg-black text-white shadow-2xl">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-6 tracking-wider uppercase">
               {content.manifestoTitle}
             </h2>
             <div className="w-24 h-1 bg-white mx-auto mb-8"></div>
-            <div className="text-2xl md:text-4xl font-black tracking-wider leading-tight">
+            <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black tracking-wider leading-tight">
               {manifestoLines.map((line, index) => (
                 <span key={index}>
                   {line}

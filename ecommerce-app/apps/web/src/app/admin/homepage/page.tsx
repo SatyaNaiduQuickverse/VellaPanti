@@ -13,8 +13,10 @@ interface CarouselImage {
   id: string;
   src: string;
   alt: string;
-  title?: string;
-  description?: string;
+  centerTitle?: string;
+  centerDescription?: string;
+  bottomLeftTitle?: string;
+  bottomLeftDescription?: string;
 }
 
 interface HomepageBanner {
@@ -72,8 +74,10 @@ export default function HomepageManagement() {
       id: Date.now().toString(),
       src: '',
       alt: '',
-      title: '',
-      description: ''
+      centerTitle: '',
+      centerDescription: '',
+      bottomLeftTitle: '',
+      bottomLeftDescription: ''
     };
     setCarouselImages([...carouselImages, newImage]);
   };
@@ -301,26 +305,52 @@ export default function HomepageManagement() {
 
                     <div>
                       <label className="block text-sm font-black uppercase tracking-wider text-gray-700 mb-2">
-                        TITLE (OPTIONAL)
+                        CENTER TITLE (OPTIONAL)
                       </label>
                       <input
                         type="text"
-                        value={image.title || ''}
-                        onChange={(e) => updateImage(image.id, 'title', e.target.value)}
-                        placeholder="MAIN HEADLINE"
+                        value={image.centerTitle || ''}
+                        onChange={(e) => updateImage(image.id, 'centerTitle', e.target.value)}
+                        placeholder="TEXT AT CENTER OF IMAGE"
                         className="w-full px-3 py-2 border-2 border-black focus:outline-none font-medium"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-black uppercase tracking-wider text-gray-700 mb-2">
-                        DESCRIPTION (OPTIONAL)
+                        CENTER DESCRIPTION (OPTIONAL)
                       </label>
                       <input
                         type="text"
-                        value={image.description || ''}
-                        onChange={(e) => updateImage(image.id, 'description', e.target.value)}
-                        placeholder="SUBTITLE OR DESCRIPTION"
+                        value={image.centerDescription || ''}
+                        onChange={(e) => updateImage(image.id, 'centerDescription', e.target.value)}
+                        placeholder="SUBTITLE AT CENTER"
+                        className="w-full px-3 py-2 border-2 border-black focus:outline-none font-medium"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-black uppercase tracking-wider text-gray-700 mb-2">
+                        BOTTOM LEFT TITLE (OPTIONAL)
+                      </label>
+                      <input
+                        type="text"
+                        value={image.bottomLeftTitle || ''}
+                        onChange={(e) => updateImage(image.id, 'bottomLeftTitle', e.target.value)}
+                        placeholder="TEXT AT BOTTOM LEFT"
+                        className="w-full px-3 py-2 border-2 border-black focus:outline-none font-medium"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-black uppercase tracking-wider text-gray-700 mb-2">
+                        BOTTOM LEFT DESCRIPTION (OPTIONAL)
+                      </label>
+                      <input
+                        type="text"
+                        value={image.bottomLeftDescription || ''}
+                        onChange={(e) => updateImage(image.id, 'bottomLeftDescription', e.target.value)}
+                        placeholder="SUBTITLE AT BOTTOM LEFT"
                         className="w-full px-3 py-2 border-2 border-black focus:outline-none font-medium"
                       />
                     </div>
@@ -593,16 +623,32 @@ export default function HomepageManagement() {
                   alt={carouselImages[0].alt}
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <div className="text-center text-white px-4">
-                    {carouselImages[0].title && (
-                      <h1 className="text-3xl md:text-5xl font-black mb-4 tracking-wider">
-                        {carouselImages[0].title}
-                      </h1>
+                <div className="absolute inset-0 bg-black/40">
+                  {/* Center Text */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center text-white px-4 sm:px-6">
+                      {carouselImages[0].centerTitle && (
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-2 sm:mb-3 md:mb-4 tracking-wider">
+                          {carouselImages[0].centerTitle}
+                        </h1>
+                      )}
+                      {carouselImages[0].centerDescription && (
+                        <p className="text-xs sm:text-sm md:text-base lg:text-lg font-bold tracking-wider">
+                          {carouselImages[0].centerDescription}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {/* Bottom Left Text */}
+                  <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6">
+                    {carouselImages[0].bottomLeftTitle && (
+                      <h3 className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-black mb-1 sm:mb-2 uppercase tracking-wide">
+                        {carouselImages[0].bottomLeftTitle}
+                      </h3>
                     )}
-                    {carouselImages[0].description && (
-                      <p className="text-sm md:text-lg font-bold tracking-wider">
-                        {carouselImages[0].description}
+                    {carouselImages[0].bottomLeftDescription && (
+                      <p className="text-white/90 text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide">
+                        {carouselImages[0].bottomLeftDescription}
                       </p>
                     )}
                   </div>

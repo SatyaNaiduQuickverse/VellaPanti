@@ -8,8 +8,10 @@ interface CarouselImage {
   id: string;
   src: string;
   alt: string;
-  title?: string;
-  description?: string;
+  centerTitle?: string;
+  centerDescription?: string;
+  bottomLeftTitle?: string;
+  bottomLeftDescription?: string;
 }
 
 interface ImageCarouselProps {
@@ -91,17 +93,35 @@ export function ImageCarousel({
         {/* Overlay for text readability */}
         {showOverlay && <div className="absolute inset-0 bg-black/30" />}
 
-        {/* Text Overlay */}
-        {(images[currentIndex].title || images[currentIndex].description) && (
-          <div className="absolute bottom-6 left-6 right-6">
-            {images[currentIndex].title && (
-              <h3 className="text-white text-2xl md:text-3xl font-black mb-2 uppercase tracking-wide">
-                {images[currentIndex].title}
+        {/* Center Text Overlay */}
+        {(images[currentIndex].centerTitle || images[currentIndex].centerDescription) && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center text-white px-4 sm:px-6 md:px-8">
+              {images[currentIndex].centerTitle && (
+                <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl font-black mb-2 sm:mb-3 md:mb-4 uppercase tracking-wider">
+                  {images[currentIndex].centerTitle}
+                </h2>
+              )}
+              {images[currentIndex].centerDescription && (
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl font-bold uppercase tracking-wider">
+                  {images[currentIndex].centerDescription}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Bottom Left Text Overlay */}
+        {(images[currentIndex].bottomLeftTitle || images[currentIndex].bottomLeftDescription) && (
+          <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6">
+            {images[currentIndex].bottomLeftTitle && (
+              <h3 className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-black mb-1 sm:mb-2 uppercase tracking-wide">
+                {images[currentIndex].bottomLeftTitle}
               </h3>
             )}
-            {images[currentIndex].description && (
-              <p className="text-white/90 text-sm md:text-base font-bold uppercase tracking-wide">
-                {images[currentIndex].description}
+            {images[currentIndex].bottomLeftDescription && (
+              <p className="text-white/90 text-xs sm:text-sm md:text-base font-bold uppercase tracking-wide">
+                {images[currentIndex].bottomLeftDescription}
               </p>
             )}
           </div>
