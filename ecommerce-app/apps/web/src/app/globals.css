@@ -53,6 +53,11 @@
   * {
     @apply border-border;
   }
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+    position: relative;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;

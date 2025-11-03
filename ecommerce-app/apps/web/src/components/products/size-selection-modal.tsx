@@ -41,26 +41,15 @@ const SizeSelectionModalComponent = ({
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
       document.body.style.overflow = 'hidden';
       document.body.style.paddingRight = `${scrollbarWidth}px`;
-      document.body.style.pointerEvents = 'none'; // Prevent interaction with background
-
-      // Find the modal element and restore pointer events
-      requestAnimationFrame(() => {
-        const modal = document.querySelector('[data-modal="size-selection"]');
-        if (modal instanceof HTMLElement) {
-          modal.style.pointerEvents = 'auto';
-        }
-      });
     } else {
-      // Unlock body scroll and restore interactions
+      // Unlock body scroll
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
-      document.body.style.pointerEvents = '';
     }
 
     return () => {
       document.body.style.overflow = '';
       document.body.style.paddingRight = '';
-      document.body.style.pointerEvents = '';
     };
   }, [isOpen]);
 
@@ -126,11 +115,9 @@ const SizeSelectionModalComponent = ({
     <div
       className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4"
       onClick={handleBackdropClick}
-      data-modal="size-selection"
       style={{
         backdropFilter: 'blur(4px)',
-        WebkitBackdropFilter: 'blur(4px)',
-        pointerEvents: 'auto'
+        WebkitBackdropFilter: 'blur(4px)'
       }}
     >
       <div

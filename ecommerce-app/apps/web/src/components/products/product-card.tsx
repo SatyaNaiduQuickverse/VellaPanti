@@ -189,7 +189,7 @@ export function ProductCard({ product, theme = 'light' }: ProductCardProps) {
   return (
     <div className={`group ${config.cardBg} overflow-hidden transition-all duration-500 ${config.shadow} hover:-translate-y-1 flex flex-col h-full`}>
       <Link href={`/products/${product.slug}`} className="block" prefetch={false}>
-        <div className="aspect-square relative overflow-hidden bg-black">
+        <div className={`aspect-square relative overflow-hidden bg-black ${theme === 'dark' ? 'border border-white/30' : ''}`}>
           {(() => {
             const imageUrl = product.images?.[0];
 
