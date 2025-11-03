@@ -104,7 +104,7 @@ export default function RegisterPage() {
         {/* Header */}
         <div className="text-center">
           <h2 className="text-5xl font-bold text-white tracking-tighter mb-3 drop-shadow-lg">
-            Join VellaPanti
+            JOIN VELLAPANTI
           </h2>
           <p className="text-base text-gray-300 font-light tracking-wide">Create your account and start shopping</p>
         </div>

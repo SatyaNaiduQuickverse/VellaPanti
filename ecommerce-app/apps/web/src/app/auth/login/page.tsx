@@ -89,7 +89,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="text-center">
           <h2 className="text-5xl font-bold text-white tracking-tighter mb-3 drop-shadow-lg">
-            VellaPanti
+            VELLAPANTI
           </h2>
           <p className="text-base text-gray-300 font-light tracking-wide">Sign in to continue your journey</p>
         </div>
