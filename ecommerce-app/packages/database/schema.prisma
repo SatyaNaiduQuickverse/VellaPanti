@@ -316,6 +316,18 @@ model HomepageBanner {
   @@map("homepage_banners")
 }
 
+model HomepageSectionText {
+  id                  String     @id @default(cuid())
+  theme               ThemeLabel
+  mainTitle           String     @default("DEEPEST BLACK TEES")
+  mainSubtitle        String     @default("CLASSIC • STRONG • UNDERSTATED POWER")
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  @@unique([theme])
+  @@map("homepage_section_texts")
+}
+
 model Wishlist {
   id        String   @id @default(cuid())
   userId    String

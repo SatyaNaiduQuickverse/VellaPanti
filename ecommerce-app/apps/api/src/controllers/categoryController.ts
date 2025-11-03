@@ -652,3 +652,15 @@ export const getPublicHomepageBanners = asyncHandler(async (req: Request, res: R
     data: banners,
   });
 });
+
+// Get public homepage section texts
+export const getPublicHomepageSectionTexts = asyncHandler(async (req: Request, res: Response) => {
+  const sectionTexts = await prisma.homepageSectionText.findMany({
+    orderBy: { theme: 'asc' }, // BLACK first, then WHITE
+  });
+
+  res.json({
+    success: true,
+    data: sectionTexts,
+  });
+});

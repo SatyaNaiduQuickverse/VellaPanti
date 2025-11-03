@@ -18,6 +18,8 @@ import {
   updateFeaturedCollections,
   getHomepageBanners,
   updateHomepageBanners,
+  getHomepageSectionTexts,
+  updateHomepageSectionTexts,
   getOfferPopup,
   createOfferPopup,
   updateOfferPopup,
@@ -69,6 +71,10 @@ router.put('/featured-collections', updateFeaturedCollections);
 // Homepage Banners Management
 router.get('/homepage-banners', getHomepageBanners);
 router.put('/homepage-banners', updateHomepageBanners);
+
+// Homepage Section Texts Management
+router.get('/homepage-section-texts', getHomepageSectionTexts);
+router.put('/homepage-section-texts', updateHomepageSectionTexts);
 
 // Offer Popup Management
 router.get('/offer-popup', getOfferPopup);

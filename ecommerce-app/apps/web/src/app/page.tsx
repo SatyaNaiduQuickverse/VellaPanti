@@ -7,6 +7,7 @@ import { useFeaturedProducts } from '@/hooks/useFeaturedProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { useCarousel } from '@/hooks/useCarousel';
 import { useHomepageBanners } from '@/hooks/useHomepageBanners';
+import { useHomepageSectionTexts } from '@/hooks/useHomepageSectionTexts';
 import { ProductCard } from '@/components/products/product-card';
 import { CategoryGrid } from '@/components/categories/category-grid';
 import { ImageCarousel } from '@/components/carousel/image-carousel';
@@ -69,11 +70,15 @@ export default function HomePage() {
   // Get homepage banners
   const { data: homepageBannersData, isLoading: homepageBannersLoading } = useHomepageBanners();
 
+  // Get homepage section texts
+  const { data: sectionTextsData } = useHomepageSectionTexts();
+
   const featuredProducts = (productsData as any)?.data || [];
   const blackFeaturedProducts = (blackFeaturedData as any)?.data || [];
   const whiteFeaturedProducts = (whiteFeaturedData as any)?.data || [];
   const carouselImages = (carouselData as any)?.data || [];
   const homepageBanners = (homepageBannersData as any)?.data || [];
+  const sectionTexts = (sectionTextsData as any)?.data || [];
 
   // Use carousel images from admin or fallback to default
   const heroCarouselImages = carouselImages.length > 0 ? carouselImages : [
@@ -81,21 +86,22 @@ export default function HomePage() {
       id: '1',
       src: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&h=800&q=80&fit=crop&auto=format',
       alt: 'VellaPanti Collection',
-      description: 'STREET CULTURE • PREMIUM FASHION • AUTHENTIC STYLE'
+      centerTitle: 'VELLA PANTI',
+      centerDescription: 'STREET CULTURE • PREMIUM FASHION • AUTHENTIC STYLE'
     },
     {
       id: '2',
       src: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1200&h=800&q=80&fit=crop&auto=format',
       alt: 'Urban Collection',
-      title: 'URBAN VIBES',
-      description: 'BOLD • MINIMALIST • TRENDSETTING'
+      centerTitle: 'URBAN VIBES',
+      centerDescription: 'BOLD • MINIMALIST • TRENDSETTING'
     },
     {
       id: '3',
       src: 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=1200&h=800&q=80&fit=crop&auto=format',
       alt: 'Premium Collection',
-      title: 'PREMIUM DROPS',
-      description: 'LIMITED EDITION • EXCLUSIVE DESIGN'
+      centerTitle: 'PREMIUM DROPS',
+      centerDescription: 'LIMITED EDITION • EXCLUSIVE DESIGN'
     }
   ];
 
@@ -105,7 +111,7 @@ export default function HomePage() {
       <OfferPopup />
 
       {/* Single Hero Carousel */}
-      <section className="h-[400px] sm:h-[500px] md:h-[550px] lg:h-[600px] relative overflow-hidden">
+      <section className="h-[400px] sm:h-[500px] md:h-[550px] lg:h-[600px] relative overflow-hidden mb-8 sm:mb-12 md:mb-16">
         {carouselLoading ? (
           <div className="w-full h-full bg-gray-900 flex items-center justify-center">
             <div className="animate-spin rounded-full h-20 w-20 sm:h-32 sm:w-32 border-b-2 border-white"></div>
@@ -115,64 +121,21 @@ export default function HomePage() {
             images={heroCarouselImages}
             theme="black"
             className="h-full"
-            showOverlay={heroCarouselImages.some((img: any) => img.title || img.description)}
+            showOverlay={heroCarouselImages.some((img: any) => img.centerTitle || img.centerDescription || img.bottomLeftTitle || img.bottomLeftDescription)}
           />
         )}
-
-        {/* Hero Content Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center text-white px-4 sm:px-6">
-            {/* Use carousel data if available, otherwise fallback to default */}
-            {carouselImages.length > 0 && carouselImages[0].title !== undefined ? (
-              carouselImages[0].title !== '' && (
-                <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 sm:mb-6 tracking-wider">
-                  {carouselImages[0].title}
-                </h1>
-              )
-            ) : (
-              <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black mb-4 sm:mb-6 tracking-wider">
-                VELLA PANTI
-              </h1>
-            )}
-
-            {carouselImages.length > 0 && carouselImages[0].description !== undefined ? (
-              carouselImages[0].description !== '' && (
-                <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-8 font-bold tracking-wider">
-                  {carouselImages[0].description}
-                </p>
-              )
-            ) : (
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-6 sm:mb-8 font-bold tracking-wider">
-                STREET CULTURE • PREMIUM FASHION • AUTHENTIC STYLE
-              </p>
-            )}
-
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-              <Link href="/categories">
-                <Button size="lg" className="bg-white text-black hover:bg-gray-100 px-6 py-2 sm:px-8 sm:py-3 text-xs sm:text-sm font-black uppercase tracking-wider w-full sm:w-auto">
-                  EXPLORE COLLECTIONS
-                </Button>
-              </Link>
-              <Link href="/products">
-                <Button size="lg" className="bg-white text-black border-2 border-white hover:bg-gray-100 hover:text-black px-6 py-2 sm:px-8 sm:py-3 text-xs sm:text-sm font-black uppercase tracking-wider w-full sm:w-auto">
-                  SHOP NOW
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Homepage Banner Images */}
-      <section className="flex flex-col lg:flex-row h-auto lg:h-96 relative overflow-hidden">
+      <section className="flex flex-col lg:flex-row h-auto relative overflow-hidden">
         {homepageBannersLoading ? (
-          <div className="w-full h-96 lg:h-full bg-gray-500 flex items-center justify-center">
+          <div className="w-full aspect-square lg:aspect-auto bg-gray-500 flex items-center justify-center">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
           </div>
         ) : (
           <>
             {/* Black Side Banner */}
-            <div className="w-full lg:w-1/2 h-80 lg:h-auto relative overflow-hidden">
+            <div className="w-full lg:w-1/2 aspect-square lg:aspect-square relative overflow-hidden">
               {(() => {
                 const blackBanner = homepageBanners.find((b: any) => b.theme === 'BLACK');
                 if (blackBanner?.src) {
@@ -181,13 +144,13 @@ export default function HomePage() {
                       <img
                         src={blackBanner.src}
                         alt={blackBanner.alt || 'Black Theme Banner'}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover border-2 border-white"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.src = 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=400&q=80&fit=crop&auto=format';
                         }}
                       />
-                      <div className="absolute inset-0 bg-black/30" />
+                      <div className="absolute inset-0 bg-black/30 border-2 border-white" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-4 sm:p-6 lg:p-8">
                         {blackBanner.title && (
                           <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black mb-3 sm:mb-4 text-center tracking-wider uppercase">
@@ -223,7 +186,7 @@ export default function HomePage() {
             </div>
 
             {/* White Side Banner */}
-            <div className="w-full lg:w-1/2 h-80 lg:h-auto relative overflow-hidden border-t lg:border-t-0 lg:border-l border-gray-300">
+            <div className="w-full lg:w-1/2 aspect-square lg:aspect-square relative overflow-hidden border-t lg:border-t-0 lg:border-l border-gray-300">
               {(() => {
                 const whiteBanner = homepageBanners.find((b: any) => b.theme === 'WHITE');
                 if (whiteBanner?.src) {
@@ -232,21 +195,20 @@ export default function HomePage() {
                       <img
                         src={whiteBanner.src}
                         alt={whiteBanner.alt || 'White Theme Banner'}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover border-2 border-white"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.src = 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800&h=400&q=80&fit=crop&auto=format';
                         }}
                       />
-                      <div className="absolute inset-0 bg-white/30" />
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-black p-4 sm:p-6 lg:p-8">
                         {whiteBanner.title && (
-                          <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black mb-3 sm:mb-4 text-center tracking-wider uppercase">
+                          <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black mb-3 sm:mb-4 text-center tracking-wider uppercase drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(255,255,255,0.8)' }}>
                             {whiteBanner.title}
                           </h3>
                         )}
                         {whiteBanner.description && (
-                          <p className="text-base sm:text-lg md:text-xl font-bold mb-4 sm:mb-6 text-center tracking-wide">
+                          <p className="text-base sm:text-lg md:text-xl font-bold mb-4 sm:mb-6 text-center tracking-wide drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(255,255,255,0.8)' }}>
                             {whiteBanner.description}
                           </p>
                         )}
@@ -282,12 +244,22 @@ export default function HomePage() {
         <div className="w-full lg:w-1/2 bg-black text-white relative">
           <div className="p-4 sm:p-6 md:p-8 lg:p-16 min-h-screen flex flex-col">
             <div className="mb-8 sm:mb-10 lg:mb-12 text-center">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider">
-                DEEPEST<br />BLACK TEES
-              </h2>
-              <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-300">
-                CLASSIC • STRONG • UNDERSTATED POWER
-              </p>
+              {(() => {
+                const blackText = sectionTexts.find((t: any) => t.theme === 'BLACK');
+                const title = blackText?.mainTitle || 'DEEPEST BLACK TEES';
+                const subtitle = blackText?.mainSubtitle || 'CLASSIC • STRONG • UNDERSTATED POWER';
+
+                return (
+                  <>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider whitespace-pre-line">
+                      {title}
+                    </h2>
+                    <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-300">
+                      {subtitle}
+                    </p>
+                  </>
+                );
+              })()}
             </div>
 
             {/* Collections Grid */}
@@ -379,12 +351,22 @@ export default function HomePage() {
         <div className="w-full lg:w-1/2 bg-white text-black border-t lg:border-t-0 lg:border-l border-gray-200">
           <div className="p-4 sm:p-6 md:p-8 lg:p-16 min-h-screen flex flex-col">
             <div className="mb-8 sm:mb-10 lg:mb-12 text-center">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider">
-                PUREST<br />WHITE TEES
-              </h2>
-              <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-600">
-                CLEAN • BRIGHT • EFFORTLESS STYLE
-              </p>
+              {(() => {
+                const whiteText = sectionTexts.find((t: any) => t.theme === 'WHITE');
+                const title = whiteText?.mainTitle || 'PUREST WHITE TEES';
+                const subtitle = whiteText?.mainSubtitle || 'CLEAN • BRIGHT • EFFORTLESS STYLE';
+
+                return (
+                  <>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4 tracking-wider whitespace-pre-line">
+                      {title}
+                    </h2>
+                    <p className="text-base sm:text-lg md:text-xl font-bold tracking-wider text-gray-600">
+                      {subtitle}
+                    </p>
+                  </>
+                );
+              })()}
             </div>
 
             {/* Collections Grid */}

@@ -10,6 +10,7 @@ import {
   getHomepageCarousel,
   getFeaturedCategories,
   getPublicHomepageBanners,
+  getPublicHomepageSectionTexts,
 } from '../controllers/categoryController';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { uploadSingle } from '../services/uploadService';
@@ -20,6 +21,7 @@ router.get('/', getCategories);
 router.get('/carousel', getHomepageCarousel);
 router.get('/featured', getFeaturedCategories);
 router.get('/homepage-banners', getPublicHomepageBanners);
+router.get('/homepage-section-texts', getPublicHomepageSectionTexts);
 router.get('/id/:id', getCategoryById);
 router.get('/:slug', getCategoryBySlug);
 router.get('/:slug/products', getCategoryProducts);

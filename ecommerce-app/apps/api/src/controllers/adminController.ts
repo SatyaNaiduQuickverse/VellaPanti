@@ -1208,3 +1208,68 @@ export const updateStoryPage = asyncHandler(async (req: AuthRequest, res: Respon
     data: storyPage,
   });
 });
+
+// Get homepage section texts
+export const getHomepageSectionTexts = asyncHandler(async (_req: Request, res: Response) => {
+  const sectionTexts = await prisma.homepageSectionText.findMany({
+    orderBy: { theme: 'asc' }, // BLACK first, then WHITE
+  });
+
+  res.json({
+    success: true,
+    data: sectionTexts,
+  });
+});
+
+// Update homepage section texts
+export const updateHomepageSectionTexts = asyncHandler(async (req: AuthRequest, res: Response) => {
+  const { blackSection, whiteSection } = req.body;
+
+  console.log('Updating homepage section texts:', { blackSection, whiteSection });
+
+  const updates = [];
+
+  // Update BLACK section
+  if (blackSection) {
+    const updateData = {
+      theme: 'BLACK' as const,
+      mainTitle: blackSection.mainTitle || 'DEEPEST BLACK TEES',
+      mainSubtitle: blackSection.mainSubtitle || 'CLASSIC • STRONG • UNDERSTATED POWER',
+    };
+
+    updates.push(
+      prisma.homepageSectionText.upsert({
+        where: { theme: 'BLACK' },
+        create: updateData,
+        update: updateData,
+      })
+    );
+  }
+
+  // Update WHITE section
+  if (whiteSection) {
+    const updateData = {
+      theme: 'WHITE' as const,
+      mainTitle: whiteSection.mainTitle || 'PUREST WHITE TEES',
+      mainSubtitle: whiteSection.mainSubtitle || 'CLEAN • BRIGHT • EFFORTLESS STYLE',
+    };
+
+    updates.push(
+      prisma.homepageSectionText.upsert({
+        where: { theme: 'WHITE' },
+        create: updateData,
+        update: updateData,
+      })
+    );
+  }
+
+  const results = await Promise.all(updates);
+
+  console.log('Homepage section texts updated successfully');
+
+  res.json({
+    success: true,
+    message: 'Homepage section texts updated successfully',
+    data: results,
+  });
+});

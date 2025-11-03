@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Search, ShoppingCart, User, LogOut, Settings, Package, Heart, Menu, X } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import { NoSSR } from './no-ssr';
@@ -29,8 +30,17 @@ export function Header() {
           </button>
 
           {/* Logo */}
-          <Link href="/" className="text-2xl md:text-3xl font-black text-black hover:text-gray-800 transition-colors uppercase tracking-tight">
-            VELLA<span className="border-b-2 border-black pb-1">PANTI</span>
+          <Link href="/" className="flex items-center space-x-2 md:space-x-3 hover:opacity-80 transition-opacity">
+            <Image
+              src="/logo.png"
+              alt="VellaPanti Logo"
+              width={40}
+              height={40}
+              className="md:w-12 md:h-12"
+            />
+            <span className="text-2xl md:text-3xl font-black text-black uppercase tracking-tight">
+              VELLA<span className="border-b-2 border-black pb-1">PANTI</span>
+            </span>
           </Link>
 
           {/* Desktop Search Bar */}

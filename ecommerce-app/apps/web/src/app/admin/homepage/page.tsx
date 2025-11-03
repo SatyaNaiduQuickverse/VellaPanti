@@ -31,9 +31,17 @@ interface HomepageBanner {
   isActive: boolean;
 }
 
+interface HomepageSectionText {
+  id: string;
+  theme: 'BLACK' | 'WHITE';
+  mainTitle: string;
+  mainSubtitle: string;
+}
+
 export default function HomepageManagement() {
   const [carouselImages, setCarouselImages] = useState<CarouselImage[]>([]);
   const [homepageBanners, setHomepageBanners] = useState<HomepageBanner[]>([]);
+  const [sectionTexts, setSectionTexts] = useState<HomepageSectionText[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -57,6 +65,12 @@ export default function HomepageManagement() {
         const bannersResponse = await api.get("/admin/homepage-banners");
         if (bannersResponse.data.success) {
           setHomepageBanners(bannersResponse.data.data || []);
+        }
+
+        // Load homepage section texts
+        const sectionTextsResponse = await api.get("/admin/homepage-section-texts");
+        if (sectionTextsResponse.data.success) {
+          setSectionTexts(sectionTextsResponse.data.data || []);
         }
       } catch (error) {
         console.error('Failed to load homepage data:', error);
@@ -108,6 +122,29 @@ export default function HomepageManagement() {
 
   const deleteImage = (id: string) => {
     setCarouselImages(carouselImages.filter(img => img.id !== id));
+  };
+
+  // Homepage Section Text Management
+  const updateSectionText = (theme: 'BLACK' | 'WHITE', field: keyof Omit<HomepageSectionText, 'id' | 'theme'>, value: string) => {
+    setSectionTexts(prevTexts => {
+      const existingText = prevTexts.find(t => t.theme === theme);
+      if (existingText) {
+        // Update existing text
+        return prevTexts.map(t =>
+          t.theme === theme ? { ...t, [field]: value } : t
+        );
+      } else {
+        // Create new text
+        const newText: HomepageSectionText = {
+          id: Date.now().toString(),
+          theme,
+          mainTitle: theme === 'BLACK' ? 'DEEPEST BLACK TEES' : 'PUREST WHITE TEES',
+          mainSubtitle: theme === 'BLACK' ? 'CLASSIC • STRONG • UNDERSTATED POWER' : 'CLEAN • BRIGHT • EFFORTLESS STYLE',
+          [field]: value,
+        };
+        return [...prevTexts, newText];
+      }
+    });
   };
 
   // Homepage Banner Management
@@ -186,11 +223,25 @@ export default function HomepageManagement() {
         throw new Error(bannersResponse.data.error || 'Failed to update homepage banners');
       }
 
+      // Save section texts
+      const blackText = sectionTexts.find(t => t.theme === 'BLACK');
+      const whiteText = sectionTexts.find(t => t.theme === 'WHITE');
+
+      const sectionTextsResponse = await api.put("/admin/homepage-section-texts", {
+        blackSection: blackText || null,
+        whiteSection: whiteText || null,
+      });
+
+      if (!sectionTextsResponse.data.success) {
+        throw new Error(sectionTextsResponse.data.error || 'Failed to update section texts');
+      }
+
       toast.success('Homepage updated successfully!');
 
       // Invalidate caches to update homepage immediately
       queryClient.invalidateQueries({ queryKey: ['carousel'] });
       queryClient.invalidateQueries({ queryKey: ['homepageBanners'] });
+      queryClient.invalidateQueries({ queryKey: ['homepageSectionTexts'] });
 
     } catch (error: any) {
       console.error('Failed to save homepage data:', error);
@@ -604,6 +655,105 @@ export default function HomepageManagement() {
                       </div>
                     </div>
                   </>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+
+        {/* Homepage Section Texts */}
+        <div className="bg-white border-2 border-black p-6 mb-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-black text-black uppercase tracking-tight mb-2">
+              <Image className="h-6 w-6 inline mr-2" />
+              HOMEPAGE SECTION HEADINGS
+            </h2>
+            <p className="text-gray-600 font-bold">
+              Edit the main headings for "DEEPEST BLACK TEES" and "PUREST WHITE TEES" sections
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Black Section Text */}
+            <div className="border-2 border-gray-200 p-6 hover:border-black transition-colors">
+              <div className="mb-4">
+                <h3 className="text-lg font-black uppercase tracking-wider bg-black text-white px-4 py-2">
+                  BLACK SECTION TEXT
+                </h3>
+              </div>
+
+              {(() => {
+                const blackText = sectionTexts.find(t => t.theme === 'BLACK');
+                return (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-black uppercase tracking-wider text-gray-700 mb-2">
+                        MAIN TITLE
+                      </label>
+                      <input
+                        type="text"
+                        value={blackText?.mainTitle || 'DEEPEST BLACK TEES'}
+                        onChange={(e) => updateSectionText('BLACK', 'mainTitle', e.target.value)}
+                        placeholder="DEEPEST BLACK TEES"
+                        className="w-full px-3 py-2 border-2 border-black focus:outline-none font-medium"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-black uppercase tracking-wider text-gray-700 mb-2">
+                        SUBTITLE / DESCRIPTION
+                      </label>
+                      <input
+                        type="text"
+                        value={blackText?.mainSubtitle || 'CLASSIC • STRONG • UNDERSTATED POWER'}
+                        onChange={(e) => updateSectionText('BLACK', 'mainSubtitle', e.target.value)}
+                        placeholder="CLASSIC • STRONG • UNDERSTATED POWER"
+                        className="w-full px-3 py-2 border-2 border-black focus:outline-none font-medium"
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* White Section Text */}
+            <div className="border-2 border-gray-200 p-6 hover:border-black transition-colors">
+              <div className="mb-4">
+                <h3 className="text-lg font-black uppercase tracking-wider bg-white text-black border-2 border-black px-4 py-2">
+                  WHITE SECTION TEXT
+                </h3>
+              </div>
+
+              {(() => {
+                const whiteText = sectionTexts.find(t => t.theme === 'WHITE');
+                return (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-black uppercase tracking-wider text-gray-700 mb-2">
+                        MAIN TITLE
+                      </label>
+                      <input
+                        type="text"
+                        value={whiteText?.mainTitle || 'PUREST WHITE TEES'}
+                        onChange={(e) => updateSectionText('WHITE', 'mainTitle', e.target.value)}
+                        placeholder="PUREST WHITE TEES"
+                        className="w-full px-3 py-2 border-2 border-black focus:outline-none font-medium"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-black uppercase tracking-wider text-gray-700 mb-2">
+                        SUBTITLE / DESCRIPTION
+                      </label>
+                      <input
+                        type="text"
+                        value={whiteText?.mainSubtitle || 'CLEAN • BRIGHT • EFFORTLESS STYLE'}
+                        onChange={(e) => updateSectionText('WHITE', 'mainSubtitle', e.target.value)}
+                        placeholder="CLEAN • BRIGHT • EFFORTLESS STYLE"
+                        className="w-full px-3 py-2 border-2 border-black focus:outline-none font-medium"
+                      />
+                    </div>
+                  </div>
                 );
               })()}
             </div>
