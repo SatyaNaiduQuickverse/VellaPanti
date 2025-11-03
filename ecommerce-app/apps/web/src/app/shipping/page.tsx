@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, Truck, Globe, Clock, Package, MapPin, CreditCard, Shield, AlertCircle, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Truck, Clock, Package, MapPin, CreditCard, Shield, AlertCircle, MessageCircle } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 
@@ -27,7 +27,7 @@ export default function ShippingPage() {
         </div>
 
         {/* Key Benefits */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="bg-gray-50 border-2 border-black p-6 text-center">
             <Truck className="h-10 w-10 mx-auto mb-3" />
             <h3 className="font-black uppercase text-sm mb-2">Fast Delivery</h3>
@@ -37,11 +37,6 @@ export default function ShippingPage() {
             <Package className="h-10 w-10 mx-auto mb-3" />
             <h3 className="font-black uppercase text-sm mb-2">Free Shipping</h3>
             <p className="text-gray-600 text-xs">On orders above ₹699</p>
-          </div>
-          <div className="bg-gray-50 border-2 border-black p-6 text-center">
-            <Globe className="h-10 w-10 mx-auto mb-3" />
-            <h3 className="font-black uppercase text-sm mb-2">Global Reach</h3>
-            <p className="text-gray-600 text-xs">International shipping</p>
           </div>
           <div className="bg-gray-50 border-2 border-black p-6 text-center">
             <Shield className="h-10 w-10 mx-auto mb-3" />
@@ -115,65 +110,6 @@ export default function ShippingPage() {
                   Get <strong>FREE standard shipping</strong> (instead of ₹99) on all orders above <strong>₹699</strong>.
                   Discount automatically applied at checkout. Valid for domestic orders only.
                 </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* International Shipping */}
-        <div className="mb-12">
-          <h2 className="text-3xl font-black uppercase tracking-tight mb-6">International Shipping</h2>
-
-          <div className="border-2 border-black p-8">
-            <Globe className="h-12 w-12 mb-4" />
-            <p className="text-gray-600 mb-6">
-              We ship to select international destinations. Shipping costs and delivery times vary by location
-              and are calculated at checkout based on your destination and order weight.
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-black uppercase mb-3">Delivery Time</h4>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start">
-                    <span className="mr-2">•</span>
-                    <span><strong>Asia & Middle East:</strong> 7-12 business days</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2">•</span>
-                    <span><strong>Europe & UK:</strong> 10-15 business days</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2">•</span>
-                    <span><strong>North America:</strong> 12-18 business days</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2">•</span>
-                    <span><strong>Australia & NZ:</strong> 10-15 business days</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="font-black uppercase mb-3">Important Information</h4>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start">
-                    <span className="mr-2">•</span>
-                    <span>Customs duties and import taxes may apply</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2">•</span>
-                    <span>Additional charges are buyer's responsibility</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2">•</span>
-                    <span>Tracking provided for all international orders</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="mr-2">•</span>
-                    <span>Delays may occur due to customs processing</span>
-                  </li>
-                </ul>
               </div>
             </div>
           </div>
