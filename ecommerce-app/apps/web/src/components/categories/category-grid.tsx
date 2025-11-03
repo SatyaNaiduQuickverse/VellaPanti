@@ -123,10 +123,22 @@ export function CategoryGrid({ limit, theme, featured = false }: CategoryGridPro
     return categoriesList.filter(category => category.theme === theme);
   };
 
+  const sortCategoriesByTheme = (categoriesList: any[]) => {
+    // If no theme filter, sort so BLACK categories appear first (left side), then WHITE (right side)
+    if (!theme) {
+      return [...categoriesList].sort((a, b) => {
+        if (a.theme === 'BLACK' && b.theme === 'WHITE') return -1;
+        if (a.theme === 'WHITE' && b.theme === 'BLACK') return 1;
+        return 0;
+      });
+    }
+    return categoriesList;
+  };
+
   // For featured mode, show empty state if no categories, otherwise use fallback
   const displayCategories = featured
-    ? (mounted && categories.length > 0 ? categories : [])
-    : (mounted && categories.length > 0 ? categories : filterCategoriesByTheme(mockCategories));
+    ? (mounted && categories.length > 0 ? sortCategoriesByTheme(categories) : [])
+    : (mounted && categories.length > 0 ? sortCategoriesByTheme(categories) : sortCategoriesByTheme(filterCategoriesByTheme(mockCategories)));
 
   if (!mounted || isLoading) {
     return (
@@ -162,7 +174,7 @@ export function CategoryGrid({ limit, theme, featured = false }: CategoryGridPro
           href={`/categories/${category.slug}?theme=${category.theme || ''}`}
           className="group cursor-pointer"
         >
-          <div className="relative overflow-hidden bg-black aspect-[4/3] group-hover:bg-white group-hover:shadow-2xl transition-all duration-300 border border-black rounded-lg">
+          <div className={`relative overflow-hidden bg-black aspect-[4/3] group-hover:bg-white group-hover:shadow-2xl transition-all duration-300 rounded-lg ${theme === 'BLACK' ? 'border border-white/30' : 'border border-black'}`}>
             <Image
               src={category.image || '/placeholder-category.svg'}
               alt={category.name}
