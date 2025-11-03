@@ -230,7 +230,7 @@ export default function ProfilePage() {
                       {loading ? '...' : accountStats.loyaltyPoints}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-400">Earn 1 point per ₹100 spent • Redeem for discounts</p>
+                  <p className="text-xs text-gray-400">Earn 1 point per ₹100 spent • Redeemable on next order</p>
                 </div>
               </div>
             </div>
