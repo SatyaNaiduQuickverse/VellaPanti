@@ -1,6 +1,29 @@
+'use client';
+
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 export function Footer() {
+  const [footerDescription, setFooterDescription] = useState('STREET CULTURE • RAP AESTHETICS • GEN Z VIBES\nAUTHENTIC • BOLD • UNAPOLOGETIC');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/settings`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.data?.footerDescription) {
+            setFooterDescription(data.data.footerDescription);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch footer settings:', error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
   return (
     <footer className="bg-black text-white mt-auto">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
@@ -10,9 +33,8 @@ export function Footer() {
             <h3 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">
               VELLA<span className="border-b-2 border-white pb-1">PANTI</span>
             </h3>
-            <p className="text-gray-300 text-xs sm:text-sm font-bold uppercase tracking-wide">
-              STREET CULTURE • RAP AESTHETICS • GEN Z VIBES<br className="hidden sm:block"/>
-              AUTHENTIC • BOLD • UNAPOLOGETIC
+            <p className="text-gray-300 text-xs sm:text-sm font-bold uppercase tracking-wide whitespace-pre-line">
+              {footerDescription}
             </p>
           </div>
 

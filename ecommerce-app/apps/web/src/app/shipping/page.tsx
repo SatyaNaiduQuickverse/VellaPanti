@@ -36,7 +36,7 @@ export default function ShippingPage() {
           <div className="bg-gray-50 border-2 border-black p-6 text-center">
             <Package className="h-10 w-10 mx-auto mb-3" />
             <h3 className="font-black uppercase text-sm mb-2">Free Shipping</h3>
-            <p className="text-gray-600 text-xs">On orders above ₹999</p>
+            <p className="text-gray-600 text-xs">On orders above ₹699</p>
           </div>
           <div className="bg-gray-50 border-2 border-black p-6 text-center">
             <Globe className="h-10 w-10 mx-auto mb-3" />
@@ -112,7 +112,7 @@ export default function ShippingPage() {
               <div>
                 <h4 className="font-black uppercase text-lg mb-2">Free Shipping Offer</h4>
                 <p className="text-gray-700">
-                  Get <strong>FREE standard shipping</strong> on all orders above <strong>₹999</strong>.
+                  Get <strong>FREE standard shipping</strong> (instead of ₹99) on all orders above <strong>₹699</strong>.
                   Discount automatically applied at checkout. Valid for domestic orders only.
                 </p>
               </div>

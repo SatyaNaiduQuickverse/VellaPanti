@@ -12,6 +12,7 @@ interface SiteSettings {
   support_email: string;
   support_phone: string;
   business_hours: string;
+  footer_description: string;
 }
 
 export default function SiteSettingsPage() {
@@ -21,6 +22,7 @@ export default function SiteSettingsPage() {
     support_email: '',
     support_phone: '',
     business_hours: '',
+    footer_description: '',
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -274,6 +276,46 @@ export default function SiteSettingsPage() {
                   placeholder="Monday - Friday: 9AM - 6PM EST"
                   className="w-full p-3 border-2 border-gray-300 focus:border-black"
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Description */}
+          <div className="bg-white border-2 border-black p-6">
+            <div className="flex items-center mb-6">
+              <Settings className="h-8 w-8 mr-3" />
+              <h2 className="text-2xl font-black uppercase tracking-tight">
+                Footer Description
+              </h2>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block font-bold mb-2 uppercase tracking-wide text-sm text-gray-600">
+                  Description Text *
+                </label>
+                <textarea
+                  value={settings.footer_description}
+                  onChange={(e) => handleChange('footer_description', e.target.value)}
+                  placeholder="STREET CULTURE • RAP AESTHETICS • GEN Z VIBES"
+                  rows={4}
+                  className="w-full p-3 border-2 border-gray-300 focus:border-black"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  This text appears below the VELLAPANTI brand name in the footer. Use line breaks for multiple lines.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 border border-gray-200 p-4 rounded">
+                <h4 className="font-bold text-sm mb-3">Preview</h4>
+                <div className="bg-black text-white p-4 rounded">
+                  <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-2">
+                    VELLA<span className="border-b-2 border-white pb-1">PANTI</span>
+                  </h3>
+                  <p className="text-gray-300 text-xs font-bold uppercase tracking-wide whitespace-pre-line">
+                    {settings.footer_description || 'STREET CULTURE • RAP AESTHETICS • GEN Z VIBES\nAUTHENTIC • BOLD • UNAPOLOGETIC'}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

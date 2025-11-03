@@ -642,7 +642,7 @@ export const updateFeaturedProducts = asyncHandler(async (req: AuthRequest, res:
 });
 
 // Carousel Images Management
-export const getCarouselImages = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getCarouselImages = asyncHandler(async (_req: AuthRequest, res: Response) => {
   const carouselImages = await prisma.carouselImage.findMany({
     where: { isActive: true },
     orderBy: { position: 'asc' },
@@ -695,7 +695,7 @@ export const updateCarouselImages = asyncHandler(async (req: AuthRequest, res: R
 });
 
 // Featured Collections Management
-export const getFeaturedCollections = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getFeaturedCollections = asyncHandler(async (_req: AuthRequest, res: Response) => {
   const featuredCollections = await prisma.featuredCollection.findMany({
     include: {
       category: {
@@ -780,7 +780,7 @@ export const updateFeaturedCollections = asyncHandler(async (req: AuthRequest, r
 });
 
 // Get homepage banners
-export const getHomepageBanners = asyncHandler(async (req: Request, res: Response) => {
+export const getHomepageBanners = asyncHandler(async (_req: Request, res: Response) => {
   const banners = await prisma.homepageBanner.findMany({
     orderBy: { theme: 'asc' }, // BLACK first, then WHITE
   });
@@ -872,7 +872,7 @@ export const updateHomepageBanners = asyncHandler(async (req: AuthRequest, res: 
 });
 
 // Offer Popup Management
-export const getOfferPopup = asyncHandler(async (req: Request, res: Response) => {
+export const getOfferPopup = asyncHandler(async (_req: Request, res: Response) => {
   const popup = await prisma.offerPopup.findFirst({
     orderBy: { createdAt: 'desc' },
   });
@@ -883,7 +883,7 @@ export const getOfferPopup = asyncHandler(async (req: Request, res: Response) =>
   });
 });
 
-export const updateOfferPopup = asyncHandler(async (req: Request, res: Response) => {
+export const updateOfferPopup = asyncHandler(async (req: AuthRequest, res: Response) => {
   const {
     id,
     isActive,
@@ -939,7 +939,7 @@ export const updateOfferPopup = asyncHandler(async (req: Request, res: Response)
   });
 });
 
-export const createOfferPopup = asyncHandler(async (req: Request, res: Response) => {
+export const createOfferPopup = asyncHandler(async (req: AuthRequest, res: Response) => {
   const {
     isActive,
     imageUrl,
@@ -1067,6 +1067,7 @@ export const getPublicSiteSettings = asyncHandler(async (_req: Request, res: Res
       supportEmail: true,
       supportPhone: true,
       businessHours: true,
+      footerDescription: true,
     },
   });
 
@@ -1080,6 +1081,7 @@ export const getPublicSiteSettings = asyncHandler(async (_req: Request, res: Res
         supportEmail: 'support@vellapanti.com',
         supportPhone: '+1 (555) 123-4567',
         businessHours: 'Monday - Friday: 9AM - 6PM EST',
+        footerDescription: 'STREET CULTURE • RAP AESTHETICS • GEN Z VIBES\nAUTHENTIC • BOLD • UNAPOLOGETIC',
       },
     });
 
@@ -1089,6 +1091,7 @@ export const getPublicSiteSettings = asyncHandler(async (_req: Request, res: Res
       supportEmail: newSettings.supportEmail,
       supportPhone: newSettings.supportPhone,
       businessHours: newSettings.businessHours,
+      footerDescription: newSettings.footerDescription,
     };
   }
 
