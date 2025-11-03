@@ -39,7 +39,7 @@ export default function ContactSupportPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/support/ticket', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/support/ticket`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
