@@ -32,30 +32,18 @@ export default function FeaturedProductsManagement() {
   const { accessToken } = useAuthStore();
   const queryClient = useQueryClient();
 
-  // Fetch black theme products
+  // Fetch all products (no theme filter)
   const {
-    data: blackProductsData,
-    isLoading: isLoadingBlackProducts,
-    error: blackProductsError,
+    data: allProductsData,
+    isLoading: isLoadingProducts,
+    error: productsError,
   } = useProducts({
-    theme: 'BLACK',
-    limit: 50,
+    limit: 100,
   });
 
-  // Fetch white theme products
-  const {
-    data: whiteProductsData,
-    isLoading: isLoadingWhiteProducts,
-    error: whiteProductsError,
-  } = useProducts({
-    theme: 'WHITE',
-    limit: 50,
-  });
-
-  const blackProducts = blackProductsData?.data || [];
-  const whiteProducts = whiteProductsData?.data || [];
-  const blackFeaturedProducts = blackProducts.filter((p) => blackFeaturedIds.includes(p.id));
-  const whiteFeaturedProducts = whiteProducts.filter((p) => whiteFeaturedIds.includes(p.id));
+  const allProducts = allProductsData?.data || [];
+  const blackFeaturedProducts = allProducts.filter((p) => blackFeaturedIds.includes(p.id));
+  const whiteFeaturedProducts = allProducts.filter((p) => whiteFeaturedIds.includes(p.id));
 
   // Load existing featured products from API
   useEffect(() => {
@@ -192,7 +180,7 @@ export default function FeaturedProductsManagement() {
   };
 
   // Loading state
-  if (isInitialLoading || isLoadingBlackProducts || isLoadingWhiteProducts) {
+  if (isInitialLoading || isLoadingProducts) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -204,7 +192,7 @@ export default function FeaturedProductsManagement() {
   }
 
   // Error state
-  if (blackProductsError || whiteProductsError) {
+  if (productsError) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white border-2 border-red-500 p-8 max-w-md">
@@ -332,11 +320,11 @@ export default function FeaturedProductsManagement() {
             {/* Available Products */}
             <div>
               <h3 className="text-lg font-black uppercase tracking-wider mb-4">
-                AVAILABLE STREET PRODUCTS ({blackProducts.filter((p) => !blackFeaturedIds.includes(p.id)).length})
+                AVAILABLE PRODUCTS ({allProducts.filter((p) => !blackFeaturedIds.includes(p.id)).length})
               </h3>
               <div className="max-h-96 overflow-y-auto space-y-2 custom-scrollbar">
-                {blackProducts.filter((p) => !blackFeaturedIds.includes(p.id)).length > 0 ? (
-                  blackProducts
+                {allProducts.filter((p) => !blackFeaturedIds.includes(p.id)).length > 0 ? (
+                  allProducts
                     .filter((p) => !blackFeaturedIds.includes(p.id))
                     .map((product) => (
                       <div
@@ -444,11 +432,11 @@ export default function FeaturedProductsManagement() {
             {/* Available Products */}
             <div>
               <h3 className="text-lg font-black uppercase tracking-wider mb-4">
-                AVAILABLE PREMIUM PRODUCTS ({whiteProducts.filter((p) => !whiteFeaturedIds.includes(p.id)).length})
+                AVAILABLE PRODUCTS ({allProducts.filter((p) => !whiteFeaturedIds.includes(p.id)).length})
               </h3>
               <div className="max-h-96 overflow-y-auto space-y-2 custom-scrollbar">
-                {whiteProducts.filter((p) => !whiteFeaturedIds.includes(p.id)).length > 0 ? (
-                  whiteProducts
+                {allProducts.filter((p) => !whiteFeaturedIds.includes(p.id)).length > 0 ? (
+                  allProducts
                     .filter((p) => !whiteFeaturedIds.includes(p.id))
                     .map((product) => (
                       <div
@@ -505,7 +493,7 @@ export default function FeaturedProductsManagement() {
               <ul className="space-y-1 text-gray-600">
                 <li>• Select up to 8 products for the black/street themed section</li>
                 <li>• These products appear on the left side of the homepage</li>
-                <li>• Only products with BLACK theme are available for selection</li>
+                <li>• All products from all collections are available for selection</li>
                 <li>• Drag products to reorder (coming soon)</li>
               </ul>
             </div>
@@ -514,7 +502,7 @@ export default function FeaturedProductsManagement() {
               <ul className="space-y-1 text-gray-600">
                 <li>• Select up to 8 products for the white/premium themed section</li>
                 <li>• These products appear on the right side of the homepage</li>
-                <li>• Only products with WHITE theme are available for selection</li>
+                <li>• All products from all collections are available for selection</li>
                 <li>• Drag products to reorder (coming soon)</li>
               </ul>
             </div>
