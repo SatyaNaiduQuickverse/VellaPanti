@@ -166,6 +166,79 @@ export function CategoryGrid({ limit, theme, featured = false }: CategoryGridPro
     );
   }
 
+  // If no theme filter (showing all collections), split into BLACK and WHITE columns
+  if (!theme) {
+    const blackCategories = displayCategories.filter((cat: any) => cat.theme === 'BLACK');
+    const whiteCategories = displayCategories.filter((cat: any) => cat.theme === 'WHITE');
+
+    return (
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* LEFT HALF - BLACK COLLECTIONS */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-center mb-6">BLACK COLLECTIONS</h2>
+          <div className="grid grid-cols-1 gap-4 sm:gap-6">
+            {blackCategories.map((category: any) => (
+              <Link
+                key={category.id}
+                href={`/categories/${category.slug}?theme=${category.theme || ''}`}
+                className="group cursor-pointer"
+              >
+                <div className="relative overflow-hidden bg-black aspect-[4/3] group-hover:bg-white group-hover:shadow-2xl transition-all duration-300 rounded-lg border border-white/30">
+                  <Image
+                    src={category.image || '/placeholder-category.svg'}
+                    alt={category.name}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500 grayscale group-hover:grayscale-0 filter contrast-125 rounded-lg"
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-black/60 group-hover:bg-white/90 transition-all duration-300 rounded-lg" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <h3 className="text-white group-hover:text-black font-black text-sm sm:text-base md:text-lg lg:text-xl text-center px-3 sm:px-4 uppercase tracking-wider transition-colors leading-tight">
+                      {category.name}
+                    </h3>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* RIGHT HALF - WHITE COLLECTIONS */}
+        <div className="space-y-4">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-center mb-6">WHITE COLLECTIONS</h2>
+          <div className="grid grid-cols-1 gap-4 sm:gap-6">
+            {whiteCategories.map((category: any) => (
+              <Link
+                key={category.id}
+                href={`/categories/${category.slug}?theme=${category.theme || ''}`}
+                className="group cursor-pointer"
+              >
+                <div className="relative overflow-hidden bg-black aspect-[4/3] group-hover:bg-white group-hover:shadow-2xl transition-all duration-300 rounded-lg border border-black">
+                  <Image
+                    src={category.image || '/placeholder-category.svg'}
+                    alt={category.name}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500 grayscale group-hover:grayscale-0 filter contrast-125 rounded-lg"
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-black/60 group-hover:bg-white/90 transition-all duration-300 rounded-lg" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <h3 className="text-white group-hover:text-black font-black text-sm sm:text-base md:text-lg lg:text-xl text-center px-3 sm:px-4 uppercase tracking-wider transition-colors leading-tight">
+                      {category.name}
+                    </h3>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If theme filter is applied, show regular grid
   return (
     <div className="grid grid-cols-2 gap-4 sm:gap-6">
       {displayCategories.map((category: any) => (
