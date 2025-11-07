@@ -79,9 +79,14 @@ export const getCategories = asyncHandler(async (req: Request, res: Response) =>
         },
       },
     },
-    orderBy: {
-      name: 'asc',
-    },
+    orderBy: [
+      {
+        theme: 'asc', // BLACK comes before WHITE alphabetically
+      },
+      {
+        name: 'asc', // Then sort by name within each theme
+      },
+    ],
   });
 
   res.json({
