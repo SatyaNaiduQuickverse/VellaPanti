@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { emailService } from '../services/emailService';
 import { AuthRequest } from '../middleware/auth';
+import { prisma } from '@ecommerce/database';
 
 interface SupportTicketRequest {
   subject: string;
@@ -20,8 +21,9 @@ export const submitSupportTicket = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const validPriorities = ['low', 'medium', 'high', 'critical'];
-    if (!validPriorities.includes(priority.toLowerCase())) {
+    const validPriorities = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+    const normalizedPriority = priority.toUpperCase();
+    if (!validPriorities.includes(normalizedPriority)) {
       return res.status(400).json({
         success: false,
         error: 'Invalid priority level',
@@ -31,27 +33,46 @@ export const submitSupportTicket = async (req: AuthRequest, res: Response) => {
     // Get user info if authenticated
     let customerName: string | undefined;
     let customerEmail: string | undefined;
+    let userId: string | null = null;
 
     if (req.user) {
       customerName = req.user.name;
       customerEmail = req.user.email;
+      userId = req.user.id;
+    }
+
+    // Save support ticket to database only if user is authenticated
+    let savedTicket = null;
+    if (userId) {
+      savedTicket = await prisma.supportTicket.create({
+        data: {
+          userId,
+          subject,
+          category,
+          priority: normalizedPriority as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL',
+          message,
+          status: 'OPEN',
+        },
+      });
     }
 
     // Send support ticket email
     await emailService.sendSupportTicket({
       subject,
       category,
-      priority,
+      priority: normalizedPriority,
       message,
       customerName,
       customerEmail,
     });
 
+    const ticketId = savedTicket ? savedTicket.id : `SUP-${Date.now().toString().slice(-6)}`;
+
     return res.status(200).json({
       success: true,
       message: 'Support ticket submitted successfully',
       data: {
-        ticketId: `SUP-${Date.now().toString().slice(-6)}`,
+        ticketId,
         status: 'submitted',
         submittedAt: new Date().toISOString(),
       },
