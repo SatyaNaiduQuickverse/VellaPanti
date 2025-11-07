@@ -2,6 +2,7 @@ import { Response } from 'express';
 import { emailService } from '../services/emailService';
 import { AuthRequest } from '../middleware/auth';
 import { prisma } from '@ecommerce/database';
+import { asyncHandler, AppError } from '../middleware/errorHandler';
 
 interface SupportTicketRequest {
   subject: string;
@@ -85,3 +86,106 @@ export const submitSupportTicket = async (req: AuthRequest, res: Response) => {
     });
   }
 };
+
+// Get all support tickets (Admin only)
+export const getAllSupportTickets = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (req.user!.role !== 'ADMIN') {
+    throw new AppError('Admin access required', 403);
+  }
+
+  const {
+    page = 1,
+    limit = 20,
+    status,
+    priority,
+  } = req.query as any;
+
+  const pageNum = parseInt(page);
+  const limitNum = parseInt(limit);
+  const skip = (pageNum - 1) * limitNum;
+
+  const where: any = {};
+
+  if (status) {
+    where.status = status.toUpperCase();
+  }
+
+  if (priority) {
+    where.priority = priority.toUpperCase();
+  }
+
+  const [tickets, total] = await Promise.all([
+    prisma.supportTicket.findMany({
+      where,
+      skip,
+      take: limitNum,
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    }),
+    prisma.supportTicket.count({ where }),
+  ]);
+
+  res.json({
+    success: true,
+    data: tickets,
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum),
+    },
+  });
+});
+
+// Update support ticket status (Admin only)
+export const updateSupportTicketStatus = asyncHandler(async (req: AuthRequest, res: Response) => {
+  if (req.user!.role !== 'ADMIN') {
+    throw new AppError('Admin access required', 403);
+  }
+
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const validStatuses = ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
+  if (!validStatuses.includes(status)) {
+    throw new AppError('Invalid status', 400);
+  }
+
+  const ticket = await prisma.supportTicket.findUnique({
+    where: { id },
+  });
+
+  if (!ticket) {
+    throw new AppError('Support ticket not found', 404);
+  }
+
+  const updatedTicket = await prisma.supportTicket.update({
+    where: { id },
+    data: { status },
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
+    },
+  });
+
+  res.json({
+    success: true,
+    data: updatedTicket,
+    message: 'Support ticket status updated successfully',
+  });
+});
