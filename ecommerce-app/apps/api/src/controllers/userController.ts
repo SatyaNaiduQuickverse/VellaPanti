@@ -303,9 +303,9 @@ export const getUserStats = asyncHandler(async (req: AuthRequest, res: Response)
       },
     });
 
-    // Calculate loyalty points (simplified: 1 point per dollar spent)
+    // Calculate loyalty points (1 point per Rs. 100 spent)
     const totalSpent = orderStats._sum.total || 0;
-    const loyaltyPoints = Math.floor(totalSpent);
+    const loyaltyPoints = Math.floor(totalSpent / 100);
 
     res.json({
       success: true,
