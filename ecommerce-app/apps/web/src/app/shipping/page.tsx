@@ -107,8 +107,7 @@ export default function ShippingPage() {
               <div>
                 <h4 className="font-black uppercase text-lg mb-2">Free Shipping Offer</h4>
                 <p className="text-gray-700">
-                  Get <strong>FREE standard shipping</strong> (instead of ₹99) on all orders above <strong>₹699</strong>.
-                  Discount automatically applied at checkout. Valid for domestic orders only.
+                  FREE SHIPPING ON ORDERS ABOVE 699 FOR STANDARD SHIPPING FREE SHIPPING INSTEAD OF RS. 99
                 </p>
               </div>
             </div>
