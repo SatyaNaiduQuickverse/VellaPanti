@@ -64,7 +64,7 @@ export default function ProfilePage() {
     fetchAccountStats();
   }, [hasHydrated, isAuthenticated, accessToken, router]);
 
-  if (!isAuthenticated()) {
+  if (!hasHydrated || !isAuthenticated()) {
     return null;
   }
 
