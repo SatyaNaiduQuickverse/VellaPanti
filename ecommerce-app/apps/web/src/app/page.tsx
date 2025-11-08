@@ -12,7 +12,8 @@ import { ProductCard } from '@/components/products/product-card';
 import { CategoryGrid } from '@/components/categories/category-grid';
 import { ImageCarousel } from '@/components/carousel/image-carousel';
 import { OfferPopup } from '@/components/offers/OfferPopup';
-import { Suspense } from 'react';
+import { useImagePreloader, clearExpiredCache } from '@/hooks/useImagePreloader';
+import { Suspense, useEffect, useMemo } from 'react';
 
 // All Products Grid Component
 function AllProductsGrid({ theme, limit = 12 }: { theme?: 'BLACK' | 'WHITE', limit?: number }) {
@@ -104,6 +105,38 @@ export default function HomePage() {
       centerDescription: 'LIMITED EDITION • EXCLUSIVE DESIGN'
     }
   ];
+
+  // Collect all images to preload
+  const imagesToPreload = useMemo(() => {
+    const images: string[] = [];
+
+    // Add carousel images
+    heroCarouselImages.forEach((img: any) => {
+      if (img.src) images.push(img.src);
+    });
+
+    // Add product images
+    [...blackFeaturedProducts, ...whiteFeaturedProducts, ...featuredProducts].forEach((product: any) => {
+      if (product.images && product.images.length > 0) {
+        images.push(product.images[0]);
+      }
+    });
+
+    // Add banner images
+    homepageBanners.forEach((banner: any) => {
+      if (banner.src) images.push(banner.src);
+    });
+
+    return images;
+  }, [heroCarouselImages, blackFeaturedProducts, whiteFeaturedProducts, featuredProducts, homepageBanners]);
+
+  // Preload images for faster subsequent loads
+  useImagePreloader(imagesToPreload, imagesToPreload.length > 0);
+
+  // Clear expired cache on mount
+  useEffect(() => {
+    clearExpiredCache();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">

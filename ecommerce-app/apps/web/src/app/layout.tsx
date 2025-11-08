@@ -21,6 +21,13 @@ export const metadata: Metadata = {
   },
   description: 'VellaPanti - Premium streetwear and fashion. Discover authentic style with our curated collection of urban clothing and accessories.',
   keywords: 'VellaPanti, streetwear, fashion, urban clothing, premium fashion, street culture, authentic style',
+  manifest: '/manifest.json',
+  themeColor: '#000000',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'VellaPanti',
+  },
   openGraph: {
     title: 'VellaPanti - Street Culture • Premium Fashion • Authentic Style',
     description: 'VellaPanti - Premium streetwear and fashion. Discover authentic style with our curated collection of urban clothing and accessories.',
