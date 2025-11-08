@@ -5,7 +5,7 @@ import { imageService } from '../services/uploadService';
 import type { AuthRequest } from '../middleware/auth';
 
 // Dashboard Stats
-export const getDashboardStats = asyncHandler(async (req: AuthRequest, res: Response) => {
+export const getDashboardStats = asyncHandler(async (_req: AuthRequest, res: Response) => {
   const [
     totalProducts,
     totalCategories,
@@ -591,27 +591,23 @@ export const updateFeaturedProducts = asyncHandler(async (req: AuthRequest, res:
     throw new AppError('Invalid featured products data', 400);
   }
 
-  // Validate that all products exist and have correct themes
-  const blackProducts = await prisma.product.findMany({
-    where: {
-      id: { in: blackFeaturedIds },
-      theme: 'BLACK',
-    },
-  });
+  // Validate that all products exist (removed theme validation)
+  const allProductIds = [...blackFeaturedIds, ...whiteFeaturedIds];
 
-  const whiteProducts = await prisma.product.findMany({
-    where: {
-      id: { in: whiteFeaturedIds },
-      theme: 'WHITE',
-    },
-  });
+  if (allProductIds.length > 0) {
+    const products = await prisma.product.findMany({
+      where: {
+        id: { in: allProductIds },
+      },
+      select: { id: true },
+    });
 
-  if (blackProducts.length !== blackFeaturedIds.length) {
-    throw new AppError('Some BLACK theme products not found', 400);
-  }
+    const foundIds = products.map(p => p.id);
+    const missingIds = allProductIds.filter(id => !foundIds.includes(id));
 
-  if (whiteProducts.length !== whiteFeaturedIds.length) {
-    throw new AppError('Some WHITE theme products not found', 400);
+    if (missingIds.length > 0) {
+      throw new AppError(`Products not found: ${missingIds.join(', ')}`, 404);
+    }
   }
 
   // Remove existing featured products
@@ -1011,9 +1007,17 @@ export const getSiteSettings = asyncHandler(async (_req: Request, res: Response)
     });
   }
 
+  // Transform camelCase to snake_case for frontend
   res.json({
     success: true,
-    data: settings,
+    data: {
+      whatsapp_number: settings.whatsappNumber,
+      whatsapp_enabled: settings.whatsappEnabled,
+      support_email: settings.supportEmail,
+      support_phone: settings.supportPhone,
+      business_hours: settings.businessHours,
+      footer_description: settings.footerDescription,
+    },
   });
 });
 
@@ -1050,10 +1054,18 @@ export const updateSiteSettings = asyncHandler(async (req: AuthRequest, res: Res
     },
   });
 
+  // Transform camelCase to snake_case for frontend
   res.json({
     success: true,
     message: 'Site settings updated successfully',
-    data: settings,
+    data: {
+      whatsapp_number: settings.whatsappNumber,
+      whatsapp_enabled: settings.whatsappEnabled,
+      support_email: settings.supportEmail,
+      support_phone: settings.supportPhone,
+      business_hours: settings.businessHours,
+      footer_description: settings.footerDescription,
+    },
   });
 });
 

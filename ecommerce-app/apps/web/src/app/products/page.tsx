@@ -13,6 +13,7 @@ export default function ProductsPage() {
   const searchParams = useSearchParams();
   const theme = searchParams.get('theme') as ThemeLabel | null;
   const limit = parseInt(searchParams.get('limit') || '12');
+  const searchParam = searchParams.get('search') || '';
 
   const [filters, setFilters] = useState<ProductFilters>({
     page: 1,
@@ -20,6 +21,7 @@ export default function ProductsPage() {
     sort: 'createdAt',
     sortOrder: 'desc',
     theme: theme || undefined,
+    search: searchParam || undefined,
   });
 
   useEffect(() => {
@@ -27,12 +29,13 @@ export default function ProductsPage() {
       ...prev,
       theme: theme || undefined,
       limit: limit,
+      search: searchParam || undefined,
       page: 1 // Reset to first page when filters change
     }));
-  }, [theme, limit]);
+  }, [theme, limit, searchParam]);
 
   const [showFilters, setShowFilters] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParam);
 
   const { data: productsData, isLoading } = useProducts(filters);
   const { data: categoriesData } = useCategories();

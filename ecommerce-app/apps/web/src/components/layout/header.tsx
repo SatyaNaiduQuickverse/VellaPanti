@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Search, ShoppingCart, User, LogOut, Settings, Package, Heart, Menu, X } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import { NoSSR } from './no-ssr';
@@ -13,8 +14,23 @@ import { useWishlistCount } from '@/hooks/useWishlist';
 import { useState } from 'react';
 
 export function Header() {
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setMobileSearchOpen(false);
+    }
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
     <header className="bg-white sticky top-0 z-50 shadow-md">
@@ -50,6 +66,9 @@ export function Header() {
               <input
                 type="text"
                 placeholder="SEARCH DROPS..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
                 className="w-full pl-10 pr-4 py-3 border-2 border-black bg-white focus:outline-none font-bold uppercase tracking-wide placeholder-gray-600"
               />
             </div>
@@ -98,6 +117,9 @@ export function Header() {
               <input
                 type="text"
                 placeholder="SEARCH DROPS..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleSearchKeyPress}
                 className="w-full pl-10 pr-4 py-3 border-2 border-black bg-white focus:outline-none font-bold uppercase tracking-wide placeholder-gray-600 text-sm"
               />
             </div>

@@ -21,8 +21,7 @@ router.get('/', getCategories);
 router.get('/carousel', getHomepageCarousel);
 router.get('/featured', getFeaturedCategories);
 router.get('/homepage-banners', getPublicHomepageBanners);
-// Temporarily commented out - causing undefined function error
-// router.get('/homepage-section-texts', getPublicHomepageSectionTexts);
+router.get('/homepage-section-texts', getPublicHomepageSectionTexts);
 router.get('/id/:id', getCategoryById);
 router.get('/:slug', getCategoryBySlug);
 router.get('/:slug/products', getCategoryProducts);
