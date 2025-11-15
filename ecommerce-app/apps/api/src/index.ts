@@ -23,15 +23,20 @@ async function startServer() {
 
     // Security middleware
     app.use(helmet());
-    app.use(cors({
-      origin: [
+
+    // CORS is handled by nginx in production, only enable for local development
+    if (process.env.NODE_ENV === 'development') {
+      const corsOrigins = [
         'http://localhost:3061',
         'http://0.0.0.0:3061',
         'http://80.225.231.66:3061',
-        process.env.CORS_ORIGIN
-      ].filter(Boolean),
-      credentials: true,
-    }));
+      ].filter(Boolean);
+
+      app.use(cors({
+        origin: corsOrigins,
+        credentials: true,
+      }));
+    }
 
     // Static file serving for uploads
     app.use('/uploads', express.static(path.join(process.cwd(), config.upload.uploadPath)));

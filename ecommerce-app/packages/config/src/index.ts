@@ -63,6 +63,13 @@ export const config = {
     apiVersion: '2023-08-01',
   },
 
+  // MSG91 SMS Gateway
+  msg91: {
+    authKey: process.env.MSG91_AUTH_KEY || '',
+    senderId: process.env.MSG91_SENDER_ID || 'MSGIND',
+    templateId: process.env.MSG91_TEMPLATE_ID || '',
+  },
+
   // API URLs
   api: {
     baseUrl: process.env.API_URL || 'http://localhost:3062',

@@ -15,6 +15,10 @@ import type { RegisterRequest } from '@ecommerce/types';
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
+  phone: z.string()
+    .regex(/^[6-9]\d{9}$/, 'Invalid phone number. Must be a 10-digit Indian mobile number starting with 6-9')
+    .min(10, 'Phone number must be 10 digits')
+    .max(10, 'Phone number must be 10 digits'),
   password: z
     .string()
     .min(8, 'Password must be at least 8 characters')
@@ -54,10 +58,25 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     try {
       const { confirmPassword, ...registerData } = data;
-      await register.mutateAsync(registerData);
-      router.push('/');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(registerData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Registration failed');
+      }
+
+      // Redirect to OTP verification page with phone number
+      router.push(`/auth/verify-otp?phone=${encodeURIComponent(registerData.phone)}`);
     } catch (error) {
-      // Error is handled by the mutation
+      // Error is handled by toast in the component
+      console.error('Registration error:', error);
     }
   };
 
@@ -145,6 +164,30 @@ export default function RegisterPage() {
               />
               {errors.email && (
                 <p className="text-red-600 text-xs mt-2 font-medium">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="phone" className="block text-sm font-semibold text-gray-900 mb-3 tracking-tight uppercase text-xs">
+                Phone Number
+              </label>
+              <div className="flex">
+                <span className="inline-flex items-center px-4 py-4 rounded-l-xl border-2 border-r-0 border-gray-200 bg-gray-100 text-gray-700 font-semibold text-base">
+                  +91
+                </span>
+                <Input
+                  id="phone"
+                  type="tel"
+                  maxLength={10}
+                  {...registerField('phone')}
+                  placeholder="9876543210"
+                  className={`w-full px-5 py-4 rounded-r-xl border-2 ${
+                    errors.phone ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50'
+                  } focus:ring-4 focus:ring-black/10 focus:border-black transition-all text-base font-medium placeholder:text-gray-400 placeholder:font-normal`}
+                />
+              </div>
+              {errors.phone && (
+                <p className="text-red-600 text-xs mt-2 font-medium">{errors.phone.message}</p>
               )}
             </div>
 

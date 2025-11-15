@@ -2,7 +2,10 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  phone?: string;
   role: 'USER' | 'ADMIN';
+  isPhoneVerified?: boolean;
+  isEmailVerified?: boolean;
   createdAt: Date;
   updatedAt: Date;
   addresses?: UserAddress[];
@@ -238,6 +241,16 @@ export interface RegisterRequest {
   email: string;
   password: string;
   name: string;
+  phone: string;
+}
+
+export interface SendPhoneOtpRequest {
+  phone: string;
+}
+
+export interface VerifyPhoneOtpRequest {
+  phone: string;
+  otp: string;
 }
 
 export interface AuthResponse {

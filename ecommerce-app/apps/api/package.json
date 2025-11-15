@@ -24,7 +24,7 @@
     "@ecommerce/config": "workspace:*",
     "@ecommerce/database": "workspace:*",
     "@ecommerce/types": "workspace:*",
-    "axios": "^1.6.8",
+    "axios": "^1.12.2",
     "bcrypt": "^5.1.1",
     "cashfree-pg-sdk-nodejs": "2.0.1",
     "cors": "^2.8.5",

@@ -15,6 +15,27 @@ export const registerSchema = z.object({
       'Password must contain at least one lowercase letter, one uppercase letter, and one number'
     ),
   name: z.string().min(2, 'Name must be at least 2 characters'),
+  phone: z.string()
+    .regex(/^[6-9]\d{9}$/, 'Invalid phone number. Must be a 10-digit Indian mobile number starting with 6-9')
+    .min(10, 'Phone number must be 10 digits')
+    .max(10, 'Phone number must be 10 digits'),
+});
+
+export const sendPhoneOtpSchema = z.object({
+  phone: z.string()
+    .regex(/^[6-9]\d{9}$/, 'Invalid phone number. Must be a 10-digit Indian mobile number starting with 6-9')
+    .min(10, 'Phone number must be 10 digits')
+    .max(10, 'Phone number must be 10 digits'),
+});
+
+export const verifyPhoneOtpSchema = z.object({
+  phone: z.string()
+    .regex(/^[6-9]\d{9}$/, 'Invalid phone number. Must be a 10-digit Indian mobile number starting with 6-9')
+    .min(10, 'Phone number must be 10 digits')
+    .max(10, 'Phone number must be 10 digits'),
+  otp: z.string()
+    .length(6, 'OTP must be 6 digits')
+    .regex(/^\d{6}$/, 'OTP must contain only numbers'),
 });
 
 export const refreshTokenSchema = z.object({

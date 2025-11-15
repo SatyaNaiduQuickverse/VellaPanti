@@ -6,6 +6,7 @@ import { prisma } from '@ecommerce/database';
 import { config } from '@ecommerce/config';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { emailService } from '../services/emailService';
+import msg91Service from '../services/msg91Service';
 import type { LoginRequest, RegisterRequest, AuthResponse } from '@ecommerce/types';
 
 interface RefreshTokenRequest {
@@ -19,6 +20,15 @@ interface ForgotPasswordRequest {
 interface ResetPasswordRequest {
   token: string;
   password: string;
+}
+
+interface SendPhoneOtpRequest {
+  phone: string;
+}
+
+interface VerifyPhoneOtpRequest {
+  phone: string;
+  otp: string;
 }
 
 const generateTokens = (userId: string, email: string, role: string) => {
@@ -74,14 +84,19 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
 });
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password, name }: RegisterRequest = req.body;
+  const { email, password, name, phone }: RegisterRequest = req.body;
+
+  // Validate phone number
+  if (!msg91Service.isValidIndianPhone(phone)) {
+    throw new AppError('Invalid phone number. Please enter a valid 10-digit Indian mobile number.', 400);
+  }
 
   const existingUser = await prisma.user.findUnique({
     where: { email: email.toLowerCase() },
   });
 
   if (existingUser) {
-    if (existingUser.isEmailVerified) {
+    if (existingUser.isEmailVerified || existingUser.isPhoneVerified) {
       throw new AppError('User with this email already exists', 409);
     }
     // If user exists but not verified, allow resending OTP
@@ -93,37 +108,42 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
 
   const hashedPassword = await bcrypt.hash(password, config.security.bcryptRounds);
 
-  // Generate 6-digit OTP
-  const otp = crypto.randomInt(100000, 999999).toString();
-  const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+  // Generate 6-digit OTP for phone
+  const phoneOtp = crypto.randomInt(100000, 999999).toString();
+  const phoneOtpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
 
-  // Create user with unverified email and OTP
+  // Format phone number for storage
+  const formattedPhone = msg91Service.formatPhoneNumber(phone);
+
+  // Create user with unverified phone and OTP
   const user = await prisma.user.create({
     data: {
       email: email.toLowerCase(),
       password: hashedPassword,
       name,
+      phone: formattedPhone,
       role: 'USER',
       isEmailVerified: false,
-      emailOtp: otp,
-      emailOtpExpiry: otpExpiry,
+      isPhoneVerified: false,
+      phoneOtp,
+      phoneOtpExpiry,
     },
   });
 
-  // Send OTP email
+  // Send OTP via SMS
   try {
-    await emailService.sendOtpEmail(user.email, otp, user.name);
+    await msg91Service.sendOTP(formattedPhone, phoneOtp);
   } catch (error) {
-    // If email fails, delete the user and throw error
+    // If SMS fails, delete the user and throw error
     await prisma.user.delete({ where: { id: user.id } });
-    throw new AppError('Failed to send verification email. Please try again.', 500);
+    throw new AppError('Failed to send verification SMS. Please try again.', 500);
   }
 
   res.status(201).json({
     success: true,
-    message: 'Registration initiated. Please check your email for verification code.',
+    message: 'Registration initiated. Please check your phone for verification code.',
     data: {
-      email: user.email,
+      phone: formattedPhone,
       requiresVerification: true,
     },
   });
@@ -294,5 +314,116 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
   res.json({
     success: true,
     message: 'Password has been reset successfully. You can now login with your new password.',
+  });
+});
+
+export const sendPhoneOtp = asyncHandler(async (req: Request, res: Response) => {
+  const { phone }: SendPhoneOtpRequest = req.body;
+
+  // Validate phone number
+  if (!msg91Service.isValidIndianPhone(phone)) {
+    throw new AppError('Invalid phone number. Please enter a valid 10-digit Indian mobile number.', 400);
+  }
+
+  const formattedPhone = msg91Service.formatPhoneNumber(phone);
+
+  // Find user by phone
+  const user = await prisma.user.findFirst({
+    where: { phone: formattedPhone },
+  });
+
+  if (!user) {
+    throw new AppError('No user found with this phone number', 404);
+  }
+
+  if (user.isPhoneVerified) {
+    throw new AppError('Phone number is already verified', 400);
+  }
+
+  // Generate new OTP
+  const phoneOtp = crypto.randomInt(100000, 999999).toString();
+  const phoneOtpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+  // Update user with new OTP
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      phoneOtp,
+      phoneOtpExpiry,
+    },
+  });
+
+  // Send OTP via SMS
+  try {
+    await msg91Service.sendOTP(formattedPhone, phoneOtp);
+  } catch (error) {
+    throw new AppError('Failed to send verification SMS. Please try again.', 500);
+  }
+
+  res.json({
+    success: true,
+    message: 'OTP sent successfully to your phone.',
+    data: {
+      phone: formattedPhone,
+    },
+  });
+});
+
+export const verifyPhoneOtp = asyncHandler(async (req: Request, res: Response) => {
+  const { phone, otp }: VerifyPhoneOtpRequest = req.body;
+
+  // Validate phone number
+  if (!msg91Service.isValidIndianPhone(phone)) {
+    throw new AppError('Invalid phone number. Please enter a valid 10-digit Indian mobile number.', 400);
+  }
+
+  const formattedPhone = msg91Service.formatPhoneNumber(phone);
+
+  // Find user by phone with valid OTP
+  const user = await prisma.user.findFirst({
+    where: {
+      phone: formattedPhone,
+      phoneOtp: otp,
+      phoneOtpExpiry: {
+        gt: new Date(),
+      },
+    },
+    include: {
+      addresses: true,
+    },
+  });
+
+  if (!user) {
+    throw new AppError('Invalid or expired OTP', 400);
+  }
+
+  // Mark phone as verified and clear OTP
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      isPhoneVerified: true,
+      phoneOtp: null,
+      phoneOtpExpiry: null,
+    },
+  });
+
+  // Generate authentication tokens
+  const { accessToken, refreshToken } = generateTokens(user.id, user.email, user.role);
+
+  const { password: _, ...userWithoutPassword } = user;
+
+  const response: AuthResponse = {
+    user: {
+      ...userWithoutPassword,
+      isPhoneVerified: true,
+    },
+    accessToken,
+    refreshToken,
+  };
+
+  res.json({
+    success: true,
+    data: response,
+    message: 'Phone verified successfully. You are now logged in.',
   });
 });

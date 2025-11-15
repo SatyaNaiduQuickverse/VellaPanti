@@ -43,7 +43,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/types
       axios:
-        specifier: ^1.6.8
+        specifier: ^1.12.2
         version: 1.12.2
       bcrypt:
         specifier: ^5.1.1
