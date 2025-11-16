@@ -1,0 +1,6 @@
+*.tar.gz*
+DEPLOYMENT_GUIDE.md
+TRANSFER_INSTRUCTIONS.md
+.tarignore
+test-cache.js
+*.tsbuildinfo

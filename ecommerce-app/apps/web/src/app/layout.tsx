@@ -22,7 +22,6 @@ export const metadata: Metadata = {
   description: 'VellaPanti - Premium streetwear and fashion. Discover authentic style with our curated collection of urban clothing and accessories.',
   keywords: 'VellaPanti, streetwear, fashion, urban clothing, premium fashion, street culture, authentic style',
   manifest: '/manifest.json',
-  themeColor: '#000000',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -45,6 +44,7 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  themeColor: '#000000',
 };
 
 export default function RootLayout({

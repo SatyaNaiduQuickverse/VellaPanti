@@ -81,11 +81,11 @@ export function ImageCarousel({
           src={images[currentIndex].src}
           alt={images[currentIndex].alt}
           fill
+          sizes="100vw"
           className="object-cover"
           priority
           onError={(e) => {
-            console.error('Image failed to load:', images[currentIndex].src);
-            // Hide broken image
+            // Silently handle image load errors
             (e.target as HTMLElement).style.display = 'none';
           }}
         />
