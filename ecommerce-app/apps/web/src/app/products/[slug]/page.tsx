@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import { useProduct, useProducts } from '@/hooks/useProducts';
 import { useAddToCart } from '@/hooks/useCart';
 import { useAuthStore } from '@/stores/authStore';
 import { ProductCard } from '@/components/products/product-card';
+import { useImagePreloader, clearExpiredCache } from '@/hooks/useImagePreloader';
 import toast from 'react-hot-toast';
 
 interface ProductPageProps {
@@ -31,6 +32,33 @@ export default function ProductPage({ params }: ProductPageProps) {
   const addToCart = useAddToCart();
 
   const recommendedProducts = recommendedData?.data?.filter(p => p.id !== product?.id)?.slice(0, 4) || [];
+
+  // Collect all images for preloading
+  const imagesToPreload = useMemo(() => {
+    const images: string[] = [];
+
+    // Add product images
+    if (product?.images) {
+      images.push(...product.images);
+    }
+
+    // Add recommended product images
+    recommendedProducts.forEach((p: any) => {
+      if (p.images && p.images.length > 0) {
+        images.push(p.images[0]);
+      }
+    });
+
+    return images;
+  }, [product, recommendedProducts]);
+
+  // Preload images for faster loading
+  useImagePreloader(imagesToPreload, imagesToPreload.length > 0);
+
+  // Clear expired cache on mount
+  useEffect(() => {
+    clearExpiredCache();
+  }, []);
 
   // Auto-select first available options if none selected
   useEffect(() => {

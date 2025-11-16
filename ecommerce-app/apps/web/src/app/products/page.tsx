@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, Filter } from 'lucide-react';
 import { Button } from '@ecommerce/ui';
 import { useProducts } from '@/hooks/useProducts';
 import { useCategories } from '@/hooks/useCategories';
 import { ProductCard } from '@/components/products/product-card';
+import { useImagePreloader, clearExpiredCache } from '@/hooks/useImagePreloader';
 import type { ProductFilters, ThemeLabel } from '@ecommerce/types';
 
 export default function ProductsPage() {
@@ -43,6 +44,25 @@ export default function ProductsPage() {
 
   const products = productsData?.data || [];
   const pagination = productsData?.pagination;
+
+  // Collect all product images for preloading
+  const imagesToPreload = useMemo(() => {
+    const images: string[] = [];
+    products.forEach((product: any) => {
+      if (product.images && product.images.length > 0) {
+        images.push(product.images[0]);
+      }
+    });
+    return images;
+  }, [products]);
+
+  // Preload images for faster loading
+  useImagePreloader(imagesToPreload, imagesToPreload.length > 0);
+
+  // Clear expired cache on mount
+  useEffect(() => {
+    clearExpiredCache();
+  }, []);
 
   const handleFilterChange = (newFilters: Partial<ProductFilters>) => {
     setFilters(prev => ({ ...prev, ...newFilters, page: 1 }));

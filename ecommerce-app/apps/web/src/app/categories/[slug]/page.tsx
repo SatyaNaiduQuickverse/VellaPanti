@@ -1,11 +1,12 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ProductCard } from '@/components/products/product-card';
 import { Button } from '@ecommerce/ui';
 import { Filter, Grid, List, SlidersHorizontal } from 'lucide-react';
 import Link from 'next/link';
+import { useImagePreloader, clearExpiredCache } from '@/hooks/useImagePreloader';
 
 // Create a hook to fetch category products
 import { useQuery } from '@tanstack/react-query';
@@ -66,6 +67,25 @@ export default function CategoryPage() {
   const products = data?.data || [];
   const category = data?.category;
   const pagination = data?.pagination;
+
+  // Collect all product images for preloading
+  const imagesToPreload = useMemo(() => {
+    const images: string[] = [];
+    products.forEach((product: any) => {
+      if (product.images && product.images.length > 0) {
+        images.push(product.images[0]);
+      }
+    });
+    return images;
+  }, [products]);
+
+  // Preload images for faster loading
+  useImagePreloader(imagesToPreload, imagesToPreload.length > 0);
+
+  // Clear expired cache on mount
+  useEffect(() => {
+    clearExpiredCache();
+  }, []);
 
   // Get theme-based styles
   const getThemeStyles = () => {

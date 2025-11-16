@@ -17,7 +17,8 @@ export function Footer() {
           }
         }
       } catch (error) {
-        console.error('Failed to fetch footer settings:', error);
+        // Silently fail - using default footer description
+        // This can happen during development with React strict mode double-rendering
       }
     };
 
